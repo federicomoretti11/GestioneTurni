@@ -60,11 +60,17 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql
+   set search_path = public, pg_temp;
 
 create trigger turni_updated_at
   before update on turni
   for each row execute function update_updated_at();
+
+-- Indici per performance delle RLS policies e query frequenti
+create index idx_profiles_reparto_id on profiles(reparto_id);
+create index idx_turni_dipendente_id on turni(dipendente_id);
+create index idx_turni_data on turni(data);
 
 -- Trigger per creare il profilo automaticamente dopo la registrazione
 create or replace function handle_new_user()
@@ -75,11 +81,12 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data->>'nome', ''),
     coalesce(new.raw_user_meta_data->>'cognome', ''),
-    coalesce((new.raw_user_meta_data->>'ruolo')::ruolo_utente, 'dipendente')
+    'dipendente'  -- sempre dipendente; admin/manager assegnati solo da admin via API
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer
+   set search_path = public, pg_temp;
 
 create trigger on_auth_user_created
   after insert on auth.users

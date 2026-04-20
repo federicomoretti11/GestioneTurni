@@ -10,13 +10,15 @@ alter table turni enable row level security;
 create or replace function get_my_role()
 returns ruolo_utente as $$
   select ruolo from profiles where id = auth.uid();
-$$ language sql security definer stable;
+$$ language sql security definer stable
+   set search_path = public, pg_temp;
 
 -- Helper function per ottenere il reparto_id dell'utente corrente
 create or replace function get_my_reparto()
 returns uuid as $$
   select reparto_id from profiles where id = auth.uid();
-$$ language sql security definer stable;
+$$ language sql security definer stable
+   set search_path = public, pg_temp;
 
 -- === PROFILES ===
 -- Admin: vede tutto
