@@ -45,7 +45,7 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
 
   return (
     <div className="overflow-x-auto">
-      <table className="border-collapse text-sm w-full">
+      <table className="border-collapse text-sm w-full" style={{ minWidth: 720 }}>
         <thead>
           <tr>
             <th className="border border-gray-200 bg-gray-50 px-3 py-2 text-left font-medium text-gray-600 min-w-[160px]">
