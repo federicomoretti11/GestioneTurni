@@ -5,15 +5,15 @@ export interface Profile {
   nome: string
   cognome: string
   ruolo: RuoloUtente
-  reparto_id: string | null
   attivo: boolean
   created_at: string
 }
 
-export interface Reparto {
+export interface PostoDiServizio {
   id: string
   nome: string
-  manager_id: string | null
+  descrizione: string | null
+  attivo: boolean
   created_at: string
 }
 
@@ -33,16 +33,19 @@ export interface Turno {
   data: string        // "YYYY-MM-DD"
   ora_inizio: string  // "HH:MM:SS"
   ora_fine: string    // "HH:MM:SS"
+  posto_id: string | null
   note: string | null
   creato_da: string
   created_at: string
   updated_at: string
   // join opzionali
   profile?: Profile
-  template?: TurnoTemplate
+  template?: TurnoTemplate | null | undefined
+  posto?: PostoDiServizio | null
 }
 
 export interface TurnoConDettagli extends Turno {
   profile: Profile
   template: TurnoTemplate | null
+  posto: PostoDiServizio | null
 }
