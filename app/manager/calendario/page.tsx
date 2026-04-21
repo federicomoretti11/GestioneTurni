@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
+import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
@@ -175,15 +176,32 @@ export default function CalendarioPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        {loading ? <SkeletonCalendario righe={dipendentiFiltrati.length || 4} colonne={giorni.length} /> : <GrigliaCalendario
-          giorni={giorni}
-          dipendenti={dipendentiFiltrati}
-          turni={turniFiltrati}
-          onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
-          onEditTurno={turno => setModale({ open: true, turno })}
-        />}
-      </div>
+      {loading ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <SkeletonCalendario righe={dipendentiFiltrati.length || 4} colonne={giorni.length} />
+        </div>
+      ) : (
+        <>
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <GrigliaCalendario
+              giorni={giorni}
+              dipendenti={dipendentiFiltrati}
+              turni={turniFiltrati}
+              onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
+              onEditTurno={turno => setModale({ open: true, turno })}
+            />
+          </div>
+          <div className="md:hidden">
+            <GrigliaCalendarioMobile
+              giorni={giorni}
+              dipendenti={dipendentiFiltrati}
+              turni={turniFiltrati}
+              onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
+              onEditTurno={turno => setModale({ open: true, turno })}
+            />
+          </div>
+        </>
+      )}
       <ModaleTurno
         open={modale.open}
         onClose={() => setModale({ open: false })}
