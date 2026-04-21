@@ -4,6 +4,7 @@ function timeToMinutes(time: string): number {
 }
 
 export function calcolaOreTurno(oraInizio: string, oraFine: string): number {
+  if (oraInizio === oraFine) return 0  // turno di riposo
   const start = timeToMinutes(oraInizio)
   let end = timeToMinutes(oraFine)
   if (end <= start) end += 24 * 60
@@ -11,5 +12,5 @@ export function calcolaOreTurno(oraInizio: string, oraFine: string): number {
 }
 
 export function isOrarioValido(oraInizio: string, oraFine: string): boolean {
-  return oraInizio !== oraFine
+  return true  // orari uguali = riposo (0 ore), è valido
 }

@@ -1,0 +1,40 @@
+import { TurnoConDettagli } from '@/lib/types'
+import { BadgeTurno } from '@/components/ui/Badge'
+
+interface CellaProps {
+  turni: TurnoConDettagli[]
+  onAdd: () => void
+  onEdit: (turno: TurnoConDettagli) => void
+  readonly?: boolean
+  isOggi?: boolean
+  isPassato?: boolean
+}
+
+export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, isOggi = false, isPassato = false }: CellaProps) {
+  const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-gray-50' : '')
+  return (
+    <td className={`border border-gray-200 p-1 align-top min-w-[80px] h-14 group relative ${sfondo}`}>
+      <div className="space-y-0.5">
+        {turni.map(t => (
+          <BadgeTurno
+            key={t.id}
+            label={t.template?.nome ?? 'Custom'}
+            oraInizio={t.ora_inizio}
+            oraFine={t.ora_fine}
+            colore={t.template?.colore ?? '#6b7280'}
+            posto={t.posto?.nome ?? ''}
+            onClick={readonly ? undefined : () => onEdit(t)}
+          />
+        ))}
+      </div>
+      {!readonly && turni.length === 0 && (
+        <button
+          onClick={onAdd}
+          className="absolute inset-0 flex items-center justify-center text-gray-300 hover:text-blue-500 hover:bg-blue-50 text-xl font-light transition-colors"
+        >
+          +
+        </button>
+      )}
+    </td>
+  )
+}

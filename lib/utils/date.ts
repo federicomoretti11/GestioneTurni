@@ -1,18 +1,13 @@
 export function getWeekDays(date: Date): Date[] {
-  const day = date.getDay()
-  const monday = new Date(date)
+  const day = date.getUTCDay()
   const diff = day === 0 ? -6 : 1 - day
-  monday.setDate(date.getDate() + diff)
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    return d
-  })
+  const monday = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + diff))
+  return Array.from({ length: 7 }, (_, i) => new Date(monday.getTime() + i * 86400000))
 }
 
 export function getMonthDays(year: number, month: number): Date[] {
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  return Array.from({ length: daysInMonth }, (_, i) => new Date(year, month, i + 1))
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
+  return Array.from({ length: daysInMonth }, (_, i) => new Date(Date.UTC(year, month, i + 1)))
 }
 
 export function formatDateIT(dateStr: string): string {

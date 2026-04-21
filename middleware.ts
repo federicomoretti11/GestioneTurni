@@ -24,8 +24,10 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
+  const pubbliche = ['/login', '/reset-password']
+
   // Non autenticato → redirect al login
-  if (!user && path !== '/login') {
+  if (!user && !pubbliche.includes(path)) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -45,14 +47,14 @@ export async function middleware(request: NextRequest) {
       if (ruolo === 'dipendente') return NextResponse.redirect(new URL('/dipendente/turni', request.url))
     }
 
-    // Protezione route per ruolo
+    // Protezione route per ruolo (admin può accedere ovunque)
     if (path.startsWith('/admin') && ruolo !== 'admin') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    if (path.startsWith('/manager') && ruolo !== 'manager') {
+    if (path.startsWith('/manager') && ruolo !== 'manager' && ruolo !== 'admin') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    if (path.startsWith('/dipendente') && ruolo !== 'dipendente') {
+    if (path.startsWith('/dipendente') && ruolo !== 'dipendente' && ruolo !== 'admin') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }
