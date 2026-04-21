@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
   const orePerDip = new Map<string, { nome: string; ore: number }>()
   for (const t of turniSettimana ?? []) {
     const key = t.dipendente_id
-    const profile = t.profile as { nome: string; cognome: string }
+    const profile = t.profile as unknown as { nome: string; cognome: string }
     const nome = `${profile.cognome} ${profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     if (!orePerDip.has(key)) orePerDip.set(key, { nome, ore: 0 })
@@ -55,7 +55,7 @@ export default async function AdminDashboard() {
   const riepilogoSettimana = Array.from(orePerDip.values()).sort((a, b) => a.nome.localeCompare(b.nome))
 
   // Posti scoperti oggi
-  const postiCopertiOggi = new Set((turniOggi ?? []).map((t: { posto?: { nome: string } }) => t.posto?.nome).filter(Boolean))
+  const postiCopertiOggi = new Set((turniOggi ?? []).map((t: { posto?: { nome: string } | null }) => t.posto?.nome).filter(Boolean))
   const postiScoperti = (tuttiPosti ?? []).filter(p => !postiCopertiOggi.has(p.nome))
 
   return (
