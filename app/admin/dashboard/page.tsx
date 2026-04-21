@@ -63,20 +63,20 @@ export default async function AdminDashboard() {
       <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
 
       {/* KPI */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <div className="text-3xl font-bold text-gray-900">{numDipendenti ?? 0}</div>
-          <div className="text-sm text-gray-500 mt-1">Dipendenti attivi</div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex items-center justify-between sm:block">
+          <div className="text-sm text-gray-500 sm:order-2 sm:mt-1">Dipendenti attivi</div>
+          <div className="text-3xl font-bold text-gray-900 sm:order-1">{numDipendenti ?? 0}</div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <div className="text-3xl font-bold text-gray-900">{turniOggi?.length ?? 0}</div>
-          <div className="text-sm text-gray-500 mt-1">Turni oggi</div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex items-center justify-between sm:block">
+          <div className="text-sm text-gray-500 sm:order-2 sm:mt-1">Turni oggi</div>
+          <div className="text-3xl font-bold text-gray-900 sm:order-1">{turniOggi?.length ?? 0}</div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <div className={`text-3xl font-bold ${postiScoperti.length > 0 ? 'text-orange-500' : 'text-green-600'}`}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 flex items-center justify-between sm:block">
+          <div className="text-sm text-gray-500 sm:order-2 sm:mt-1">Posti scoperti oggi</div>
+          <div className={`text-3xl font-bold sm:order-1 ${postiScoperti.length > 0 ? 'text-orange-500' : 'text-green-600'}`}>
             {postiScoperti.length}
           </div>
-          <div className="text-sm text-gray-500 mt-1">Posti scoperti oggi</div>
         </div>
       </div>
 
