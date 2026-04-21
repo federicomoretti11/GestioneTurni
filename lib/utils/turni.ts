@@ -11,6 +11,6 @@ export function calcolaOreTurno(oraInizio: string, oraFine: string): number {
   return (end - start) / 60
 }
 
-export function isOrarioValido(oraInizio: string, oraFine: string): boolean {
+export function isOrarioValido(_oraInizio: string, _oraFine: string): boolean {
   return true  // orari uguali = riposo (0 ore), è valido
 }

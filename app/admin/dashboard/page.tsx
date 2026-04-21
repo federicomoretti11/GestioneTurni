@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
   const orePerDip = new Map<string, { nome: string; ore: number }>()
   for (const t of turniSettimana ?? []) {
     const key = t.dipendente_id
-    const profile = t.profile as any
+    const profile = t.profile as { nome: string; cognome: string }
     const nome = `${profile.cognome} ${profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     if (!orePerDip.has(key)) orePerDip.set(key, { nome, ore: 0 })
@@ -55,7 +55,7 @@ export default async function AdminDashboard() {
   const riepilogoSettimana = Array.from(orePerDip.values()).sort((a, b) => a.nome.localeCompare(b.nome))
 
   // Posti scoperti oggi
-  const postiCopertiOggi = new Set((turniOggi ?? []).map((t: any) => t.posto?.nome).filter(Boolean))
+  const postiCopertiOggi = new Set((turniOggi ?? []).map((t: { posto?: { nome: string } }) => t.posto?.nome).filter(Boolean))
   const postiScoperti = (tuttiPosti ?? []).filter(p => !postiCopertiOggi.has(p.nome))
 
   return (
@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
             {(turniOggi ?? []).length === 0 && (
               <p className="px-4 py-6 text-sm text-gray-400 text-center">Nessun turno oggi.</p>
             )}
-            {(turniOggi ?? []).map((t: any) => (
+            {(turniOggi ?? []).map((t: { id: string; ora_inizio: string; ora_fine: string; profile: { nome: string; cognome: string }; template?: { colore?: string }; posto?: { nome: string } }) => (
               <div key={t.id} className="flex items-center gap-3 px-4 py-2.5">
                 <div
                   className="w-2 h-8 rounded-full flex-shrink-0"
