@@ -46,7 +46,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex-1 flex flex-col items-center py-2 text-xs gap-1 ${
+            className={`flex-1 flex flex-col items-center py-3 text-xs gap-1 ${
               pathname === item.href ? 'text-blue-600' : 'text-gray-500'
             }`}
           >
@@ -57,7 +57,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
         {haAltro && (
           <button
             onClick={() => setAltroAperto(v => !v)}
-            className={`flex-1 flex flex-col items-center py-2 text-xs gap-1 ${
+            className={`flex-1 flex flex-col items-center py-3 text-xs gap-1 ${
               altroAttivo || altroAperto ? 'text-blue-600' : 'text-gray-500'
             }`}
           >

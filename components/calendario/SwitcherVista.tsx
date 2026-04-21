@@ -23,9 +23,9 @@ export function SwitcherVista({ vista, onChange, dataCorrente, onPrev, onNext, o
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <button onClick={onPrev} className="p-1.5 rounded hover:bg-gray-100 text-gray-600">‹</button>
+        <button onClick={onPrev} className="p-2.5 rounded hover:bg-gray-100 text-gray-600">‹</button>
         <span className="text-sm font-medium text-gray-700 capitalize min-w-[140px] text-center">{label}</span>
-        <button onClick={onNext} className="p-1.5 rounded hover:bg-gray-100 text-gray-600">›</button>
+        <button onClick={onNext} className="p-2.5 rounded hover:bg-gray-100 text-gray-600">›</button>
         {onOggi && (
           <button
             onClick={onOggi}
