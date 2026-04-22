@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
+import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCalendarioPostiMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
@@ -81,8 +82,11 @@ export default function CalendarioPostiPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} />
+      </div>
+      <div className="md:hidden">
+        <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
       </div>
     </div>
   )
