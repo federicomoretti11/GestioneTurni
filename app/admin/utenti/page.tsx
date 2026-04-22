@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import { Avatar } from '@/components/ui/Avatar'
 
 export default async function UtentiPage() {
   const supabase = createClient()
@@ -28,7 +29,12 @@ export default async function UtentiPage() {
           <tbody className="divide-y divide-gray-100">
             {utenti?.map(u => (
               <tr key={u.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium">{u.cognome} {u.nome}</td>
+                <td className="px-4 py-3 font-medium">
+                  <div className="flex items-center gap-3">
+                    <Avatar nome={u.nome} cognome={u.cognome} size={32} />
+                    <span>{u.cognome} {u.nome}</span>
+                  </div>
+                </td>
                 <td className="px-4 py-3 capitalize text-gray-600">{u.ruolo}</td>
                 <td className="px-4 py-3">
                   <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${u.attivo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>

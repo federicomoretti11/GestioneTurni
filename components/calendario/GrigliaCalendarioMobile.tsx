@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
+import { Avatar } from '@/components/ui/Avatar'
 
 interface GrigliaMobileProps {
   giorni: Date[]
@@ -135,6 +136,7 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                       className="w-1 rounded-full flex-shrink-0"
                       style={{ backgroundColor: isRiposo ? '#cbd5e1' : colore }}
                     />
+                    <Avatar nome={d.nome} cognome={d.cognome} size={36} />
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-sm text-gray-800 truncate">
                         {d.cognome} {d.nome}
@@ -164,10 +166,13 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
               {turniDip.length === 0 && !readonly && (
                 <button
                   onClick={() => onAddTurno(d.id, dataSelezionata)}
-                  className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between gap-3 px-3 py-3 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-sm text-gray-600">{d.cognome} {d.nome}</span>
-                  <span className="text-blue-600 text-sm font-medium">+ Aggiungi</span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar nome={d.nome} cognome={d.cognome} size={36} />
+                    <span className="text-sm text-gray-600 truncate">{d.cognome} {d.nome}</span>
+                  </div>
+                  <span className="text-blue-600 text-sm font-medium flex-shrink-0">+ Aggiungi</span>
                 </button>
               )}
             </div>
