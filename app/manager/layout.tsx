@@ -16,7 +16,7 @@ export default async function ManagerLayout({ children }: { children: React.Reac
   const { data: profile } = await supabase.from('profiles').select('nome, cognome').eq('id', user!.id).single()
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar items={NAV_ITEMS} title="GestioneTurni" />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" />
