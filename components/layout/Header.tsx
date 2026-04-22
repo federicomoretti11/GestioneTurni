@@ -2,13 +2,16 @@
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
+import { Notifiche } from '@/components/layout/Notifiche'
+import { RuoloUtente } from '@/lib/types'
 
 interface HeaderProps {
   nomeUtente: string
-  ruolo: string
+  ruolo: RuoloUtente
+  userId: string
 }
 
-export function Header({ nomeUtente, ruolo }: HeaderProps) {
+export function Header({ nomeUtente, ruolo, userId }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -22,10 +25,11 @@ export function Header({ nomeUtente, ruolo }: HeaderProps) {
   return (
     <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0">
       <span className="text-sm text-gray-500 capitalize">{ruolo}</span>
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700 hidden sm:inline">{nomeUtente}</span>
+      <div className="flex items-center gap-2">
+        <Notifiche userId={userId} ruolo={ruolo} />
+        <span className="text-sm font-medium text-gray-700 hidden sm:inline ml-1">{nomeUtente}</span>
         <Avatar nome={nome} cognome={cognome} size={30} />
-        <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-700">
+        <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-700 ml-1">
           Esci
         </button>
       </div>

@@ -19,7 +19,7 @@ export default async function ManagerLayout({ children }: { children: React.Reac
     <div className="flex h-screen bg-gray-50">
       <Sidebar items={NAV_ITEMS} title="GestioneTurni" ruolo="manager" />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" />
+        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} />
         <main className="flex-1 overflow-auto p-4 pb-20 md:pb-4">{children}</main>
       </div>
       <BottomNav items={NAV_ITEMS} />

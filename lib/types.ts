@@ -49,3 +49,17 @@ export interface TurnoConDettagli extends Turno {
   template: TurnoTemplate | null
   posto: PostoDiServizio | null
 }
+
+export type TipoNotifica = 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata'
+
+export interface Notifica {
+  id: string
+  destinatario_id: string
+  tipo: TipoNotifica
+  titolo: string
+  messaggio: string
+  turno_id: string | null
+  data_turno: string | null
+  letta: boolean
+  created_at: string
+}
