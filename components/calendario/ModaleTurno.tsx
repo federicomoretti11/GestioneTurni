@@ -93,7 +93,12 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
 
   return (
     <Modal open={open} onClose={onClose} onCloseRequest={handleCloseRequest} title={title}>
-      {data && <p className="text-sm text-gray-500 mb-4">{data}</p>}
+      {data && (
+        <div className="flex items-center gap-2 mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
+          <span className="w-1 h-1 rounded-full bg-gray-300" />
+          {data}
+        </div>
+      )}
       <div className="space-y-4">
         {mostraSelectDipendente && (
           <div className="space-y-1.5">
@@ -151,20 +156,20 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
           {errore && <p className="text-xs text-red-600 mt-1">{errore}</p>}
         </div>
         <Input label="Note (opzionale)" value={note} onChange={e => { setNote(e.target.value); setModificato(true) }} placeholder="..." />
-        <div className="flex justify-between pt-2">
-          {onDelete && !confermaElimina && (
-            <Button variant="danger" onClick={() => setConfermaElimina(true)}>Elimina</Button>
-          )}
-          {onDelete && confermaElimina && (
-            <div className="flex items-center gap-2">
-              <Button variant="danger" onClick={onDelete}>Conferma eliminazione</Button>
-              <button onClick={() => setConfermaElimina(false)} className="text-sm text-gray-500 hover:underline">Annulla</button>
-            </div>
-          )}
-          <div className="flex gap-2 ml-auto">
-            <Button variant="secondary" onClick={handleCloseRequest} disabled={salvando}>Annulla</Button>
-            <Button onClick={handleSave} disabled={salvando}>{salvando ? 'Salvataggio...' : 'Salva'}</Button>
+      </div>
+      <div className="sticky bottom-0 -mx-5 md:-mx-6 -mb-7 md:-mb-6 px-5 md:px-6 pt-4 pb-5 md:pb-4 mt-5 bg-white border-t border-gray-100 flex items-center justify-between gap-3">
+        {onDelete && !confermaElimina && (
+          <Button variant="danger" size="sm" onClick={() => setConfermaElimina(true)}>Elimina</Button>
+        )}
+        {onDelete && confermaElimina && (
+          <div className="flex items-center gap-2">
+            <Button variant="danger" size="sm" onClick={onDelete}>Conferma</Button>
+            <button onClick={() => setConfermaElimina(false)} className="text-sm text-gray-500 hover:underline">Annulla</button>
           </div>
+        )}
+        <div className="flex gap-2 ml-auto">
+          <Button variant="secondary" onClick={handleCloseRequest} disabled={salvando}>Annulla</Button>
+          <Button onClick={handleSave} disabled={salvando}>{salvando ? 'Salvataggio...' : 'Salva'}</Button>
         </div>
       </div>
     </Modal>
