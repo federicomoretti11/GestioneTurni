@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { PostoDiServizio } from '@/lib/types'
 
 export default function PostiPage() {
@@ -102,7 +103,7 @@ export default function PostiPage() {
             </div>
           </div>
         ))}
-        {posti.length === 0 && <p className="px-4 py-6 text-sm text-gray-500 text-center">Nessun posto di servizio.</p>}
+        {posti.length === 0 && <EmptyState icon="📍" title="Nessun posto di servizio" description="Creane uno per iniziare a pianificare i turni." size="sm" />}
       </div>
     </div>
   )

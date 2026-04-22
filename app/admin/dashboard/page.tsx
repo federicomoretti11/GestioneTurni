@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 import { Avatar } from '@/components/ui/Avatar'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 function oreLabel(ore: number) {
   if (ore === 0) return '—'
@@ -127,7 +128,7 @@ export default async function AdminDashboard() {
           </div>
           <div className="divide-y divide-gray-50">
             {(turniOggi ?? []).length === 0 && (
-              <p className="px-4 py-6 text-sm text-gray-400 text-center">Nessun turno oggi.</p>
+              <EmptyState icon="📅" title="Nessun turno oggi" description="Quando verranno pianificati dei turni appariranno qui." size="sm" />
             )}
             {(turniOggi ?? []).map((t: { id: string; ora_inizio: string; ora_fine: string; profile: { nome: string; cognome: string }; template?: { colore?: string; nome?: string } | null; posto?: { nome: string } | null }) => {
               const colore = t.template?.colore ?? '#6b7280'
@@ -168,7 +169,7 @@ export default async function AdminDashboard() {
           </div>
           <div className="divide-y divide-gray-50">
             {riepilogoSettimana.length === 0 && (
-              <p className="px-4 py-6 text-sm text-gray-400 text-center">Nessun turno questa settimana.</p>
+              <EmptyState icon="⏱" title="Nessun turno questa settimana" size="sm" />
             )}
             {riepilogoSettimana.map(d => {
               const [cognome, ...restoNome] = d.nome.split(' ')

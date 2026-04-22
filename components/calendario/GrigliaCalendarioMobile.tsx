@@ -4,6 +4,7 @@ import { Profile, TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 import { Avatar } from '@/components/ui/Avatar'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface GrigliaMobileProps {
   giorni: Date[]
@@ -114,7 +115,7 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
 
       <div className="flex flex-col gap-2">
         {dipendenti.length === 0 && (
-          <p className="text-sm text-gray-500 py-8 text-center">Nessun dipendente.</p>
+          <EmptyState icon="👥" title="Nessun dipendente" description="Non ci sono dipendenti con i filtri correnti." />
         )}
         {dipendenti.map(d => {
           const turniDip = turniPerDipendente.get(d.id) ?? []

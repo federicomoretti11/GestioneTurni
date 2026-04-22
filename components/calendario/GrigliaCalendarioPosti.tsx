@@ -1,6 +1,7 @@
 import { TurnoConDettagli } from '@/lib/types'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 const oggi = toDateString(new Date())
 
@@ -40,7 +41,7 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
   const oreTotale = turni.reduce((sum, t) => sum + calcolaOreTurno(t.ora_inizio, t.ora_fine), 0)
 
   if (posti.length === 0) {
-    return <p className="text-sm text-gray-500 py-6 text-center">Nessun turno nel periodo selezionato.</p>
+    return <EmptyState icon="📍" title="Nessun turno nel periodo" description="Cambia l'intervallo o crea dei turni per vedere i dati." />
   }
 
   return (

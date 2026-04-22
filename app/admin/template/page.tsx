@@ -4,6 +4,7 @@ import { TurnoTemplate } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 const COLORI_PRESET = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4']
 
@@ -66,7 +67,7 @@ export default function TemplatePage() {
             </div>
           </div>
         ))}
-        {templates.length === 0 && <p className="px-4 py-6 text-sm text-gray-500 text-center">Nessun template. Crea il primo.</p>}
+        {templates.length === 0 && <EmptyState icon="🏷️" title="Nessun template" description="I template velocizzano la creazione di turni ricorrenti." size="sm" />}
       </div>
       <Modal open={modale.open} onClose={() => setModale({ open: false })} title={modale.template ? 'Modifica template' : 'Nuovo template'}>
         <div className="space-y-4">
