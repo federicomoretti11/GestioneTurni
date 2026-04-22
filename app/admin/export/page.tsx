@@ -68,6 +68,7 @@ export default function ExportPage() {
   const [errore, setErrore] = useState('')
   const [anteprima, setAnteprima] = useState<Anteprima | null>(null)
   const [turniCaricati, setTurniCaricati] = useState<TurnoConDettagli[] | null>(null)
+  const [soloRiepilogo, setSoloRiepilogo] = useState(false)
   const festivi = useFestivi()
 
   useEffect(() => {
@@ -115,14 +116,15 @@ export default function ExportPage() {
       postoNome ? postoNome.nome.replace(/\s+/g, '_') : '',
     ].filter(Boolean)
 
-    const filename = ['turni', dataInizio, dataFine, ...suffixParts].join('_')
+    const basename = ['turni', dataInizio, dataFine, ...suffixParts].join('_')
+    const filename = tipo === 'pdf' && soloRiepilogo ? `${basename}_riepilogo` : basename
 
     const periodoParts = [`${dataInizio} / ${dataFine}`]
     if (dipNome) periodoParts.push(`Dipendente: ${dipNome.cognome} ${dipNome.nome}`)
     if (postoNome) periodoParts.push(`Posto: ${postoNome.nome}`)
     const periodo = periodoParts.join(' — ')
 
-    if (tipo === 'pdf') await exportPdf(turni, filename, periodo, festivi)
+    if (tipo === 'pdf') await exportPdf(turni, filename, periodo, festivi, { soloRiepilogo })
     if (tipo === 'excel') await exportExcel(turni, filename, festivi)
     if (tipo === 'csv') await exportCsv(turni, filename, festivi)
   }
@@ -207,8 +209,23 @@ export default function ExportPage() {
             </div>
           )}
 
+          <label className="flex items-center gap-2 text-sm text-gray-700 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={soloRiepilogo}
+              onChange={e => setSoloRiepilogo(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span>
+              PDF: <strong>solo riepilogo</strong> per dipendente
+              <span className="block text-[11px] text-gray-500 font-normal">Senza il dettaglio turno-per-turno. Utile per il payroll mensile.</span>
+            </span>
+          </label>
+
           <div className="flex flex-col gap-2 pt-2">
-            <Button onClick={() => handleExport('pdf')} disabled={loading}>Scarica PDF</Button>
+            <Button onClick={() => handleExport('pdf')} disabled={loading}>
+              {soloRiepilogo ? 'Scarica PDF riepilogo' : 'Scarica PDF'}
+            </Button>
             <Button variant="secondary" onClick={() => handleExport('excel')} disabled={loading}>Scarica Excel</Button>
             <Button variant="secondary" onClick={() => handleExport('csv')} disabled={loading}>Scarica CSV</Button>
           </div>

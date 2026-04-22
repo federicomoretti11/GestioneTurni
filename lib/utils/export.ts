@@ -206,179 +206,212 @@ export async function exportCsv(
   writeFile(wb, `${filename}.csv`, { bookType: 'csv' })
 }
 
-export async function exportPdf(
-  turni: TurnoConDettagli[],
-  filename: string,
-  periodo: string,
-  festivi: Festivo[] = []
-) {
-  const { jsPDF } = await import('jspdf')
-  const { default: autoTable } = await import('jspdf-autotable')
-  const doc = new jsPDF({ orientation: 'landscape' })
+interface OpzioniPdf {
+  soloRiepilogo?: boolean
+}
 
-  // Header compatto
+// Disegna l'intestazione comune (titolo + legenda) e ritorna la Y sotto la legenda.
+function renderIntestazione(doc: any, periodo: string, titoloExtra = ''): number {
   doc.setFontSize(12)
-  doc.setTextColor(15, 23, 42) // slate-900
-  doc.text(`Piano Turni — ${periodo}`, 10, 12)
+  doc.setTextColor(15, 23, 42)
+  const titolo = titoloExtra
+    ? `${titoloExtra} — ${periodo}`
+    : `Piano Turni — ${periodo}`
+  doc.text(titolo, 10, 12)
 
-  // Legenda inline
   doc.setFontSize(7)
-  doc.setTextColor(71, 85, 105) // slate-600
-  doc.setFillColor(99, 102, 241) // indigo-500
+  doc.setTextColor(71, 85, 105)
+  doc.setFillColor(99, 102, 241)
   doc.rect(10, 14.5, 2.5, 2.5, 'F')
   doc.text('Notturne (22-06)', 14, 16.5)
-  doc.setFillColor(225, 29, 72) // rose-600
+  doc.setFillColor(225, 29, 72)
   doc.rect(50, 14.5, 2.5, 2.5, 'F')
   doc.text('Festivi', 54, 16.5)
+  return 19
+}
 
-  // Tabella dettaglio turni (compact)
-  const rows = turniToExcelRows(turni, festivi, { compact: true })
+// Disegna la tabella riepilogo (riusata sia come pagina finale che come unica pagina).
+function renderRiepilogo(
+  doc: any,
+  autoTable: any,
+  turni: TurnoConDettagli[],
+  festivi: Festivo[],
+  startY: number,
+  fontSize: number
+) {
+  const { righe, totale } = calcolaRiepilogoDipendenti(turni, festivi)
+  if (righe.length === 0) return
+
+  const head = ['Dipendente', 'Turni', 'Ore totali', 'Diurne', 'Notturne', 'Festive']
+  const body: (string | number)[][] = righe.map(r => [
+    r.nome,
+    r.turni,
+    formatOre(r.ore),
+    formatOre(r.diurne),
+    formatOre(r.notturne),
+    r.festive > 0 ? formatOre(r.festive) : '',
+  ])
+  body.push([
+    'TOTALE',
+    totale.turni,
+    formatOre(totale.ore),
+    formatOre(totale.diurne),
+    formatOre(totale.notturne),
+    totale.festive > 0 ? formatOre(totale.festive) : '',
+  ])
+
   autoTable(doc, {
-    head: [rows[0] as string[]],
-    body: rows.slice(1) as string[][],
-    startY: 19,
+    head: [head],
+    body,
+    startY,
     margin: { left: 10, right: 10 },
-    styles: { fontSize: 7, cellPadding: 1.2, lineColor: [226, 232, 240], lineWidth: 0.1 },
-    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold', cellPadding: 1.4 },
+    styles: { fontSize, cellPadding: 2, lineColor: [226, 232, 240], lineWidth: 0.1 },
+    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
     columnStyles: {
-      0: { cellWidth: 32 },            // Dipendente
-      1: { cellWidth: 14 },            // Data
-      2: { cellWidth: 10 },            // Giorno
-      3: { cellWidth: 28 },            // Posto
-      4: { cellWidth: 12, halign: 'center' }, // Inizio
-      5: { cellWidth: 12, halign: 'center' }, // Fine
-      6: { cellWidth: 10, halign: 'right' },  // Ore
-      7: { cellWidth: 11, halign: 'right' },  // Diurne
-      8: { cellWidth: 13, halign: 'right' },  // Notturne
-      9: { cellWidth: 11, halign: 'right' },  // Festive
-      10: { cellWidth: 22 },           // Tipo
-      11: { cellWidth: 'auto' },       // Note
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 20, halign: 'right' },
+      2: { cellWidth: 28, halign: 'right' },
+      3: { cellWidth: 28, halign: 'right' },
+      4: { cellWidth: 28, halign: 'right' },
+      5: { cellWidth: 28, halign: 'right' },
     },
-    didParseCell: (data) => {
+    didParseCell: (data: any) => {
       if (data.section !== 'body') return
       const raw = data.row.raw as (string | number)[]
-      const label = typeof raw[1] === 'string' ? (raw[1] as string) : ''
-      const isSubtotale = label.startsWith('SUBTOTALE')
-      const isTotale = label === 'TOTALE GENERALE'
-      const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
-
-      if (isSubtotale) {
-        data.cell.styles.fontStyle = 'bold'
-        data.cell.styles.fillColor = [241, 245, 249]
-        data.cell.styles.textColor = [30, 41, 59]
-        return
-      }
+      const isTotale = raw[0] === 'TOTALE'
       if (isTotale) {
         data.cell.styles.fontStyle = 'bold'
         data.cell.styles.fillColor = [219, 234, 254]
         data.cell.styles.textColor = [30, 58, 138]
         return
       }
-      if (isFestivo) {
-        data.cell.styles.fillColor = [255, 241, 242]
-      }
-      if (data.column.index === COL.NOTTURNE) {
+      if (data.column.index === 4) {
         const v = data.cell.raw
         if (typeof v === 'number' && v > 0) {
           data.cell.styles.textColor = [99, 102, 241]
           data.cell.styles.fontStyle = 'bold'
         }
       }
-      if (data.column.index === COL.ORE_FESTIVE) {
+      if (data.column.index === 5) {
         const v = data.cell.raw
         if (typeof v === 'number' && v > 0) {
           data.cell.styles.textColor = [225, 29, 72]
           data.cell.styles.fontStyle = 'bold'
-        }
-      }
-      if (data.column.index === COL.TIPO) {
-        const tipo = String(data.cell.raw ?? '')
-        if (tipo.includes('Festivo') && tipo.includes('Notturno')) {
-          data.cell.styles.textColor = [139, 92, 246]
-          data.cell.styles.fontStyle = 'bold'
-        } else if (tipo === 'Festivo') {
-          data.cell.styles.textColor = [225, 29, 72]
-          data.cell.styles.fontStyle = 'bold'
-        } else if (tipo === 'Notturno') {
-          data.cell.styles.textColor = [99, 102, 241]
-          data.cell.styles.fontStyle = 'bold'
-        } else if (tipo === 'Riposo') {
-          data.cell.styles.textColor = [148, 163, 184]
         }
       }
     },
   })
+}
 
-  // Tabella riepilogo per dipendente — sempre su pagina nuova per leggibilità.
-  const riepilogo = calcolaRiepilogoDipendenti(turni, festivi)
-  if (riepilogo.righe.length > 0) {
-    doc.addPage()
-    doc.setFontSize(12)
-    doc.setTextColor(15, 23, 42)
-    doc.text('Riepilogo ore per dipendente', 10, 12)
+export async function exportPdf(
+  turni: TurnoConDettagli[],
+  filename: string,
+  periodo: string,
+  festivi: Festivo[] = [],
+  opzioni: OpzioniPdf = {}
+) {
+  const { jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
+  const doc = new jsPDF({ orientation: 'landscape' })
 
-    const riepHead = ['Dipendente', 'Turni', 'Ore totali', 'Diurne', 'Notturne', 'Festive']
-    const riepBody = riepilogo.righe.map(r => [
-      r.nome,
-      r.turni,
-      formatOre(r.ore),
-      formatOre(r.diurne),
-      formatOre(r.notturne),
-      r.festive > 0 ? formatOre(r.festive) : '',
-    ])
-    riepBody.push([
-      'TOTALE',
-      riepilogo.totale.turni,
-      formatOre(riepilogo.totale.ore),
-      formatOre(riepilogo.totale.diurne),
-      formatOre(riepilogo.totale.notturne),
-      riepilogo.totale.festive > 0 ? formatOre(riepilogo.totale.festive) : '',
-    ])
+  if (opzioni.soloRiepilogo) {
+    const startY = renderIntestazione(doc, periodo, 'Riepilogo ore')
+    renderRiepilogo(doc, autoTable, turni, festivi, startY, 10)
+  } else {
+    const startY = renderIntestazione(doc, periodo)
 
+    // Tabella dettaglio turni
+    const rows = turniToExcelRows(turni, festivi, { compact: true })
     autoTable(doc, {
-      head: [riepHead],
-      body: riepBody as (string | number)[][],
-      startY: 16,
+      head: [rows[0] as string[]],
+      body: rows.slice(1) as string[][],
+      startY,
       margin: { left: 10, right: 10 },
-      styles: { fontSize: 9, cellPadding: 2, lineColor: [226, 232, 240], lineWidth: 0.1 },
+      styles: { fontSize: 7, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1, overflow: 'ellipsize' },
       headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
       columnStyles: {
-        0: { cellWidth: 'auto' },
-        1: { cellWidth: 20, halign: 'right' },
-        2: { cellWidth: 28, halign: 'right' },
-        3: { cellWidth: 28, halign: 'right' },
-        4: { cellWidth: 28, halign: 'right' },
-        5: { cellWidth: 28, halign: 'right' },
+        0: { cellWidth: 36 },                   // Dipendente
+        1: { cellWidth: 13, halign: 'center' }, // Data
+        2: { cellWidth: 10, halign: 'center' }, // Giorno
+        3: { cellWidth: 36 },                   // Posto (ellipsize)
+        4: { cellWidth: 12, halign: 'center' }, // Inizio
+        5: { cellWidth: 12, halign: 'center' }, // Fine
+        6: { cellWidth: 10, halign: 'right' },  // Ore
+        7: { cellWidth: 11, halign: 'right' },  // Diurne
+        8: { cellWidth: 13, halign: 'right' },  // Notturne
+        9: { cellWidth: 11, halign: 'right' },  // Festive
+        10: { cellWidth: 28 },                  // Tipo
+        11: { cellWidth: 25 },                  // Note (ellipsize)
       },
-      didParseCell: (data) => {
+      didParseCell: (data: any) => {
         if (data.section !== 'body') return
         const raw = data.row.raw as (string | number)[]
-        const isTotale = raw[0] === 'TOTALE'
+        const label = typeof raw[1] === 'string' ? (raw[1] as string) : ''
+        const isSubtotale = label.startsWith('SUBTOTALE')
+        const isTotale = label === 'TOTALE GENERALE'
+        const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
+
+        if (isSubtotale) {
+          data.cell.styles.fontStyle = 'bold'
+          data.cell.styles.fillColor = [241, 245, 249]
+          data.cell.styles.textColor = [30, 41, 59]
+          return
+        }
         if (isTotale) {
           data.cell.styles.fontStyle = 'bold'
           data.cell.styles.fillColor = [219, 234, 254]
           data.cell.styles.textColor = [30, 58, 138]
           return
         }
-        if (data.column.index === 4) {
+        if (isFestivo) {
+          data.cell.styles.fillColor = [255, 241, 242]
+        }
+        if (data.column.index === COL.NOTTURNE) {
           const v = data.cell.raw
           if (typeof v === 'number' && v > 0) {
             data.cell.styles.textColor = [99, 102, 241]
             data.cell.styles.fontStyle = 'bold'
           }
         }
-        if (data.column.index === 5) {
+        if (data.column.index === COL.ORE_FESTIVE) {
           const v = data.cell.raw
           if (typeof v === 'number' && v > 0) {
             data.cell.styles.textColor = [225, 29, 72]
             data.cell.styles.fontStyle = 'bold'
           }
         }
+        if (data.column.index === COL.TIPO) {
+          const tipo = String(data.cell.raw ?? '')
+          if (tipo.includes('Festivo') && tipo.includes('Notturno')) {
+            data.cell.styles.textColor = [139, 92, 246]
+            data.cell.styles.fontStyle = 'bold'
+          } else if (tipo === 'Festivo') {
+            data.cell.styles.textColor = [225, 29, 72]
+            data.cell.styles.fontStyle = 'bold'
+          } else if (tipo === 'Notturno') {
+            data.cell.styles.textColor = [99, 102, 241]
+            data.cell.styles.fontStyle = 'bold'
+          } else if (tipo === 'Riposo') {
+            data.cell.styles.textColor = [148, 163, 184]
+          }
+        }
       },
     })
+
+    // Riepilogo su pagina nuova
+    const riepiloghiRighe = calcolaRiepilogoDipendenti(turni, festivi).righe.length
+    if (riepiloghiRighe > 0) {
+      doc.addPage()
+      doc.setFontSize(12)
+      doc.setTextColor(15, 23, 42)
+      doc.text('Riepilogo ore per dipendente', 10, 12)
+      renderRiepilogo(doc, autoTable, turni, festivi, 16, 9)
+    }
   }
 
-  // Numerazione pagine in basso a destra.
+  // Footer pagine
   const totPagine = doc.getNumberOfPages()
   for (let i = 1; i <= totPagine; i++) {
     doc.setPage(i)
