@@ -41,27 +41,33 @@ export function BottomNav({ items }: { items: NavItem[] }) {
           ))}
         </div>
       )}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex z-40">
-        {visibili.map(item => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex-1 flex flex-col items-center py-3 text-xs gap-1 ${
-              pathname === item.href ? 'text-blue-600' : 'text-gray-500'
-            }`}
-          >
-            <span className="text-lg">{item.icon}</span>
-            {item.label}
-          </Link>
-        ))}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex z-40"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {visibili.map(item => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex-1 flex flex-col items-center py-3 text-[10px] gap-1 ${
+                isActive ? 'text-blue-600 font-semibold' : 'text-gray-500'
+              }`}
+            >
+              <span className="text-lg leading-none">{item.icon}</span>
+              {item.label}
+            </Link>
+          )
+        })}
         {haAltro && (
           <button
             onClick={() => setAltroAperto(v => !v)}
-            className={`flex-1 flex flex-col items-center py-3 text-xs gap-1 ${
-              altroAttivo || altroAperto ? 'text-blue-600' : 'text-gray-500'
+            className={`flex-1 flex flex-col items-center py-3 text-[10px] gap-1 ${
+              altroAttivo || altroAperto ? 'text-blue-600 font-semibold' : 'text-gray-500'
             }`}
           >
-            <span className="text-lg">⋯</span>
+            <span className="text-lg leading-none">⋯</span>
             Altro
           </button>
         )}

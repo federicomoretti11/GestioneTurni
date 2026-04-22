@@ -20,9 +20,9 @@ export default async function UtentiPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-gray-600">Nome</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-600">Ruolo</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-600">Stato</th>
+              <th className="px-4 py-3 text-left text-[10px] font-semibold tracking-wider uppercase text-gray-500">Nome</th>
+              <th className="px-4 py-3 text-left text-[10px] font-semibold tracking-wider uppercase text-gray-500">Ruolo</th>
+              <th className="px-4 py-3 text-left text-[10px] font-semibold tracking-wider uppercase text-gray-500">Stato</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
