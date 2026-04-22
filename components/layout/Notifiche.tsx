@@ -80,7 +80,8 @@ export function Notifiche({ userId, ruolo }: Props) {
       fetch(`/api/notifiche/${n.id}`, { method: 'PATCH' }).catch(() => {})
     }
     setAperto(false)
-    const destinazione = ruolo === 'dipendente' ? '/dipendente/turni' : `/${ruolo}/calendario`
+    const base = ruolo === 'dipendente' ? '/dipendente/turni' : `/${ruolo}/calendario`
+    const destinazione = n.data_turno ? `${base}?data=${n.data_turno}` : base
     router.push(destinazione)
   }
 

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
@@ -10,9 +11,17 @@ import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
 
+function parseDataParam(s: string | null): Date | null {
+  if (!s) return null
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) return null
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+}
+
 export default function CalendarioPage() {
+  const searchParams = useSearchParams()
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
-  const [dataCorrente, setDataCorrente] = useState(new Date())
+  const [dataCorrente, setDataCorrente] = useState(() => parseDataParam(searchParams.get('data')) ?? new Date())
   const [dipendenti, setDipendenti] = useState<Profile[]>([])
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
@@ -20,9 +29,20 @@ export default function CalendarioPage() {
   const [modale, setModale] = useState<{ open: boolean; dipendenteId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [filtroDipendente, setFiltroDipendente] = useState('')
   const [filtroPosto, setFiltroPosto] = useState('')
-  const [dataMobileSel, setDataMobileSel] = useState<string>(() => toDateString(new Date()))
+  const [dataMobileSel, setDataMobileSel] = useState<string>(() => {
+    const d = parseDataParam(searchParams.get('data')) ?? new Date()
+    return toDateString(d)
+  })
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const d = parseDataParam(searchParams.get('data'))
+    if (d) {
+      setDataCorrente(d)
+      setDataMobileSel(toDateString(d))
+    }
+  }, [searchParams])
 
   const giorni = vista === 'settimana'
     ? getWeekDays(dataCorrente)

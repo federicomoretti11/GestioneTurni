@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { createClient } from '@/lib/supabase/client'
@@ -13,9 +14,17 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
+function parseDataParam(s: string | null): Date | null {
+  if (!s) return null
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+  if (!m) return null
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+}
+
 export default function MieiTurniPage() {
+  const searchParams = useSearchParams()
   const [vista, setVista] = useState<'settimana' | 'mese'>('mese')
-  const [dataCorrente, setDataCorrente] = useState(new Date())
+  const [dataCorrente, setDataCorrente] = useState(() => parseDataParam(searchParams.get('data')) ?? new Date())
   const [profilo, setProfilo] = useState<Profile | null>(null)
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [errore, setErrore] = useState('')
@@ -31,6 +40,11 @@ export default function MieiTurniPage() {
       if (user) supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => setProfilo(data))
     })
   }, [])
+
+  useEffect(() => {
+    const d = parseDataParam(searchParams.get('data'))
+    if (d) setDataCorrente(d)
+  }, [searchParams])
 
   const caricaTurni = useCallback(async () => {
     if (!profilo) return
