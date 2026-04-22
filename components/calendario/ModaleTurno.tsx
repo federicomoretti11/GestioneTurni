@@ -91,12 +91,37 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const title = turno ? 'Modifica turno' : `Nuovo turno${dipendenteNome ? ` — ${dipendenteNome}` : ''}`
   const postiAttivi = posti.filter(p => p.attivo)
 
+  const oraDaISO = (iso: string) => {
+    const d = new Date(iso)
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  }
+  const timbroIngresso = turno?.ora_ingresso_effettiva ?? null
+  const timbroUscita = turno?.ora_uscita_effettiva ?? null
+  const mostraTimbri = !!(timbroIngresso || timbroUscita)
+
   return (
     <Modal open={open} onClose={onClose} onCloseRequest={handleCloseRequest} title={title}>
       {data && (
         <div className="flex items-center gap-2 mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
           <span className="w-1 h-1 rounded-full bg-gray-300" />
           {data}
+        </div>
+      )}
+      {mostraTimbri && (
+        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+          <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <span className="inline-flex items-center gap-2 text-slate-700">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-slate-400">Ingresso</span>
+              <span className="font-semibold">{timbroIngresso ? oraDaISO(timbroIngresso) : '—'}</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-slate-700">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="text-slate-400">Uscita</span>
+              <span className="font-semibold">{timbroUscita ? oraDaISO(timbroUscita) : '—'}</span>
+            </span>
+          </div>
         </div>
       )}
       <div className="space-y-4">
