@@ -15,7 +15,7 @@ export default async function DipendenteLayout({ children }: { children: React.R
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar items={NAV_ITEMS} title="I Miei Turni" />
+      <Sidebar items={NAV_ITEMS} title="I Miei Turni" ruolo="dipendente" />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="dipendente" />
         <main className="flex-1 overflow-auto p-4 pb-20 md:pb-4">{children}</main>
