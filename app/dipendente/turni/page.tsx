@@ -9,6 +9,7 @@ import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { BannerTurnoOggi } from '@/components/dipendente/BannerTurnoOggi'
 
 function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
@@ -27,6 +28,7 @@ export default function MieiTurniPage() {
   const [dataCorrente, setDataCorrente] = useState(() => parseDataParam(searchParams.get('data')) ?? new Date())
   const [profilo, setProfilo] = useState<Profile | null>(null)
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
+  const [turnoOggi, setTurnoOggi] = useState<TurnoConDettagli | null>(null)
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
@@ -61,7 +63,21 @@ export default function MieiTurniPage() {
     }
   }, [dataCorrente, vista, profilo])
 
+  const caricaTurnoOggi = useCallback(async () => {
+    if (!profilo) return
+    const oggi = toDateString(new Date())
+    try {
+      const res = await fetch(`/api/turni?data_inizio=${oggi}&data_fine=${oggi}`)
+      const data = await res.json()
+      const mio = Array.isArray(data) ? data.find((t: TurnoConDettagli) => t.dipendente_id === profilo.id) : null
+      setTurnoOggi(mio ?? null)
+    } catch {
+      // silenzioso, il banner si limita a non mostrare
+    }
+  }, [profilo])
+
   useEffect(() => { caricaTurni() }, [caricaTurni])
+  useEffect(() => { caricaTurnoOggi() }, [caricaTurnoOggi])
 
   function spostaData(direzione: 1 | -1) {
     const d = new Date(dataCorrente)
@@ -92,6 +108,8 @@ export default function MieiTurniPage() {
       </div>
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaTurni} />}
+
+      <BannerTurnoOggi turno={turnoOggi} onRefresh={() => { caricaTurnoOggi(); caricaTurni() }} />
 
       {/* Riepilogo periodo */}
       <div className="grid grid-cols-3 gap-3">
