@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import type { Profile } from '@/lib/types'
 
@@ -44,15 +45,11 @@ export default function ModificaUtentePage() {
           <Input label="Nome" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} required />
           <Input label="Cognome" value={form.cognome} onChange={e => setForm(f => ({ ...f, cognome: e.target.value }))} required />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ruolo</label>
-          <select value={form.ruolo} onChange={e => setForm(f => ({ ...f, ruolo: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-            <option value="dipendente">Dipendente</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
+        <Select label="Ruolo" value={form.ruolo} onChange={e => setForm(f => ({ ...f, ruolo: e.target.value }))}>
+          <option value="dipendente">Dipendente</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </Select>
         <div className="flex justify-between items-center pt-2">
           <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
             {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}

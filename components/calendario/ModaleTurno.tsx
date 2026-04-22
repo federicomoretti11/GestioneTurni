@@ -96,12 +96,12 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
       {data && <p className="text-sm text-gray-500 mb-4">{data}</p>}
       <div className="space-y-4">
         {mostraSelectDipendente && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dipendente *</label>
+          <div className="space-y-1.5">
+            <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">Dipendente *</label>
             <select
               value={dipendenteId}
               onChange={e => { setDipendenteId(e.target.value); setErrore(''); setModificato(true) }}
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errore && !dipendenteId ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full h-10 border rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors ${errore && !dipendenteId ? 'border-red-500' : 'border-gray-200'}`}
             >
               <option value="">— Seleziona —</option>
               {dipendenti!.map(d => (
@@ -110,38 +110,38 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
             </select>
           </div>
         )}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">Template</label>
           <div className="flex items-center gap-2">
             {templateSelezionato && (
               <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: templateSelezionato.colore }} />
             )}
-          <select
-            value={templateId}
-            onChange={e => handleTemplateChange(e.target.value)}
-            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">— Personalizzato —</option>
-            {templates.map(t => (
-              <option key={t.id} value={t.id} style={{ backgroundColor: t.colore, color: '#fff' }}>
-                {t.nome} ({t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)})
-              </option>
-            ))}
-          </select>
+            <select
+              value={templateId}
+              onChange={e => handleTemplateChange(e.target.value)}
+              className="flex-1 h-10 border border-gray-200 rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+            >
+              <option value="">— Personalizzato —</option>
+              {templates.map(t => (
+                <option key={t.id} value={t.id} style={{ backgroundColor: t.colore, color: '#fff' }}>
+                  {t.nome} ({t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Ora inizio" type="time" value={oraInizio} onChange={e => { setOraInizio(e.target.value); setModificato(true) }} />
           <Input label="Ora fine" type="time" value={oraFine} onChange={e => { setOraFine(e.target.value); setModificato(true) }} />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Posto di servizio {isRiposo ? <span className="text-gray-400 font-normal">(facoltativo)</span> : '*'}
+        <div className="space-y-1.5">
+          <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">
+            Posto di servizio {isRiposo ? <span className="text-gray-400 normal-case tracking-normal">(facoltativo)</span> : '*'}
           </label>
           <select
             value={postoId}
             onChange={e => { setPostoId(e.target.value); setErrore(''); setModificato(true) }}
-            className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errore ? 'border-red-500' : 'border-gray-300'}`}
+            className={`w-full h-10 border rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors ${errore ? 'border-red-500' : 'border-gray-200'}`}
           >
             <option value="">— Seleziona —</option>
             {postiAttivi.map(p => (
