@@ -3,29 +3,51 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { exportExcel, exportCsv, exportPdf } from '@/lib/utils/export'
-import { calcolaOreTurno } from '@/lib/utils/turni'
-import type { Profile, PostoDiServizio, TurnoConDettagli } from '@/lib/types'
+import { calcolaOreDiurneNotturne, calcolaOreTurno } from '@/lib/utils/turni'
+import { trovaFestivo } from '@/lib/utils/maggiorazioni'
+import { useFestivi } from '@/lib/hooks/useFestivi'
+import type { Profile, PostoDiServizio, TurnoConDettagli, Festivo } from '@/lib/types'
+
+interface RigaDipendente {
+  nome: string
+  ore: number
+  diurne: number
+  notturne: number
+  festive: number
+  turni: number
+}
 
 interface Anteprima {
   totaleOre: number
+  totaleDiurne: number
+  totaleNotturne: number
+  totaleFestive: number
   totaleTurni: number
-  perDipendente: { nome: string; ore: number; turni: number }[]
+  perDipendente: RigaDipendente[]
 }
 
-function calcolaAnteprima(turni: TurnoConDettagli[]): Anteprima {
-  const map = new Map<string, { nome: string; ore: number; turni: number }>()
+function calcolaAnteprima(turni: TurnoConDettagli[], festivi: Festivo[]): Anteprima {
+  const map = new Map<string, RigaDipendente>()
   for (const t of turni) {
     const key = t.dipendente_id
     const nome = `${t.profile.cognome} ${t.profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
-    if (!map.has(key)) map.set(key, { nome, ore: 0, turni: 0 })
+    const { diurne, notturne } = calcolaOreDiurneNotturne(t.ora_inizio, t.ora_fine)
+    const oreFestive = trovaFestivo(t.data, festivi) ? ore : 0
+    if (!map.has(key)) map.set(key, { nome, ore: 0, diurne: 0, notturne: 0, festive: 0, turni: 0 })
     const entry = map.get(key)!
     entry.ore += ore
+    entry.diurne += diurne
+    entry.notturne += notturne
+    entry.festive += oreFestive
     entry.turni += 1
   }
   const perDipendente = Array.from(map.values()).sort((a, b) => a.nome.localeCompare(b.nome))
   return {
     totaleOre: perDipendente.reduce((s, d) => s + d.ore, 0),
+    totaleDiurne: perDipendente.reduce((s, d) => s + d.diurne, 0),
+    totaleNotturne: perDipendente.reduce((s, d) => s + d.notturne, 0),
+    totaleFestive: perDipendente.reduce((s, d) => s + d.festive, 0),
     totaleTurni: turni.length,
     perDipendente,
   }
@@ -46,6 +68,7 @@ export default function ExportPage() {
   const [errore, setErrore] = useState('')
   const [anteprima, setAnteprima] = useState<Anteprima | null>(null)
   const [turniCaricati, setTurniCaricati] = useState<TurnoConDettagli[] | null>(null)
+  const festivi = useFestivi()
 
   useEffect(() => {
     Promise.all([
@@ -77,7 +100,7 @@ export default function ExportPage() {
     const turni = await fetchEFiltra()
     if (!turni) return
     setTurniCaricati(turni)
-    setAnteprima(calcolaAnteprima(turni))
+    setAnteprima(calcolaAnteprima(turni, festivi))
   }
 
   async function handleExport(tipo: 'pdf' | 'excel' | 'csv') {
@@ -99,9 +122,9 @@ export default function ExportPage() {
     if (postoNome) periodoParts.push(`Posto: ${postoNome.nome}`)
     const periodo = periodoParts.join(' — ')
 
-    if (tipo === 'pdf') await exportPdf(turni, filename, periodo)
-    if (tipo === 'excel') await exportExcel(turni, filename)
-    if (tipo === 'csv') await exportCsv(turni, filename)
+    if (tipo === 'pdf') await exportPdf(turni, filename, periodo, festivi)
+    if (tipo === 'excel') await exportExcel(turni, filename, festivi)
+    if (tipo === 'csv') await exportCsv(turni, filename, festivi)
   }
 
   return (
@@ -149,13 +172,36 @@ export default function ExportPage() {
               <p className="text-xs text-gray-500 mt-0.5">Turni</p>
             </div>
           </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-amber-50 rounded-lg px-3 py-2 text-center">
+              <p className="text-base font-bold text-amber-700">{oreLabel(anteprima.totaleDiurne)}</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">Diurne</p>
+            </div>
+            <div className="bg-indigo-50 rounded-lg px-3 py-2 text-center">
+              <p className="text-base font-bold text-indigo-700">{oreLabel(anteprima.totaleNotturne)}</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">Notturne</p>
+            </div>
+            <div className="bg-red-50 rounded-lg px-3 py-2 text-center">
+              <p className="text-base font-bold text-red-700">{oreLabel(anteprima.totaleFestive)}</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">Festive</p>
+            </div>
+          </div>
 
           {anteprima.perDipendente.length > 1 && (
             <div className="divide-y divide-gray-100">
               {anteprima.perDipendente.map(d => (
-                <div key={d.nome} className="flex justify-between items-center py-2 text-sm">
-                  <span className="text-gray-700">{d.nome}</span>
-                  <span className="text-gray-500">{d.turni} turni · <span className="font-medium text-blue-700">{oreLabel(d.ore)}</span></span>
+                <div key={d.nome} className="py-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">{d.nome}</span>
+                    <span className="text-gray-500">{d.turni} turni · <span className="font-medium text-blue-700">{oreLabel(d.ore)}</span></span>
+                  </div>
+                  {(d.diurne > 0 || d.notturne > 0 || d.festive > 0) && (
+                    <div className="flex gap-3 mt-1 text-[11px] text-gray-500">
+                      <span>D: <span className="font-medium text-amber-700">{oreLabel(d.diurne)}</span></span>
+                      <span>N: <span className="font-medium text-indigo-700">{oreLabel(d.notturne)}</span></span>
+                      {d.festive > 0 && <span>F: <span className="font-medium text-red-700">{oreLabel(d.festive)}</span></span>}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
