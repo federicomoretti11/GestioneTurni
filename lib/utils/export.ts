@@ -166,11 +166,11 @@ export async function exportPdf(
   // Legenda: quadratini colorati + testo (il carattere ■ non è nel charset
   // di Helvetica di jsPDF, renderizza come '%'. Li disegniamo noi.)
   doc.setFontSize(8)
-  doc.setTextColor(0, 0, 0)
-  doc.setFillColor(79, 70, 229)   // indigo-600
+  doc.setTextColor(71, 85, 105) // slate-600
+  doc.setFillColor(99, 102, 241) // indigo-500
   doc.rect(14, 18, 3, 3, 'F')
   doc.text('Ore notturne (22-06)', 19, 20.5)
-  doc.setFillColor(185, 28, 28)   // red-700
+  doc.setFillColor(225, 29, 72) // rose-600
   doc.rect(65, 18, 3, 3, 'F')
   doc.text('Giorno festivo', 70, 20.5)
 
@@ -180,7 +180,7 @@ export async function exportPdf(
     body: rows.slice(1) as string[][],
     startY: 24,
     styles: { fontSize: 8 },
-    headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold' },
     didParseCell: (data) => {
       if (data.section !== 'body') return
       const raw = data.row.raw as (string | number)[]
@@ -194,58 +194,54 @@ export async function exportPdf(
 
       if (isSubtotale) {
         data.cell.styles.fontStyle = 'bold'
-        data.cell.styles.fillColor = [71, 85, 105]     // slate-600
-        data.cell.styles.textColor = [255, 255, 255]
-        data.cell.styles.lineWidth = 0.1
-        data.cell.styles.lineColor = [30, 41, 59]
+        data.cell.styles.fillColor = [241, 245, 249]   // slate-100
+        data.cell.styles.textColor = [30, 41, 59]      // slate-800
         return
       }
       if (isTotale) {
         data.cell.styles.fontStyle = 'bold'
-        data.cell.styles.fillColor = [30, 58, 138]     // blue-900
-        data.cell.styles.textColor = [255, 255, 255]
-        data.cell.styles.lineWidth = 0.1
-        data.cell.styles.lineColor = [15, 23, 42]
+        data.cell.styles.fillColor = [219, 234, 254]   // blue-100
+        data.cell.styles.textColor = [30, 58, 138]     // blue-900
         return
       }
 
-      // Sfondo rosato per tutta la riga se giorno festivo.
+      // Sfondo rosa chiarissimo per la riga festiva.
       if (isFestivo) {
-        data.cell.styles.fillColor = [254, 226, 226] // red-100
+        data.cell.styles.fillColor = [255, 241, 242]   // rose-50
       }
 
-      // Colora in indaco+bold le ore notturne > 0
+      // Ore notturne > 0 in indaco tenue + bold
       if (data.column.index === COL.NOTTURNE) {
         const v = data.cell.raw
         if (typeof v === 'number' && v > 0) {
-          data.cell.styles.textColor = [79, 70, 229] // indigo-600
+          data.cell.styles.textColor = [99, 102, 241]  // indigo-500
           data.cell.styles.fontStyle = 'bold'
         }
       }
 
-      // Colora in rosso+bold le ore festive
+      // Ore festive in rosato
       if (data.column.index === COL.ORE_FESTIVE) {
         const v = data.cell.raw
         if (typeof v === 'number' && v > 0) {
-          data.cell.styles.textColor = [185, 28, 28] // red-700
+          data.cell.styles.textColor = [225, 29, 72]   // rose-600
           data.cell.styles.fontStyle = 'bold'
         }
       }
 
-      // Tipo: colore coerente con le altre evidenziazioni
+      // Tipo: colore coerente, tinte più morbide
       if (data.column.index === COL.TIPO) {
         const tipo = String(data.cell.raw ?? '')
         if (tipo.includes('Festivo') && tipo.includes('Notturno')) {
-          data.cell.styles.textColor = [124, 58, 237] // viola
+          data.cell.styles.textColor = [139, 92, 246]  // viola tenue
           data.cell.styles.fontStyle = 'bold'
         } else if (tipo === 'Festivo') {
-          data.cell.styles.textColor = [185, 28, 28]
+          data.cell.styles.textColor = [225, 29, 72]
           data.cell.styles.fontStyle = 'bold'
         } else if (tipo === 'Notturno') {
-          data.cell.styles.textColor = [79, 70, 229]
+          data.cell.styles.textColor = [99, 102, 241]
           data.cell.styles.fontStyle = 'bold'
         } else if (tipo === 'Riposo') {
-          data.cell.styles.textColor = [100, 116, 139] // slate-500
+          data.cell.styles.textColor = [148, 163, 184] // slate-400
         }
       }
     },
