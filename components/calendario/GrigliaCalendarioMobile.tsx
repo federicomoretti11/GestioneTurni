@@ -120,7 +120,10 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
           const turniDip = turniPerDipendente.get(d.id) ?? []
           if (turniDip.length === 0 && readonly) return null
           return (
-            <div key={d.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div
+              key={d.id}
+              className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.04)] divide-y divide-gray-50"
+            >
               {turniDip.map(t => {
                 const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
                 const isRiposo = ore === 0
@@ -130,34 +133,35 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                     key={t.id}
                     onClick={readonly ? undefined : () => onEditTurno(t)}
                     disabled={readonly}
-                    className="w-full flex items-stretch gap-3 p-3 text-left hover:bg-gray-50 disabled:hover:bg-transparent transition-colors"
+                    className="w-full flex items-stretch gap-3 pr-3 py-2.5 text-left hover:bg-gray-50 disabled:hover:bg-transparent transition-colors"
                   >
                     <div
-                      className="w-1 rounded-full flex-shrink-0"
+                      className="w-1 rounded-full flex-shrink-0 my-0.5"
                       style={{ backgroundColor: isRiposo ? '#cbd5e1' : colore }}
                     />
-                    <Avatar nome={d.nome} cognome={d.cognome} size={36} />
+                    <Avatar nome={d.nome} cognome={d.cognome} size={34} />
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-sm text-gray-800 truncate">
+                      <div className="font-semibold text-[13px] text-gray-800 truncate leading-tight">
                         {d.cognome} {d.nome}
                       </div>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
                             isRiposo ? 'bg-gray-100 text-gray-500 border border-dashed border-gray-300' : ''
                           }`}
                           style={isRiposo ? undefined : { backgroundColor: `${colore}22`, color: colore }}
                         >
+                          {!isRiposo && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colore }} />}
                           {t.template?.nome ?? 'Custom'}
                         </span>
                         {ore > 0 && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-[11px] text-gray-500">
                             {t.ora_inizio.slice(0, 5)}–{t.ora_fine.slice(0, 5)} · {oreLabel(ore)}
                           </span>
                         )}
                       </div>
                       {t.posto && (
-                        <div className="text-xs text-gray-500 mt-1 truncate">📍 {t.posto.nome}</div>
+                        <div className="text-[11px] text-gray-500 mt-0.5 truncate">{t.posto.nome}</div>
                       )}
                     </div>
                   </button>
@@ -166,13 +170,13 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
               {turniDip.length === 0 && !readonly && (
                 <button
                   onClick={() => onAddTurno(d.id, dataSelezionata)}
-                  className="w-full flex items-center justify-between gap-3 px-3 py-3 text-left hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center justify-between gap-3 pl-3 pr-3 py-2.5 text-left hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <Avatar nome={d.nome} cognome={d.cognome} size={36} />
-                    <span className="text-sm text-gray-600 truncate">{d.cognome} {d.nome}</span>
+                    <Avatar nome={d.nome} cognome={d.cognome} size={34} />
+                    <span className="text-[13px] text-gray-600 truncate">{d.cognome} {d.nome}</span>
                   </div>
-                  <span className="text-blue-600 text-sm font-medium flex-shrink-0">+ Aggiungi</span>
+                  <span className="text-blue-600 text-[13px] font-semibold flex-shrink-0">+ Aggiungi</span>
                 </button>
               )}
             </div>
