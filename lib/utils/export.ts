@@ -7,9 +7,8 @@ import { trovaFestivo } from './maggiorazioni'
 // Mantenere allineati con l'array `header` sotto.
 const COL = {
   NOTTURNE: 8,
-  FESTIVO: 9,
-  ORE_FESTIVE: 10,
-  TIPO: 11,
+  ORE_FESTIVE: 9,
+  TIPO: 10,
 } as const
 
 function formatOre(n: number): number | string {
@@ -41,8 +40,7 @@ export function turniToExcelRows(
     'Ora fine',
     'Ore',
     'Diurne',
-    'Notturne (22–06)',
-    'Festivo',
+    'Notturne (22-06)',
     'Ore festive',
     'Tipo',
     'Note',
@@ -85,7 +83,6 @@ export function turniToExcelRows(
         formatOre(ore),
         formatOre(diurne),
         formatOre(notturne),
-        festivo?.nome ?? '',
         oreFestive > 0 ? formatOre(oreFestive) : '',
         tipo,
         t.note ?? '',
@@ -98,7 +95,7 @@ export function turniToExcelRows(
 
     rows.push([
       '',
-      `Subtotale ${nome}`,
+      `SUBTOTALE ${nome.toUpperCase()}`,
       '',
       '',
       '',
@@ -106,7 +103,6 @@ export function turniToExcelRows(
       formatOre(subtot.ore),
       formatOre(subtot.diurne),
       formatOre(subtot.notturne),
-      '',
       subtot.festive > 0 ? formatOre(subtot.festive) : '',
       '',
       '',
@@ -123,7 +119,6 @@ export function turniToExcelRows(
     formatOre(tot.ore),
     formatOre(tot.diurne),
     formatOre(tot.notturne),
-    '',
     tot.festive > 0 ? formatOre(tot.festive) : '',
     '',
     '',
@@ -168,13 +163,16 @@ export async function exportPdf(
   doc.setFontSize(14)
   doc.text(`Piano Turni — ${periodo}`, 14, 15)
 
-  // Piccola legenda sotto il titolo per spiegare i colori.
+  // Legenda: quadratini colorati + testo (il carattere ■ non è nel charset
+  // di Helvetica di jsPDF, renderizza come '%'. Li disegniamo noi.)
   doc.setFontSize(8)
-  doc.setTextColor(79, 70, 229)   // indigo-600
-  doc.text('■ Ore notturne (22–06)', 14, 20)
-  doc.setTextColor(185, 28, 28)   // red-700
-  doc.text('■ Giorno festivo', 60, 20)
   doc.setTextColor(0, 0, 0)
+  doc.setFillColor(79, 70, 229)   // indigo-600
+  doc.rect(14, 18, 3, 3, 'F')
+  doc.text('Ore notturne (22-06)', 19, 20.5)
+  doc.setFillColor(185, 28, 28)   // red-700
+  doc.rect(65, 18, 3, 3, 'F')
+  doc.text('Giorno festivo', 70, 20.5)
 
   const rows = turniToExcelRows(turni, festivi)
   autoTable(doc, {
@@ -182,24 +180,38 @@ export async function exportPdf(
     body: rows.slice(1) as string[][],
     startY: 24,
     styles: { fontSize: 8 },
-    headStyles: { fillColor: [37, 99, 235] },
+    headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
     didParseCell: (data) => {
       if (data.section !== 'body') return
       const raw = data.row.raw as (string | number)[]
-      const isFestivo = !!raw[COL.FESTIVO]
-      const isSubtotale = typeof raw[1] === 'string' && (raw[1] as string).startsWith('Subtotale')
-      const isTotale = raw[1] === 'TOTALE GENERALE'
+      const label = typeof raw[1] === 'string' ? (raw[1] as string) : ''
+      const isSubtotale = label.startsWith('SUBTOTALE')
+      const isTotale = label === 'TOTALE GENERALE'
 
-      // Sfondo rosato per tutta la riga se giorno festivo (solo righe dati, non subtotali).
-      if (isFestivo && !isSubtotale && !isTotale) {
-        data.cell.styles.fillColor = [254, 226, 226] // red-100
+      // Una riga è "festiva" se ha un numero in "Ore festive" — evita dipendere
+      // da colonne rimosse e funziona solo sulle righe dati.
+      const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
+
+      if (isSubtotale) {
+        data.cell.styles.fontStyle = 'bold'
+        data.cell.styles.fillColor = [71, 85, 105]     // slate-600
+        data.cell.styles.textColor = [255, 255, 255]
+        data.cell.styles.lineWidth = 0.1
+        data.cell.styles.lineColor = [30, 41, 59]
+        return
+      }
+      if (isTotale) {
+        data.cell.styles.fontStyle = 'bold'
+        data.cell.styles.fillColor = [30, 58, 138]     // blue-900
+        data.cell.styles.textColor = [255, 255, 255]
+        data.cell.styles.lineWidth = 0.1
+        data.cell.styles.lineColor = [15, 23, 42]
+        return
       }
 
-      // Enfasi subtotale / totale
-      if (isSubtotale || isTotale) {
-        data.cell.styles.fontStyle = 'bold'
-        if (isTotale) data.cell.styles.fillColor = [219, 234, 254] // blue-100
-        else data.cell.styles.fillColor = [241, 245, 249]           // slate-100
+      // Sfondo rosato per tutta la riga se giorno festivo.
+      if (isFestivo) {
+        data.cell.styles.fillColor = [254, 226, 226] // red-100
       }
 
       // Colora in indaco+bold le ore notturne > 0
@@ -211,7 +223,7 @@ export async function exportPdf(
         }
       }
 
-      // Colora in rosso+bold le ore festive > 0 e il nome del festivo
+      // Colora in rosso+bold le ore festive
       if (data.column.index === COL.ORE_FESTIVE) {
         const v = data.cell.raw
         if (typeof v === 'number' && v > 0) {
@@ -219,16 +231,12 @@ export async function exportPdf(
           data.cell.styles.fontStyle = 'bold'
         }
       }
-      if (data.column.index === COL.FESTIVO && raw[COL.FESTIVO]) {
-        data.cell.styles.textColor = [185, 28, 28]
-        data.cell.styles.fontStyle = 'bold'
-      }
 
-      // Tipo: colora in base al contenuto
+      // Tipo: colore coerente con le altre evidenziazioni
       if (data.column.index === COL.TIPO) {
         const tipo = String(data.cell.raw ?? '')
         if (tipo.includes('Festivo') && tipo.includes('Notturno')) {
-          data.cell.styles.textColor = [124, 58, 237] // viola (mix notturno+festivo)
+          data.cell.styles.textColor = [124, 58, 237] // viola
           data.cell.styles.fontStyle = 'bold'
         } else if (tipo === 'Festivo') {
           data.cell.styles.textColor = [185, 28, 28]
