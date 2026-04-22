@@ -10,6 +10,7 @@ interface GrigliaMobileProps {
   turni: TurnoConDettagli[]
   onAddTurno: (dipendenteId: string, data: string) => void
   onEditTurno: (turno: TurnoConDettagli) => void
+  onDataSelezionataChange?: (data: string) => void
   readonly?: boolean
 }
 
@@ -26,7 +27,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly }: GrigliaMobileProps) {
+export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno, onEditTurno, onDataSelezionataChange, readonly }: GrigliaMobileProps) {
   const oggi = toDateString(new Date())
   const indiceOggiNeiGiorni = giorni.findIndex(g => toDateString(g) === oggi)
   const [dataSelezionata, setDataSelezionata] = useState<string>(() =>
@@ -39,6 +40,10 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
       setDataSelezionata(toDateString(giorni[idx >= 0 ? idx : 0]))
     }
   }, [giorni, dataSelezionata, oggi])
+
+  useEffect(() => {
+    onDataSelezionataChange?.(dataSelezionata)
+  }, [dataSelezionata, onDataSelezionataChange])
 
   const giornoSelezionato = useMemo(
     () => giorni.find(g => toDateString(g) === dataSelezionata) ?? giorni[0],

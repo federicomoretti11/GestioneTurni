@@ -19,6 +19,7 @@ export default function CalendarioPage() {
   const [modale, setModale] = useState<{ open: boolean; dipendenteId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [filtroDipendente, setFiltroDipendente] = useState('')
   const [filtroPosto, setFiltroPosto] = useState('')
+  const [dataMobileSel, setDataMobileSel] = useState<string>(() => toDateString(new Date()))
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -73,7 +74,7 @@ export default function CalendarioPage() {
     return lista
   }, [dipendenti, filtroDipendente, filtroPosto, turniFiltrati])
 
-  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string }): Promise<string | void> {
+  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
     const res = modale.turno
       ? await fetch(`/api/turni/${modale.turno.id}`, {
           method: 'PUT',
@@ -83,7 +84,7 @@ export default function CalendarioPage() {
       : await fetch('/api/turni', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...payload, dipendente_id: modale.dipendenteId, data: modale.data }),
+          body: JSON.stringify({ ...payload, dipendente_id: payload.dipendente_id ?? modale.dipendenteId, data: modale.data }),
         })
     if (!res.ok) {
       const d = await res.json()
@@ -198,8 +199,18 @@ export default function CalendarioPage() {
               turni={turniFiltrati}
               onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
               onEditTurno={turno => setModale({ open: true, turno })}
+              onDataSelezionataChange={setDataMobileSel}
             />
           </div>
+          {!modale.open && (
+            <button
+              onClick={() => setModale({ open: true, data: dataMobileSel })}
+              aria-label="Nuovo turno"
+              className="md:hidden fixed bottom-20 right-4 z-30 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 active:scale-95 transition text-3xl leading-none flex items-center justify-center"
+            >
+              +
+            </button>
+          )}
         </>
       )}
       <ModaleTurno
@@ -211,6 +222,7 @@ export default function CalendarioPage() {
         templates={templates}
         posti={posti}
         dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
+        dipendenti={dipendentiFiltrati}
         data={modale.data ? formatDateIT(modale.data) : undefined}
       />
     </div>

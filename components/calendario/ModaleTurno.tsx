@@ -3,30 +3,34 @@ import { useState, useEffect } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
 
 interface ModaleTurnoProps {
   open: boolean
   onClose: () => void
-  onSave: (data: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string }) => Promise<string | void>
+  onSave: (data: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }) => Promise<string | void>
   onDelete?: () => void
   turno?: TurnoConDettagli | null
   templates: TurnoTemplate[]
   posti: PostoDiServizio[]
   dipendenteNome?: string
+  dipendenti?: Profile[]
   data?: string
 }
 
-export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, data }: ModaleTurnoProps) {
+export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data }: ModaleTurnoProps) {
   const [templateId, setTemplateId] = useState<string>('')
   const [oraInizio, setOraInizio] = useState('08:00')
   const [oraFine, setOraFine] = useState('16:00')
   const [postoId, setPostoId] = useState<string>('')
   const [note, setNote] = useState('')
+  const [dipendenteId, setDipendenteId] = useState<string>('')
   const [errore, setErrore] = useState('')
   const [confermaElimina, setConfermaElimina] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [modificato, setModificato] = useState(false)
+
+  const mostraSelectDipendente = !turno && !dipendenteNome && !!dipendenti && dipendenti.length > 0
 
   useEffect(() => {
     if (turno) {
@@ -42,6 +46,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
       setPostoId('')
       setNote('')
     }
+    setDipendenteId('')
     setErrore('')
     setConfermaElimina(false)
     setSalvando(false)
@@ -69,6 +74,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const isRiposo = templateSelezionato?.nome.toLowerCase().includes('riposo') ?? false
 
   async function handleSave() {
+    if (mostraSelectDipendente && !dipendenteId) { setErrore('Seleziona un dipendente'); return }
     if (!isRiposo && !postoId) { setErrore('Il posto di servizio è obbligatorio'); return }
     setSalvando(true)
     const erroreApi = await onSave({
@@ -77,6 +83,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
       ora_fine: oraFine + ':00',
       posto_id: postoId || null,
       note,
+      ...(mostraSelectDipendente ? { dipendente_id: dipendenteId } : {}),
     })
     if (erroreApi) { setErrore(erroreApi); setSalvando(false) }
   }
@@ -88,6 +95,21 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     <Modal open={open} onClose={onClose} onCloseRequest={handleCloseRequest} title={title}>
       {data && <p className="text-sm text-gray-500 mb-4">{data}</p>}
       <div className="space-y-4">
+        {mostraSelectDipendente && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Dipendente *</label>
+            <select
+              value={dipendenteId}
+              onChange={e => { setDipendenteId(e.target.value); setErrore(''); setModificato(true) }}
+              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errore && !dipendenteId ? 'border-red-500' : 'border-gray-300'}`}
+            >
+              <option value="">— Seleziona —</option>
+              {dipendenti!.map(d => (
+                <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
           <div className="flex items-center gap-2">
