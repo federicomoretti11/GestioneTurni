@@ -3,10 +3,29 @@ import { formatDateIT, formatTimeShort } from './date'
 import { calcolaOreDiurneNotturne, calcolaOreTurno } from './turni'
 import { trovaFestivo } from './maggiorazioni'
 
+// Indici di colonna — usati dal PDF per lo styling condizionale.
+// Mantenere allineati con l'array `header` sotto.
+const COL = {
+  NOTTURNE: 8,
+  FESTIVO: 9,
+  ORE_FESTIVE: 10,
+  TIPO: 11,
+} as const
+
 function formatOre(n: number): number | string {
   if (n === 0) return 0
   // xlsx preserva i numeri: manteniamo numeric per somme automatiche.
   return Math.round(n * 100) / 100
+}
+
+function classificaTipo(ore: number, notturne: number, oreFestive: number): string {
+  if (ore === 0) return 'Riposo'
+  const notturno = notturne > 0
+  const festivo = oreFestive > 0
+  if (notturno && festivo) return 'Notturno + Festivo'
+  if (festivo) return 'Festivo'
+  if (notturno) return 'Notturno'
+  return ''
 }
 
 export function turniToExcelRows(
@@ -25,6 +44,7 @@ export function turniToExcelRows(
     'Notturne (22–06)',
     'Festivo',
     'Ore festive',
+    'Tipo',
     'Note',
   ]
 
@@ -46,6 +66,7 @@ export function turniToExcelRows(
       const { diurne, notturne } = calcolaOreDiurneNotturne(t.ora_inizio, t.ora_fine)
       const festivo = trovaFestivo(t.data, festivi)
       const oreFestive = festivo ? ore : 0
+      const tipo = classificaTipo(ore, notturne, oreFestive)
 
       subtot.ore += ore
       subtot.diurne += diurne
@@ -66,6 +87,7 @@ export function turniToExcelRows(
         formatOre(notturne),
         festivo?.nome ?? '',
         oreFestive > 0 ? formatOre(oreFestive) : '',
+        tipo,
         t.note ?? '',
       ])
     }
@@ -87,6 +109,7 @@ export function turniToExcelRows(
       '',
       subtot.festive > 0 ? formatOre(subtot.festive) : '',
       '',
+      '',
     ])
   }
 
@@ -102,6 +125,7 @@ export function turniToExcelRows(
     formatOre(tot.notturne),
     '',
     tot.festive > 0 ? formatOre(tot.festive) : '',
+    '',
     '',
   ])
 
@@ -143,13 +167,80 @@ export async function exportPdf(
   const doc = new jsPDF({ orientation: 'landscape' })
   doc.setFontSize(14)
   doc.text(`Piano Turni — ${periodo}`, 14, 15)
+
+  // Piccola legenda sotto il titolo per spiegare i colori.
+  doc.setFontSize(8)
+  doc.setTextColor(79, 70, 229)   // indigo-600
+  doc.text('■ Ore notturne (22–06)', 14, 20)
+  doc.setTextColor(185, 28, 28)   // red-700
+  doc.text('■ Giorno festivo', 60, 20)
+  doc.setTextColor(0, 0, 0)
+
   const rows = turniToExcelRows(turni, festivi)
   autoTable(doc, {
     head: [rows[0] as string[]],
     body: rows.slice(1) as string[][],
-    startY: 22,
+    startY: 24,
     styles: { fontSize: 8 },
     headStyles: { fillColor: [37, 99, 235] },
+    didParseCell: (data) => {
+      if (data.section !== 'body') return
+      const raw = data.row.raw as (string | number)[]
+      const isFestivo = !!raw[COL.FESTIVO]
+      const isSubtotale = typeof raw[1] === 'string' && (raw[1] as string).startsWith('Subtotale')
+      const isTotale = raw[1] === 'TOTALE GENERALE'
+
+      // Sfondo rosato per tutta la riga se giorno festivo (solo righe dati, non subtotali).
+      if (isFestivo && !isSubtotale && !isTotale) {
+        data.cell.styles.fillColor = [254, 226, 226] // red-100
+      }
+
+      // Enfasi subtotale / totale
+      if (isSubtotale || isTotale) {
+        data.cell.styles.fontStyle = 'bold'
+        if (isTotale) data.cell.styles.fillColor = [219, 234, 254] // blue-100
+        else data.cell.styles.fillColor = [241, 245, 249]           // slate-100
+      }
+
+      // Colora in indaco+bold le ore notturne > 0
+      if (data.column.index === COL.NOTTURNE) {
+        const v = data.cell.raw
+        if (typeof v === 'number' && v > 0) {
+          data.cell.styles.textColor = [79, 70, 229] // indigo-600
+          data.cell.styles.fontStyle = 'bold'
+        }
+      }
+
+      // Colora in rosso+bold le ore festive > 0 e il nome del festivo
+      if (data.column.index === COL.ORE_FESTIVE) {
+        const v = data.cell.raw
+        if (typeof v === 'number' && v > 0) {
+          data.cell.styles.textColor = [185, 28, 28] // red-700
+          data.cell.styles.fontStyle = 'bold'
+        }
+      }
+      if (data.column.index === COL.FESTIVO && raw[COL.FESTIVO]) {
+        data.cell.styles.textColor = [185, 28, 28]
+        data.cell.styles.fontStyle = 'bold'
+      }
+
+      // Tipo: colora in base al contenuto
+      if (data.column.index === COL.TIPO) {
+        const tipo = String(data.cell.raw ?? '')
+        if (tipo.includes('Festivo') && tipo.includes('Notturno')) {
+          data.cell.styles.textColor = [124, 58, 237] // viola (mix notturno+festivo)
+          data.cell.styles.fontStyle = 'bold'
+        } else if (tipo === 'Festivo') {
+          data.cell.styles.textColor = [185, 28, 28]
+          data.cell.styles.fontStyle = 'bold'
+        } else if (tipo === 'Notturno') {
+          data.cell.styles.textColor = [79, 70, 229]
+          data.cell.styles.fontStyle = 'bold'
+        } else if (tipo === 'Riposo') {
+          data.cell.styles.textColor = [100, 116, 139] // slate-500
+        }
+      }
+    },
   })
   doc.save(`${filename}.pdf`)
 }
