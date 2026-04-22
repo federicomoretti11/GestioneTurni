@@ -4,11 +4,26 @@ import { formatDateIT, formatTimeShort } from '@/lib/utils/date'
 
 type Riga = {
   destinatario_id: string
-  tipo: 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata'
+  tipo: 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata' | 'check_in' | 'check_out'
   titolo: string
   messaggio: string
   turno_id?: string | null
   data_turno?: string | null
+}
+
+async function destinatariStaff(): Promise<string[]> {
+  const admin = createAdminClient()
+  const { data } = await admin
+    .from('profiles')
+    .select('id')
+    .in('ruolo', ['admin', 'manager'])
+    .eq('attivo', true)
+  return (data ?? []).map(r => r.id)
+}
+
+function formatOraISO(iso: string): string {
+  const d = new Date(iso)
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
 async function insertNotifiche(righe: Riga[]) {
@@ -92,6 +107,40 @@ export async function notificaSettimanaPianificata(params: {
       data_turno: params.dataInizio,
     }))
   await insertNotifiche(righe)
+}
+
+export async function notificaCheckIn(params: {
+  turnoId: string
+  dataTurno: string
+  oraIngressoISO: string
+  nomeDipendente: string
+}) {
+  const ids = await destinatariStaff()
+  await insertNotifiche(ids.map(id => ({
+    destinatario_id: id,
+    tipo: 'check_in' as const,
+    titolo: 'Check-in turno',
+    messaggio: `${params.nomeDipendente} ha iniziato il turno (${formatOraISO(params.oraIngressoISO)})`,
+    turno_id: params.turnoId,
+    data_turno: params.dataTurno,
+  })))
+}
+
+export async function notificaCheckOut(params: {
+  turnoId: string
+  dataTurno: string
+  oraUscitaISO: string
+  nomeDipendente: string
+}) {
+  const ids = await destinatariStaff()
+  await insertNotifiche(ids.map(id => ({
+    destinatario_id: id,
+    tipo: 'check_out' as const,
+    titolo: 'Check-out turno',
+    messaggio: `${params.nomeDipendente} ha terminato il turno (${formatOraISO(params.oraUscitaISO)})`,
+    turno_id: params.turnoId,
+    data_turno: params.dataTurno,
+  })))
 }
 
 export function turnoCambiatoRilevante(prev: {
