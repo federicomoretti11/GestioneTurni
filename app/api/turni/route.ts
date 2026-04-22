@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { notificaTurnoAssegnato } from '@/lib/notifiche'
 
 export async function GET(request: Request) {
   const supabase = createClient()
@@ -50,5 +51,15 @@ export async function POST(request: Request) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await notificaTurnoAssegnato({
+    turnoId: data.id,
+    dipendenteId: data.dipendente_id,
+    data: data.data,
+    oraInizio: data.ora_inizio,
+    oraFine: data.ora_fine,
+    actorId: user!.id,
+  })
+
   return NextResponse.json(data, { status: 201 })
 }

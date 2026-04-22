@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { notificaSettimanaPianificata } from '@/lib/notifiche'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -51,6 +52,17 @@ export async function POST(request: Request) {
 
   const { error: insertError } = await supabase.from('turni').insert(daCopmare)
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 })
+
+  const conteggioPerDipendente: Record<string, number> = {}
+  for (const t of daCopmare) {
+    conteggioPerDipendente[t.dipendente_id] = (conteggioPerDipendente[t.dipendente_id] ?? 0) + 1
+  }
+  await notificaSettimanaPianificata({
+    dipendenteIds: Object.keys(conteggioPerDipendente),
+    dataInizio: destinazione.toISOString().slice(0, 10),
+    actorId: user!.id,
+    conteggioPerDipendente,
+  })
 
   return NextResponse.json({ copiati: daCopmare.length })
 }
