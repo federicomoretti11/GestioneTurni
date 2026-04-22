@@ -6,7 +6,7 @@ import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendar
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
-import { getWeekDays, getMonthDays, toDateString, formatDateIT } from '@/lib/utils/date'
+import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
@@ -249,7 +249,7 @@ export default function CalendarioPage() {
         posti={posti}
         dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
         dipendenti={dipendentiFiltrati}
-        data={modale.data ? formatDateIT(modale.data) : undefined}
+        data={modale.data}
       />
     </div>
   )

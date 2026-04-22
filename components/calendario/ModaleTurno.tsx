@@ -4,6 +4,8 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { useFestivi } from '@/lib/hooks/useFestivi'
+import { classificaOre, formatOre } from '@/lib/utils/maggiorazioni'
 
 interface ModaleTurnoProps {
   open: boolean
@@ -15,7 +17,14 @@ interface ModaleTurnoProps {
   posti: PostoDiServizio[]
   dipendenteNome?: string
   dipendenti?: Profile[]
-  data?: string
+  data?: string   // YYYY-MM-DD (formattata internamente per display)
+}
+
+function formatDataIT(iso: string): string {
+  const [y, m, d] = iso.split('-')
+  const dt = new Date(Number(y), Number(m) - 1, Number(d))
+  const giorno = dt.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return giorno.charAt(0).toUpperCase() + giorno.slice(1)
 }
 
 export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data }: ModaleTurnoProps) {
@@ -99,12 +108,60 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const timbroUscita = turno?.ora_uscita_effettiva ?? null
   const mostraTimbri = !!(timbroIngresso || timbroUscita)
 
+  const festivi = useFestivi()
+  const dataISO = turno?.data ?? data ?? ''
+  const classificazione = dataISO ? classificaOre(dataISO, oraInizio, oraFine, festivi) : null
+  const mostraMaggiorazioni = !!classificazione && classificazione.ore > 0 && !isRiposo
+  const festivoDelGiorno = classificazione?.festivo ?? null
+
   return (
     <Modal open={open} onClose={onClose} onCloseRequest={handleCloseRequest} title={title}>
-      {data && (
-        <div className="flex items-center gap-2 mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
+      {dataISO && (
+        <div className="flex items-center gap-2 flex-wrap mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
           <span className="w-1 h-1 rounded-full bg-gray-300" />
-          {data}
+          <span>{formatDataIT(dataISO)}</span>
+          {festivoDelGiorno && (
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold normal-case tracking-normal ${
+                festivoDelGiorno.tipo === 'nazionale'
+                  ? 'bg-red-100 text-red-700'
+                  : festivoDelGiorno.tipo === 'patronale'
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              🎉 {festivoDelGiorno.nome}
+            </span>
+          )}
+        </div>
+      )}
+      {mostraMaggiorazioni && (
+        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+          <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Ore e maggiorazioni</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <span className="inline-flex items-center gap-2 text-slate-700">
+              <span className="text-slate-400">Totale</span>
+              <span className="font-semibold">{formatOre(classificazione!.ore)}</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-slate-700">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="text-slate-400">Diurne</span>
+              <span className="font-semibold">{formatOre(classificazione!.diurne)}</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-slate-700">
+              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+              <span className="text-slate-400">Notturne (22–06)</span>
+              <span className={`font-semibold ${classificazione!.notturne > 0 ? 'text-indigo-700' : ''}`}>
+                {formatOre(classificazione!.notturne)}
+              </span>
+            </span>
+          </div>
+          {(classificazione!.notturne > 0 || festivoDelGiorno) && (
+            <p className="text-[11px] text-slate-500 mt-2">
+              {festivoDelGiorno && <span>Tutte le ore sono su giorno festivo. </span>}
+              {classificazione!.notturne > 0 && <span>Ore notturne soggette a maggiorazione.</span>}
+            </p>
+          )}
         </div>
       )}
       {mostraTimbri && (

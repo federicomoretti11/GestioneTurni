@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { EmptyState } from '@/components/ui/EmptyState'
 import type { Festivo } from '@/lib/types'
+import { invalidaFestivi } from '@/lib/hooks/useFestivi'
 
 function formatData(iso: string) {
   const [y, m, d] = iso.split('-')
@@ -56,6 +57,7 @@ export default function FestiviPage() {
         return
       }
       setErrore('')
+      invalidaFestivi()
       await carica(annoFiltro)
     } finally {
       setLoading(false)
@@ -79,6 +81,7 @@ export default function FestiviPage() {
     }
     setForm({ data: '', nome: '', tipo: 'patronale' })
     setErrore('')
+    invalidaFestivi()
     const annoNuovo = Number(form.data.slice(0, 4))
     if (annoNuovo === annoFiltro) carica(annoFiltro)
     else setAnnoFiltro(annoNuovo)
@@ -87,6 +90,7 @@ export default function FestiviPage() {
   async function handleElimina(f: Festivo) {
     if (!confirm(`Eliminare il festivo "${f.nome}" del ${formatData(f.data)}?`)) return
     await fetch(`/api/festivi/${f.data}`, { method: 'DELETE' })
+    invalidaFestivi()
     carica(annoFiltro)
   }
 
