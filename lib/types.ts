@@ -38,6 +38,8 @@ export interface Turno {
   creato_da: string
   created_at: string
   updated_at: string
+  ora_ingresso_effettiva: string | null  // ISO timestamptz
+  ora_uscita_effettiva: string | null    // ISO timestamptz
   // join opzionali
   profile?: Profile
   template?: TurnoTemplate | null | undefined
@@ -50,7 +52,13 @@ export interface TurnoConDettagli extends Turno {
   posto: PostoDiServizio | null
 }
 
-export type TipoNotifica = 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata'
+export type TipoNotifica =
+  | 'turno_assegnato'
+  | 'turno_modificato'
+  | 'turno_eliminato'
+  | 'settimana_pianificata'
+  | 'check_in'
+  | 'check_out'
 
 export interface Notifica {
   id: string
