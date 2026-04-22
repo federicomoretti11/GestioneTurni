@@ -8,6 +8,7 @@ import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib
 import { getWeekDays, getMonthDays, toDateString, formatDateIT } from '@/lib/utils/date'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
 
 export default function CalendarioPage() {
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
@@ -178,9 +179,14 @@ export default function CalendarioPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <SkeletonCalendario righe={dipendentiFiltrati.length || 4} colonne={giorni.length} />
-        </div>
+        <>
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <SkeletonCalendario righe={dipendentiFiltrati.length || 4} colonne={giorni.length} />
+          </div>
+          <div className="md:hidden">
+            <SkeletonCalendarioMobile giorni={giorni.length} righe={Math.max(3, dipendentiFiltrati.length || 4)} />
+          </div>
+        </>
       ) : (
         <>
           <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
