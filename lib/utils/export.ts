@@ -326,48 +326,67 @@ export async function exportPdf(
 
     // Tabella dettaglio turni
     const rows = turniToExcelRows(turni, festivi, { compact: true })
+    const head = rows[0] as string[]
+    const rawBody = rows.slice(1) as (string | number)[][]
+
+    // Trasforma subtotali e totale in righe con colSpan: la label unisce
+    // Dipendente→Fine (6 colonne) allineata a destra; le ore restano nelle
+    // loro colonne; Tipo+Note uniti vuoti. Risultato: subtotali molto più
+    // leggibili e con lo stesso stile forte del totale generale.
+    const stileAggregato = {
+      fillColor: [219, 234, 254] as [number, number, number],
+      textColor: [30, 58, 138] as [number, number, number],
+      fontStyle: 'bold' as const,
+    }
+    type CellDef = string | number | { content: string | number; colSpan?: number; styles?: any }
+    const body: CellDef[][] = rawBody.map(row => {
+      const label = typeof row[1] === 'string' ? row[1] : ''
+      const isSubtotale = label.startsWith('SUBTOT')
+      const isTotale = label === 'TOTALE GENERALE'
+      if (isSubtotale || isTotale) {
+        return [
+          { content: label, colSpan: 6, styles: { ...stileAggregato, halign: 'right' } },
+          { content: row[6], styles: { ...stileAggregato, halign: 'right' } },
+          { content: row[7], styles: { ...stileAggregato, halign: 'right' } },
+          { content: row[8], styles: { ...stileAggregato, halign: 'right' } },
+          { content: row[9], styles: { ...stileAggregato, halign: 'right' } },
+          { content: '', colSpan: 2, styles: stileAggregato },
+        ]
+      }
+      return row as CellDef[]
+    })
+
     autoTable(doc, {
-      head: [rows[0] as string[]],
-      body: rows.slice(1) as string[][],
+      head: [head],
+      body: body as any,
       startY,
       margin: { left: 10, right: 10 },
+      tableWidth: 277,
       styles: { fontSize: 7, cellPadding: 1.5, lineColor: [226, 232, 240], lineWidth: 0.1, overflow: 'ellipsize' },
       headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [248, 250, 252] },
       columnStyles: {
-        0: { cellWidth: 36 },                   // Dipendente
-        1: { cellWidth: 13, halign: 'center' }, // Data
-        2: { cellWidth: 10, halign: 'center' }, // Giorno
-        3: { cellWidth: 36 },                   // Posto (ellipsize)
-        4: { cellWidth: 12, halign: 'center' }, // Inizio
-        5: { cellWidth: 12, halign: 'center' }, // Fine
-        6: { cellWidth: 10, halign: 'right' },  // Ore
-        7: { cellWidth: 11, halign: 'right' },  // Diurne
-        8: { cellWidth: 13, halign: 'right' },  // Notturne
-        9: { cellWidth: 11, halign: 'right' },  // Festive
-        10: { cellWidth: 28 },                  // Tipo
-        11: { cellWidth: 25 },                  // Note (ellipsize)
+        0: { cellWidth: 42 },                   // Dipendente
+        1: { cellWidth: 15, halign: 'center' }, // Data
+        2: { cellWidth: 12, halign: 'center' }, // Giorno
+        3: { cellWidth: 48 },                   // Posto (ellipsize)
+        4: { cellWidth: 13, halign: 'center' }, // Inizio
+        5: { cellWidth: 13, halign: 'center' }, // Fine
+        6: { cellWidth: 13, halign: 'right' },  // Ore
+        7: { cellWidth: 14, halign: 'right' },  // Diurne
+        8: { cellWidth: 16, halign: 'right' },  // Notturne
+        9: { cellWidth: 14, halign: 'right' },  // Festive
+        10: { cellWidth: 35 },                  // Tipo
+        11: { cellWidth: 32 },                  // Note (ellipsize)
       },
       didParseCell: (data: any) => {
         if (data.section !== 'body') return
         const raw = data.row.raw as (string | number)[]
+        // Le righe aggregate hanno già styling inline via colSpan — skip.
         const label = typeof raw[1] === 'string' ? (raw[1] as string) : ''
-        const isSubtotale = label.startsWith('SUBTOT')
-        const isTotale = label === 'TOTALE GENERALE'
-        const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
+        if (label.startsWith('SUBTOT') || label === 'TOTALE GENERALE') return
 
-        if (isSubtotale) {
-          data.cell.styles.fontStyle = 'bold'
-          data.cell.styles.fillColor = [241, 245, 249]
-          data.cell.styles.textColor = [30, 41, 59]
-          return
-        }
-        if (isTotale) {
-          data.cell.styles.fontStyle = 'bold'
-          data.cell.styles.fillColor = [219, 234, 254]
-          data.cell.styles.textColor = [30, 58, 138]
-          return
-        }
+        const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
         if (isFestivo) {
           data.cell.styles.fillColor = [255, 241, 242]
         }
