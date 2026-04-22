@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: 'Export', href: '/admin/export', icon: '📤' },
   { label: 'Utenti', href: '/admin/utenti', icon: '👥' },
   { label: 'Posti', href: '/admin/posti', icon: '📍' },
+  { label: 'Festivi', href: '/admin/festivi', icon: '🎉' },
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

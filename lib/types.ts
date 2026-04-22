@@ -71,3 +71,12 @@ export interface Notifica {
   letta: boolean
   created_at: string
 }
+
+export type TipoFestivo = 'nazionale' | 'patronale' | 'custom'
+
+export interface Festivo {
+  data: string      // YYYY-MM-DD
+  nome: string
+  tipo: TipoFestivo
+  created_at: string
+}
