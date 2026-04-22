@@ -109,7 +109,7 @@ export function turniToExcelRows(
 
     rows.push([
       '',
-      `SUBTOTALE ${nome.toUpperCase()}`,
+      compact ? `SUBTOT. ${nome.toUpperCase()}` : `SUBTOTALE ${nome.toUpperCase()}`,
       '',
       '',
       '',
@@ -260,21 +260,24 @@ function renderRiepilogo(
     totale.festive > 0 ? formatOre(totale.festive) : '',
   ])
 
+  // Larghezze sommate a 277 mm = A4 landscape (297) - margini (10+10).
+  // La tabella occupa così tutta la larghezza utile senza buchi a destra.
   autoTable(doc, {
     head: [head],
     body,
     startY,
     margin: { left: 10, right: 10 },
-    styles: { fontSize, cellPadding: 2, lineColor: [226, 232, 240], lineWidth: 0.1 },
-    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold' },
+    tableWidth: 277,
+    styles: { fontSize, cellPadding: 3, lineColor: [226, 232, 240], lineWidth: 0.1 },
+    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold', halign: 'left' },
     alternateRowStyles: { fillColor: [248, 250, 252] },
     columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 20, halign: 'right' },
-      2: { cellWidth: 28, halign: 'right' },
-      3: { cellWidth: 28, halign: 'right' },
-      4: { cellWidth: 28, halign: 'right' },
-      5: { cellWidth: 28, halign: 'right' },
+      0: { cellWidth: 85 },                      // Dipendente
+      1: { cellWidth: 26, halign: 'right' },     // Turni
+      2: { cellWidth: 40, halign: 'right' },     // Ore totali
+      3: { cellWidth: 40, halign: 'right' },     // Diurne
+      4: { cellWidth: 44, halign: 'right' },     // Notturne
+      5: { cellWidth: 42, halign: 'right' },     // Festive
     },
     didParseCell: (data: any) => {
       if (data.section !== 'body') return
@@ -317,7 +320,7 @@ export async function exportPdf(
 
   if (opzioni.soloRiepilogo) {
     const startY = renderIntestazione(doc, periodo, 'Riepilogo ore')
-    renderRiepilogo(doc, autoTable, turni, festivi, startY, 10)
+    renderRiepilogo(doc, autoTable, turni, festivi, startY, 11)
   } else {
     const startY = renderIntestazione(doc, periodo)
 
@@ -349,7 +352,7 @@ export async function exportPdf(
         if (data.section !== 'body') return
         const raw = data.row.raw as (string | number)[]
         const label = typeof raw[1] === 'string' ? (raw[1] as string) : ''
-        const isSubtotale = label.startsWith('SUBTOTALE')
+        const isSubtotale = label.startsWith('SUBTOT')
         const isTotale = label === 'TOTALE GENERALE'
         const isFestivo = typeof raw[COL.ORE_FESTIVE] === 'number' && (raw[COL.ORE_FESTIVE] as number) > 0
 
@@ -407,7 +410,7 @@ export async function exportPdf(
       doc.setFontSize(12)
       doc.setTextColor(15, 23, 42)
       doc.text('Riepilogo ore per dipendente', 10, 12)
-      renderRiepilogo(doc, autoTable, turni, festivi, 16, 9)
+      renderRiepilogo(doc, autoTable, turni, festivi, 16, 11)
     }
   }
 
