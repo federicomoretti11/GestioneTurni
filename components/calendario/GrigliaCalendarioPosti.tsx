@@ -1,6 +1,7 @@
 import { TurnoConDettagli } from '@/lib/types'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { EmptyState } from '@/components/ui/EmptyState'
 
 const oggi = toDateString(new Date())
@@ -78,20 +79,35 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
                 return (
                   <td key={data} className={`border border-gray-200 p-1 align-top min-w-[100px] ${data === oggi ? 'bg-blue-50/40' : ''}`}>
                     <div className="space-y-0.5">
-                      {turniCella.map(t => (
-                        <div
-                          key={t.id}
-                          className="rounded px-1.5 py-0.5 text-white text-xs"
-                          style={{ backgroundColor: t.template?.colore ?? '#6b7280' }}
-                        >
-                          <div className="font-medium truncate">
-                            {t.profile.cognome} {t.profile.nome}
+                      {turniCella.map(t => {
+                        const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
+                        const isRiposo = ore === 0
+                        const stato = isRiposo ? 'non_iniziato' : statoTimbratura({
+                          ora_ingresso_effettiva: t.ora_ingresso_effettiva,
+                          ora_uscita_effettiva: t.ora_uscita_effettiva,
+                        })
+                        return (
+                          <div
+                            key={t.id}
+                            className="relative rounded px-1.5 py-0.5 text-white text-xs"
+                            style={{ backgroundColor: t.template?.colore ?? '#6b7280' }}
+                          >
+                            <div className="font-medium truncate">
+                              {t.profile.cognome} {t.profile.nome}
+                            </div>
+                            {t.ora_inizio !== t.ora_fine && (
+                              <div className="opacity-90">{t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)}</div>
+                            )}
+                            <PallinoTimbratura
+                              stato={stato}
+                              oraIngresso={t.ora_ingresso_effettiva}
+                              oraUscita={t.ora_uscita_effettiva}
+                              size="sm"
+                              className="absolute -top-0.5 -right-0.5"
+                            />
                           </div>
-                          {t.ora_inizio !== t.ora_fine && (
-                            <div className="opacity-90">{t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)}</div>
-                          )}
-                        </div>
-                      ))}
+                        )
+                      })}
                       {turniCella.length === 0 && (
                         <span className="text-gray-200 text-lg flex items-center justify-center h-8">—</span>
                       )}
