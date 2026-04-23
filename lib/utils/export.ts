@@ -1,3 +1,5 @@
+import type { jsPDF } from 'jspdf'
+import type { CellHookData, RowInput, Styles, UserOptions } from 'jspdf-autotable'
 import { Festivo, TurnoConDettagli } from '@/lib/types'
 import { formatDateIT, formatTimeShort } from './date'
 import { calcolaOreDiurneNotturne, calcolaOreTurno } from './turni'
@@ -211,7 +213,7 @@ interface OpzioniPdf {
 }
 
 // Disegna l'intestazione comune (titolo + legenda) e ritorna la Y sotto la legenda.
-function renderIntestazione(doc: any, periodo: string, titoloExtra = ''): number {
+function renderIntestazione(doc: jsPDF, periodo: string, titoloExtra = ''): number {
   doc.setFontSize(12)
   doc.setTextColor(15, 23, 42)
   const titolo = titoloExtra
@@ -232,8 +234,8 @@ function renderIntestazione(doc: any, periodo: string, titoloExtra = ''): number
 
 // Disegna la tabella riepilogo (riusata sia come pagina finale che come unica pagina).
 function renderRiepilogo(
-  doc: any,
-  autoTable: any,
+  doc: jsPDF,
+  autoTable: (doc: jsPDF, options: UserOptions) => void,
   turni: TurnoConDettagli[],
   festivi: Festivo[],
   startY: number,
@@ -279,7 +281,7 @@ function renderRiepilogo(
       4: { cellWidth: 44, halign: 'right' },     // Notturne
       5: { cellWidth: 42, halign: 'right' },     // Festive
     },
-    didParseCell: (data: any) => {
+    didParseCell: (data: CellHookData) => {
       if (data.section !== 'body') return
       const raw = data.row.raw as (string | number)[]
       const isTotale = raw[0] === 'TOTALE'
@@ -338,7 +340,7 @@ export async function exportPdf(
       textColor: [30, 58, 138] as [number, number, number],
       fontStyle: 'bold' as const,
     }
-    type CellDef = string | number | { content: string | number; colSpan?: number; styles?: any }
+    type CellDef = string | number | { content: string | number; colSpan?: number; styles?: Partial<Styles> }
     const body: CellDef[][] = rawBody.map(row => {
       const label = typeof row[1] === 'string' ? row[1] : ''
       const isSubtotale = label.startsWith('SUBTOT')
@@ -358,7 +360,7 @@ export async function exportPdf(
 
     autoTable(doc, {
       head: [head],
-      body: body as any,
+      body: body as RowInput[],
       startY,
       margin: { left: 10, right: 10 },
       tableWidth: 277,
@@ -379,7 +381,7 @@ export async function exportPdf(
         10: { cellWidth: 35 },                  // Tipo
         11: { cellWidth: 32 },                  // Note (ellipsize)
       },
-      didParseCell: (data: any) => {
+      didParseCell: (data: CellHookData) => {
         if (data.section !== 'body') return
         const raw = data.row.raw as (string | number)[]
         // Le righe aggregate hanno già styling inline via colSpan — skip.
