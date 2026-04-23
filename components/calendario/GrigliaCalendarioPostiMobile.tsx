@@ -2,7 +2,8 @@
 import { useState, useMemo, useEffect } from 'react'
 import { TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { Avatar } from '@/components/ui/Avatar'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -129,6 +130,10 @@ export function GrigliaCalendarioPostiMobile({ giorni, turni }: Props) {
                   const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
                   const isRiposo = ore === 0
                   const colore = t.template?.colore ?? '#6b7280'
+                  const stato = isRiposo ? 'non_iniziato' : statoTimbratura({
+                    ora_ingresso_effettiva: t.ora_ingresso_effettiva,
+                    ora_uscita_effettiva: t.ora_uscita_effettiva,
+                  })
                   return (
                     <div
                       key={t.id}
@@ -153,6 +158,7 @@ export function GrigliaCalendarioPostiMobile({ giorni, turni }: Props) {
                             {!isRiposo && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colore }} />}
                             {t.template?.nome ?? 'Custom'}
                           </span>
+                          <PallinoTimbratura stato={stato} size="md" />
                           {ore > 0 && (
                             <span className="text-[11px] text-gray-500">
                               {t.ora_inizio.slice(0, 5)}–{t.ora_fine.slice(0, 5)} · {oreLabel(ore)}
