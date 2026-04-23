@@ -45,3 +45,14 @@ export function calcolaOreDiurneNotturne(oraInizio: string, oraFine: string): { 
     notturne: notturneMin / 60,
   }
 }
+
+export type StatoTimbratura = 'non_iniziato' | 'in_corso' | 'completato'
+
+export function statoTimbratura(t: {
+  ora_ingresso_effettiva: string | null
+  ora_uscita_effettiva: string | null
+}): StatoTimbratura {
+  if (t.ora_ingresso_effettiva && t.ora_uscita_effettiva) return 'completato'
+  if (t.ora_ingresso_effettiva) return 'in_corso'
+  return 'non_iniziato'
+}
