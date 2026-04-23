@@ -24,6 +24,8 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, isOggi
             colore={t.template?.colore ?? '#6b7280'}
             posto={t.posto?.nome ?? ''}
             onClick={readonly ? undefined : () => onEdit(t)}
+            oraIngressoEffettiva={t.ora_ingresso_effettiva}
+            oraUscitaEffettiva={t.ora_uscita_effettiva}
           />
         ))}
       </div>
