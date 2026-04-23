@@ -2,7 +2,8 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { Avatar } from '@/components/ui/Avatar'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -155,6 +156,15 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                           {!isRiposo && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colore }} />}
                           {t.template?.nome ?? 'Custom'}
                         </span>
+                        {!isRiposo && (
+                          <PallinoTimbratura
+                            stato={statoTimbratura({
+                              ora_ingresso_effettiva: t.ora_ingresso_effettiva,
+                              ora_uscita_effettiva: t.ora_uscita_effettiva,
+                            })}
+                            size="md"
+                          />
+                        )}
                         {ore > 0 && (
                           <span className="text-[11px] text-gray-500">
                             {t.ora_inizio.slice(0, 5)}–{t.ora_fine.slice(0, 5)} · {oreLabel(ore)}
