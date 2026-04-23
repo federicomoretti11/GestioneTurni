@@ -130,6 +130,10 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                 const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
                 const isRiposo = ore === 0
                 const colore = t.template?.colore ?? '#6b7280'
+                const stato = isRiposo ? 'non_iniziato' : statoTimbratura({
+                  ora_ingresso_effettiva: t.ora_ingresso_effettiva,
+                  ora_uscita_effettiva: t.ora_uscita_effettiva,
+                })
                 return (
                   <button
                     key={t.id}
@@ -156,15 +160,7 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                           {!isRiposo && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colore }} />}
                           {t.template?.nome ?? 'Custom'}
                         </span>
-                        {!isRiposo && (
-                          <PallinoTimbratura
-                            stato={statoTimbratura({
-                              ora_ingresso_effettiva: t.ora_ingresso_effettiva,
-                              ora_uscita_effettiva: t.ora_uscita_effettiva,
-                            })}
-                            size="md"
-                          />
-                        )}
+                        <PallinoTimbratura stato={stato} size="md" />
                         {ore > 0 && (
                           <span className="text-[11px] text-gray-500">
                             {t.ora_inizio.slice(0, 5)}–{t.ora_fine.slice(0, 5)} · {oreLabel(ore)}
