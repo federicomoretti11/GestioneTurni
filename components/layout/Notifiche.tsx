@@ -40,6 +40,7 @@ export function Notifiche({ userId, ruolo }: Props) {
   const ref = useRef<HTMLDivElement>(null)
 
   const nonLette = notifiche.filter(n => !n.letta).length
+  const lette = notifiche.length - nonLette
 
   const carica = useCallback(async () => {
     setLoading(true)
@@ -92,6 +93,17 @@ export function Notifiche({ userId, ruolo }: Props) {
     fetch('/api/notifiche/segna-tutte-lette', { method: 'POST' }).catch(() => {})
   }
 
+  async function handleElimina(e: React.MouseEvent, id: string) {
+    e.stopPropagation()
+    setNotifiche(prev => prev.filter(n => n.id !== id))
+    fetch(`/api/notifiche/${id}`, { method: 'DELETE' }).catch(() => {})
+  }
+
+  async function handleSvuotaLette() {
+    setNotifiche(prev => prev.filter(n => !n.letta))
+    fetch('/api/notifiche/pulisci', { method: 'POST' }).catch(() => {})
+  }
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -112,13 +124,20 @@ export function Notifiche({ userId, ruolo }: Props) {
 
       {aperto && (
         <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 gap-2">
             <span className="font-semibold text-sm text-gray-900">Notifiche</span>
-            {nonLette > 0 && (
-              <button onClick={handleSegnaTutte} className="text-xs text-blue-600 hover:underline">
-                Segna tutte come lette
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {nonLette > 0 && (
+                <button onClick={handleSegnaTutte} className="text-xs text-blue-600 hover:underline">
+                  Segna tutte come lette
+                </button>
+              )}
+              {lette > 0 && (
+                <button onClick={handleSvuotaLette} className="text-xs text-gray-500 hover:underline">
+                  Svuota lette
+                </button>
+              )}
+            </div>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {loading && notifiche.length === 0 ? (
@@ -127,25 +146,39 @@ export function Notifiche({ userId, ruolo }: Props) {
               <div className="px-4 py-8 text-center text-sm text-gray-400">Nessuna notifica</div>
             ) : (
               notifiche.map(n => (
-                <button
+                <div
                   key={n.id}
-                  onClick={() => handleClickNotifica(n)}
-                  className={`w-full text-left px-4 py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 flex gap-3 ${
+                  className={`group relative border-b border-gray-50 last:border-0 ${
                     !n.letta ? 'bg-blue-50/40' : ''
-                  }`}
+                  } hover:bg-gray-50`}
                 >
-                  <span className="text-lg leading-none pt-0.5">{iconaPerTipo[n.tipo]}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm ${!n.letta ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
-                        {n.titolo}
-                      </span>
-                      {!n.letta && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+                  <button
+                    onClick={() => handleClickNotifica(n)}
+                    className="w-full text-left px-4 py-3 pr-10 flex gap-3"
+                  >
+                    <span className="text-lg leading-none pt-0.5">{iconaPerTipo[n.tipo]}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm ${!n.letta ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
+                          {n.titolo}
+                        </span>
+                        {!n.letta && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+                      </div>
+                      <div className="text-xs text-gray-600 mt-0.5 truncate">{n.messaggio}</div>
+                      <div className="text-[11px] text-gray-400 mt-1">{tempoRelativo(n.created_at)}</div>
                     </div>
-                    <div className="text-xs text-gray-600 mt-0.5 truncate">{n.messaggio}</div>
-                    <div className="text-[11px] text-gray-400 mt-1">{tempoRelativo(n.created_at)}</div>
-                  </div>
-                </button>
+                  </button>
+                  <button
+                    onClick={e => handleElimina(e, n.id)}
+                    aria-label="Elimina notifica"
+                    className="absolute top-2 right-2 p-1 rounded text-gray-300 hover:text-gray-600 hover:bg-gray-100 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
               ))
             )}
           </div>
