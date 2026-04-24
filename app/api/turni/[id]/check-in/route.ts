@@ -11,10 +11,12 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   const admin = createAdminClient()
   const { data: turno, error: readErr } = await admin
     .from('turni')
-    .select('id, dipendente_id, data, ora_ingresso_effettiva, profile:profiles!turni_dipendente_id_fkey(nome, cognome)')
+    .select('id, dipendente_id, data, stato, ora_ingresso_effettiva, profile:profiles!turni_dipendente_id_fkey(nome, cognome)')
     .eq('id', params.id)
     .single()
   if (readErr || !turno) return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
+  // 404 sulle bozze per non rivelarne l'esistenza al dipendente.
+  if (turno.stato === 'bozza') return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
   if (turno.dipendente_id !== user.id) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   if (turno.ora_ingresso_effettiva) return NextResponse.json({ error: 'Check-in già effettuato' }, { status: 409 })
 
