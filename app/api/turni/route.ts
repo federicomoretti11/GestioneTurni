@@ -1,18 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { notificaTurnoAssegnato } from '@/lib/notifiche'
+import { queryTurni, type FiltroTurni } from '@/lib/supabase/turni'
+
+const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
 
 export async function GET(request: Request) {
   const supabase = createClient()
   const { searchParams } = new URL(request.url)
   const dataInizio = searchParams.get('data_inizio')
   const dataFine = searchParams.get('data_fine')
+  const statoParam = searchParams.get('stato')
+  const filtro: FiltroTurni = statoParam === 'bozza' ? 'bozza' : statoParam === 'tutti' ? 'tutti' : 'confermati'
 
-  let query = supabase
-    .from('turni')
-    .select('*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)')
-    .order('data')
-
+  let query = queryTurni(supabase, filtro, SELECT).order('data')
   if (dataInizio) query = query.gte('data', dataInizio)
   if (dataFine) query = query.lte('data', dataFine)
 

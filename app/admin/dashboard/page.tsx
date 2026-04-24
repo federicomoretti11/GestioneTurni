@@ -48,11 +48,13 @@ export default async function AdminDashboard() {
     supabase
       .from('turni')
       .select('*, profile:profiles!turni_dipendente_id_fkey(nome, cognome), template:turni_template(colore, nome), posto:posti_di_servizio(nome)')
+      .eq('stato', 'confermato')
       .eq('data', oggi)
       .order('ora_inizio'),
     supabase
       .from('turni')
       .select('dipendente_id, ora_inizio, ora_fine, profile:profiles!turni_dipendente_id_fkey(nome, cognome)')
+      .eq('stato', 'confermato')
       .gte('data', inizio)
       .lte('data', fine),
     supabase.from('posti_di_servizio').select('id, nome').eq('attivo', true).order('nome'),
