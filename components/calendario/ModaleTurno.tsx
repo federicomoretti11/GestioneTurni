@@ -120,6 +120,11 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         <div className="flex items-center gap-2 flex-wrap mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
           <span className="w-1 h-1 rounded-full bg-gray-300" />
           <span>{formatDataIT(dataISO)}</span>
+          {turno?.stato === 'bozza' && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold tracking-wide">
+              BOZZA
+            </span>
+          )}
           {festivoDelGiorno && (
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold normal-case tracking-normal ${
