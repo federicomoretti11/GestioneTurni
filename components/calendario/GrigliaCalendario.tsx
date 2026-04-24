@@ -44,7 +44,7 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
       <table className="border-collapse text-sm w-full" style={{ minWidth: 720 }}>
         <thead>
           <tr>
-            <th className="border border-gray-200 bg-gray-50 px-3 py-2 text-left font-medium text-gray-600 min-w-[140px]">
+            <th className="sticky left-0 z-10 border border-gray-200 bg-gray-50 px-3 py-2 text-left font-medium text-gray-600 min-w-[140px]">
               Dipendente
             </th>
             {giorni.map(g => {
@@ -63,8 +63,8 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
         </thead>
         <tbody>
           {dipendenti.map(d => (
-            <tr key={d.id} className="hover:bg-gray-50">
-              <td className="border border-gray-200 px-3 py-2 font-medium text-gray-700 whitespace-nowrap">
+            <tr key={d.id} className="group hover:bg-gray-50">
+              <td className="sticky left-0 z-10 border border-gray-200 bg-white group-hover:bg-gray-50 px-3 py-2 font-medium text-gray-700 whitespace-nowrap">
                 {d.nome} {d.cognome}
               </td>
               {giorni.map(g => {
@@ -90,7 +90,7 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
         {dipendenti.length > 0 && (
           <tfoot>
             <tr className="bg-gray-50">
-              <td className="border border-gray-200 px-3 py-2 font-semibold text-gray-600">Totale giorno</td>
+              <td className="sticky left-0 z-10 border border-gray-200 bg-gray-50 px-3 py-2 font-semibold text-gray-600">Totale giorno</td>
               {giorni.map(g => {
                 const data = toDateString(g)
                 const ore = oreColonna(data)
