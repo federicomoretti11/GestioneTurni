@@ -26,15 +26,22 @@ export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const body = await request.json()
+  const stato: 'bozza' | 'confermato' = body.stato === 'bozza' ? 'bozza' : 'confermato'
 
-  // Controllo sovrapposizione
+  // Controllo sovrapposizione STESSO STATO — bozza e confermato vivono in namespace distinti
   const { data: esistente } = await supabase
     .from('turni')
     .select('id')
     .eq('dipendente_id', body.dipendente_id)
     .eq('data', body.data)
+    .eq('stato', stato)
     .maybeSingle()
-  if (esistente) return NextResponse.json({ error: 'Il dipendente ha già un turno in questa data.' }, { status: 409 })
+  if (esistente) {
+    return NextResponse.json(
+      { error: `Il dipendente ha già un turno ${stato === 'bozza' ? 'in bozza' : 'ufficiale'} in questa data.` },
+      { status: 409 }
+    )
+  }
 
   const { data, error } = await supabase
     .from('turni')
@@ -47,20 +54,24 @@ export async function POST(request: Request) {
       posto_id: body.posto_id ?? null,
       note: body.note ?? null,
       creato_da: user!.id,
+      stato,
     })
-    .select('*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)')
+    .select(SELECT)
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await notificaTurnoAssegnato({
-    turnoId: data.id,
-    dipendenteId: data.dipendente_id,
-    data: data.data,
-    oraInizio: data.ora_inizio,
-    oraFine: data.ora_fine,
-    actorId: user!.id,
-  })
+  // Nessuna notifica sulle bozze: i dipendenti non sanno nulla finché non confermi.
+  if (stato === 'confermato') {
+    await notificaTurnoAssegnato({
+      turnoId: data.id,
+      dipendenteId: data.dipendente_id,
+      data: data.data,
+      oraInizio: data.ora_inizio,
+      oraFine: data.ora_fine,
+      actorId: user!.id,
+    })
+  }
 
   return NextResponse.json(data, { status: 201 })
 }
