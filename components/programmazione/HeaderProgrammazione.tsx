@@ -62,7 +62,12 @@ export function HeaderProgrammazione({
               <input
                 type="date"
                 value={periodo.inizio}
-                onChange={e => onPeriodoChange({ ...periodo, inizio: e.target.value })}
+                onChange={e => {
+                  const inizio = e.target.value
+                  // Auto-allinea fine se il nuovo inizio la supera, così il range resta valido.
+                  const fine = inizio > periodo.fine ? inizio : periodo.fine
+                  onPeriodoChange({ inizio, fine })
+                }}
                 className="border border-gray-300 rounded-md px-2 py-1 text-sm"
               />
             </label>
@@ -71,7 +76,11 @@ export function HeaderProgrammazione({
               <input
                 type="date"
                 value={periodo.fine}
-                onChange={e => onPeriodoChange({ ...periodo, fine: e.target.value })}
+                onChange={e => {
+                  const fine = e.target.value
+                  const inizio = fine < periodo.inizio ? fine : periodo.inizio
+                  onPeriodoChange({ inizio, fine })
+                }}
                 className="border border-gray-300 rounded-md px-2 py-1 text-sm"
               />
             </label>

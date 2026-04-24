@@ -34,7 +34,9 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
   const oggi = toDateString(new Date())
   const indiceOggiNeiGiorni = giorni.findIndex(g => toDateString(g) === oggi)
   const [dataSelezionata, setDataSelezionata] = useState<string>(() =>
-    toDateString(giorni[indiceOggiNeiGiorni >= 0 ? indiceOggiNeiGiorni : 0])
+    giorni.length > 0
+      ? toDateString(giorni[indiceOggiNeiGiorni >= 0 ? indiceOggiNeiGiorni : 0])
+      : ''
   )
 
   useEffect(() => {
@@ -52,6 +54,16 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
     () => giorni.find(g => toDateString(g) === dataSelezionata) ?? giorni[0],
     [giorni, dataSelezionata]
   )
+
+  if (giorni.length === 0 || !giornoSelezionato) {
+    return (
+      <EmptyState
+        icon="📅"
+        title="Intervallo vuoto"
+        description="Seleziona un periodo valido per vedere i turni."
+      />
+    )
+  }
 
   const turniDelGiorno = useMemo(
     () => turni.filter(t => t.data === dataSelezionata),
