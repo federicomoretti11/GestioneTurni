@@ -26,3 +26,13 @@ export function toDateString(date: Date): string {
 export function formatDayLabel(date: Date): string {
   return date.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric' })
 }
+
+export function getDaysBetween(inizio: string, fine: string): Date[] {
+  const [y1, m1, d1] = inizio.split('-').map(Number)
+  const [y2, m2, d2] = fine.split('-').map(Number)
+  const start = Date.UTC(y1, m1 - 1, d1)
+  const end = Date.UTC(y2, m2 - 1, d2)
+  const giorni: Date[] = []
+  for (let t = start; t <= end; t += 86400000) giorni.push(new Date(t))
+  return giorni
+}
