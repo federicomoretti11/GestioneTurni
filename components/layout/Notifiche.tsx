@@ -29,6 +29,7 @@ const iconaPerTipo: Record<Notifica['tipo'], string> = {
   settimana_pianificata: '🗓️',
   check_in: '🟢',
   check_out: '🔴',
+  turni_pubblicati: '📣',
 }
 
 export function Notifiche({ userId, ruolo }: Props) {

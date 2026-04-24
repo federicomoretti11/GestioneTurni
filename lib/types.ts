@@ -62,6 +62,7 @@ export type TipoNotifica =
   | 'settimana_pianificata'
   | 'check_in'
   | 'check_out'
+  | 'turni_pubblicati'
 
 export interface Notifica {
   id: string

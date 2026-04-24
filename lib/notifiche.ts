@@ -4,7 +4,7 @@ import { formatDateIT, formatTimeShort } from '@/lib/utils/date'
 
 type Riga = {
   destinatario_id: string
-  tipo: 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata' | 'check_in' | 'check_out'
+  tipo: 'turno_assegnato' | 'turno_modificato' | 'turno_eliminato' | 'settimana_pianificata' | 'check_in' | 'check_out' | 'turni_pubblicati'
   titolo: string
   messaggio: string
   turno_id?: string | null
@@ -141,6 +141,26 @@ export async function notificaCheckOut(params: {
     turno_id: params.turnoId,
     data_turno: params.dataTurno,
   })))
+}
+
+export async function notificaTurniPubblicati(params: {
+  dipendenteIds: string[]
+  dataInizio: string
+  dataFine: string
+  actorId: string
+  conteggioPerDipendente: Record<string, number>
+}) {
+  const righe: Riga[] = params.dipendenteIds
+    .filter(id => id !== params.actorId)
+    .map(id => ({
+      destinatario_id: id,
+      tipo: 'turni_pubblicati' as const,
+      titolo: 'Turni pubblicati',
+      messaggio: `${params.conteggioPerDipendente[id] ?? 0} turni dal ${formatDateIT(params.dataInizio)} al ${formatDateIT(params.dataFine)}`,
+      turno_id: null,
+      data_turno: params.dataInizio,
+    }))
+  await insertNotifiche(righe)
 }
 
 export function turnoCambiatoRilevante(prev: {
