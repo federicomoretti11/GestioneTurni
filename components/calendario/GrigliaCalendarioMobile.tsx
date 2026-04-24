@@ -55,16 +55,6 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
     [giorni, dataSelezionata]
   )
 
-  if (giorni.length === 0 || !giornoSelezionato) {
-    return (
-      <EmptyState
-        icon="📅"
-        title="Intervallo vuoto"
-        description="Seleziona un periodo valido per vedere i turni."
-      />
-    )
-  }
-
   const turniDelGiorno = useMemo(
     () => turni.filter(t => t.data === dataSelezionata),
     [turni, dataSelezionata]
@@ -78,6 +68,16 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
     }
     return m
   }, [turniDelGiorno])
+
+  if (giorni.length === 0 || !giornoSelezionato) {
+    return (
+      <EmptyState
+        icon="📅"
+        title="Intervallo vuoto"
+        description="Seleziona un periodo valido per vedere i turni."
+      />
+    )
+  }
 
   const oreGiorno = turniDelGiorno.reduce(
     (sum, t) => sum + calcolaOreTurno(t.ora_inizio, t.ora_fine),
