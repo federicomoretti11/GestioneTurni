@@ -26,6 +26,8 @@ export interface TurnoTemplate {
   created_at: string
 }
 
+export type StatoTurno = 'bozza' | 'confermato'
+
 export interface Turno {
   id: string
   dipendente_id: string
@@ -40,6 +42,7 @@ export interface Turno {
   updated_at: string
   ora_ingresso_effettiva: string | null  // ISO timestamptz
   ora_uscita_effettiva: string | null    // ISO timestamptz
+  stato: StatoTurno
   // join opzionali
   profile?: Profile
   template?: TurnoTemplate | null | undefined
