@@ -7,6 +7,7 @@ import { HeaderProgrammazione } from '@/components/programmazione/HeaderProgramm
 import { ModaleConfermaPeriodo } from '@/components/programmazione/ModaleConfermaPeriodo'
 import { ModaleCopiaDaPeriodo } from '@/components/programmazione/ModaleCopiaDaPeriodo'
 import { ModaleSvuotaBozza } from '@/components/programmazione/ModaleSvuotaBozza'
+import { ModaleConfermaAggiuntaTurno } from '@/components/programmazione/ModaleConfermaAggiuntaTurno'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
@@ -25,6 +26,7 @@ export default function CalendarioProgrammazionePage() {
   const [modaleConferma, setModaleConferma] = useState(false)
   const [modaleCopia, setModaleCopia] = useState(false)
   const [modaleSvuota, setModaleSvuota] = useState(false)
+  const [modaleAggiunta, setModaleAggiunta] = useState<{ payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }; conflitti: { dipendente: string; orario: string }[]; data: string; dipendenteNome: string } | null>(null)
   const [loadingAzione, setLoadingAzione] = useState(false)
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
@@ -57,7 +59,7 @@ export default function CalendarioProgrammazionePage() {
 
   useEffect(() => { caricaDati() }, [caricaDati])
 
-  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+  async function eseguiSalvataggio(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
     const res = modale.turno
       ? await fetch(`/api/turni/${modale.turno.id}`, {
           method: 'PUT',
@@ -75,6 +77,36 @@ export default function CalendarioProgrammazionePage() {
     }
     setModale({ open: false })
     caricaDati()
+  }
+
+  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+    // Controllo conflitti solo su creazione con posto selezionato
+    if (!modale.turno && payload.posto_id) {
+      const data = modale.data!
+      const dipId = payload.dipendente_id ?? modale.dipendenteId!
+      const conflitti = turni.filter(t =>
+        t.data === data &&
+        t.dipendente_id !== dipId &&
+        t.posto_id === payload.posto_id
+      )
+      if (conflitti.length > 0) {
+        const dip = dipendenti.find(d => d.id === dipId)
+        setModaleAggiunta({
+          payload,
+          data,
+          dipendenteNome: dip ? `${dip.nome} ${dip.cognome}` : '',
+          conflitti: conflitti.map(t => {
+            const d = dipendenti.find(x => x.id === t.dipendente_id)
+            return {
+              dipendente: d ? `${d.cognome} ${d.nome}` : t.dipendente_id,
+              orario: t.ora_inizio !== t.ora_fine ? `${t.ora_inizio.slice(0,5)}–${t.ora_fine.slice(0,5)}` : '',
+            }
+          }),
+        })
+        return // aspetta conferma
+      }
+    }
+    return eseguiSalvataggio(payload)
   }
 
   async function handleEliminaTurno() {
@@ -223,6 +255,20 @@ export default function CalendarioProgrammazionePage() {
         onAnnulla={() => setModaleSvuota(false)}
         loading={loadingAzione}
       />
+
+      {modaleAggiunta && (
+        <ModaleConfermaAggiuntaTurno
+          open
+          data={modaleAggiunta.data}
+          dipendenteNome={modaleAggiunta.dipendenteNome}
+          turniEsistenti={modaleAggiunta.conflitti}
+          onConferma={async () => {
+            setModaleAggiunta(null)
+            await eseguiSalvataggio(modaleAggiunta.payload)
+          }}
+          onAnnulla={() => setModaleAggiunta(null)}
+        />
+      )}
     </div>
   )
 }
