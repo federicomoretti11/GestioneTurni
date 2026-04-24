@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-interface NavItem { label: string; href: string; icon: string }
+interface NavItem { label: string; href: string; icon: string; badge?: number }
 
 interface SidebarProps { items: NavItem[]; title: string; ruolo?: string }
 
@@ -28,7 +28,12 @@ export function Sidebar({ items, title, ruolo }: SidebarProps) {
               }`}
             >
               <span className="text-[15px] leading-none">{item.icon}</span>
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {typeof item.badge === 'number' && item.badge > 0 && (
+                <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                  {item.badge > 99 ? '99+' : item.badge}
+                </span>
+              )}
             </Link>
           )
         })}
