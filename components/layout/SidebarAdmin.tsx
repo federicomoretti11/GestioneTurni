@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { useBozzaCount } from './BozzaCounter'
 
@@ -16,8 +17,13 @@ const BASE_ITEMS = [
 ]
 
 export function SidebarAdmin() {
+  // Il badge viene valorizzato solo dopo mount per evitare mismatch di hydration
+  // (useBozzaCount fa fetch+realtime, il primo render lato server non può ancora averli).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const bozza = useBozzaCount()
-  const items = BASE_ITEMS.map(it => it.href === '/admin/calendario-programmazione'
+
+  const items = BASE_ITEMS.map(it => it.href === '/admin/calendario-programmazione' && mounted
     ? { ...it, badge: bozza }
     : it)
   return <Sidebar items={items} title="GestioneTurni" ruolo="admin" />
