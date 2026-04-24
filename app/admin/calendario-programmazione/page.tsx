@@ -29,6 +29,8 @@ export default function CalendarioProgrammazionePage() {
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
 
+  const dipSelezionato = dipendenti.find(d => d.id === modale.dipendenteId)
+
   const caricaDati = useCallback(async () => {
     setErrore('')
     setLoading(true)
@@ -190,6 +192,7 @@ export default function CalendarioProgrammazionePage() {
         turno={modale.turno}
         templates={templates}
         posti={posti}
+        dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
         dipendenti={dipendenti}
         data={modale.data}
       />
