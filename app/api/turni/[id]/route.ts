@@ -10,20 +10,26 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   // Snapshot prima della modifica per confronto
   const { data: prev } = await supabase
     .from('turni')
-    .select('template_id, data, ora_inizio, ora_fine, posto_id, dipendente_id')
+    .select('template_id, data, ora_inizio, ora_fine, posto_id, dipendente_id, stato')
     .eq('id', params.id)
     .single()
 
-  // Controllo sovrapposizione (escludo il turno corrente)
-  if (body.dipendente_id && body.data) {
+  // Controllo sovrapposizione nello STESSO stato (escludo il turno corrente)
+  if (body.dipendente_id && body.data && prev) {
     const { data: esistente } = await supabase
       .from('turni')
       .select('id')
       .eq('dipendente_id', body.dipendente_id)
       .eq('data', body.data)
+      .eq('stato', prev.stato)
       .neq('id', params.id)
       .maybeSingle()
-    if (esistente) return NextResponse.json({ error: 'Il dipendente ha già un turno in questa data.' }, { status: 409 })
+    if (esistente) {
+      return NextResponse.json(
+        { error: `Il dipendente ha già un turno ${prev.stato === 'bozza' ? 'in bozza' : 'ufficiale'} in questa data.` },
+        { status: 409 }
+      )
+    }
   }
 
   const { data, error } = await supabase
@@ -41,7 +47,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  if (prev && turnoCambiatoRilevante(prev, data)) {
+  // Notifica solo se il turno è confermato; sulle bozze nessuno dei dipendenti è informato.
+  if (prev?.stato === 'confermato' && turnoCambiatoRilevante(prev, data)) {
     await notificaTurnoModificato({
       turnoId: data.id,
       dipendenteId: data.dipendente_id,
@@ -61,14 +68,14 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
 
   const { data: turno } = await supabase
     .from('turni')
-    .select('dipendente_id, data')
+    .select('dipendente_id, data, stato')
     .eq('id', params.id)
     .single()
 
   const { error } = await supabase.from('turni').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  if (turno) {
+  if (turno && turno.stato === 'confermato') {
     await notificaTurnoEliminato({
       dipendenteId: turno.dipendente_id,
       data: turno.data,
