@@ -12,8 +12,10 @@ import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { useToast } from '@/components/ui/ToastProvider'
 
 export default function CalendarioProgrammazionePage() {
+  const { mostra } = useToast()
   const [periodo, setPeriodo] = useState<Periodo>(() => presetPeriodo('mese-corrente'))
   const [dipendenti, setDipendenti] = useState<Profile[]>([])
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
@@ -93,10 +95,10 @@ export default function CalendarioProgrammazionePage() {
     setLoadingAzione(false)
     setModaleConferma(false)
     if (res.ok) {
-      alert(`${d.confermati} turni pubblicati per ${d.dipendenti} dipendenti.`)
+      mostra(`${d.confermati} turni pubblicati per ${d.dipendenti} dipendenti.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante la conferma.')
+      mostra(d.error ?? 'Errore durante la conferma.', 'errore')
     }
   }
 
@@ -115,10 +117,10 @@ export default function CalendarioProgrammazionePage() {
     setLoadingAzione(false)
     setModaleCopia(false)
     if (res.ok) {
-      alert(`${d.copiati} turni copiati in bozza.`)
+      mostra(`${d.copiati} turni copiati in bozza.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante la copia.')
+      mostra(d.error ?? 'Errore durante la copia.', 'errore')
     }
   }
 
@@ -133,10 +135,10 @@ export default function CalendarioProgrammazionePage() {
     setLoadingAzione(false)
     setModaleSvuota(false)
     if (res.ok) {
-      alert(`${d.eliminati} turni bozza eliminati.`)
+      mostra(`${d.eliminati} turni bozza eliminati.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante lo svuotamento.')
+      mostra(d.error ?? 'Errore durante lo svuotamento.', 'errore')
     }
   }
 

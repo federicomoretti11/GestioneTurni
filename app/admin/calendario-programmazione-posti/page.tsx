@@ -9,8 +9,10 @@ import { ModaleSvuotaBozza } from '@/components/programmazione/ModaleSvuotaBozza
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
+import { useToast } from '@/components/ui/ToastProvider'
 
 export default function CalendarioProgrammazionePostiPage() {
+  const { mostra } = useToast()
   const [periodo, setPeriodo] = useState<Periodo>(() => presetPeriodo('mese-corrente'))
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
@@ -54,10 +56,10 @@ export default function CalendarioProgrammazionePostiPage() {
     setLoadingAzione(false)
     setModaleConferma(false)
     if (res.ok) {
-      alert(`${d.confermati} turni pubblicati per ${d.dipendenti} dipendenti.`)
+      mostra(`${d.confermati} turni pubblicati per ${d.dipendenti} dipendenti.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante la conferma.')
+      mostra(d.error ?? 'Errore durante la conferma.', 'errore')
     }
   }
 
@@ -76,10 +78,10 @@ export default function CalendarioProgrammazionePostiPage() {
     setLoadingAzione(false)
     setModaleCopia(false)
     if (res.ok) {
-      alert(`${d.copiati} turni copiati in bozza.`)
+      mostra(`${d.copiati} turni copiati in bozza.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante la copia.')
+      mostra(d.error ?? 'Errore durante la copia.', 'errore')
     }
   }
 
@@ -94,10 +96,10 @@ export default function CalendarioProgrammazionePostiPage() {
     setLoadingAzione(false)
     setModaleSvuota(false)
     if (res.ok) {
-      alert(`${d.eliminati} turni bozza eliminati.`)
+      mostra(`${d.eliminati} turni bozza eliminati.`)
       caricaDati()
     } else {
-      alert(d.error ?? 'Errore durante lo svuotamento.')
+      mostra(d.error ?? 'Errore durante lo svuotamento.', 'errore')
     }
   }
 

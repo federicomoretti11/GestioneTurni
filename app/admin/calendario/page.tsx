@@ -10,6 +10,7 @@ import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
+import { useToast } from '@/components/ui/ToastProvider'
 
 function parseDataParam(s: string | null): Date | null {
   if (!s) return null
@@ -19,6 +20,7 @@ function parseDataParam(s: string | null): Date | null {
 }
 
 export default function CalendarioPage() {
+  const { mostra } = useToast()
   const searchParams = useSearchParams()
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
   const [dataCorrente, setDataCorrente] = useState(() => parseDataParam(searchParams.get('data')) ?? new Date())
@@ -122,8 +124,8 @@ export default function CalendarioPage() {
       body: JSON.stringify({ data_inizio_origine: toDateString(giorni[0]) }),
     })
     const d = await res.json()
-    if (d.copiati === 0) alert('Nessun turno da copiare: tutti i turni della settimana successiva esistono già.')
-    else { alert(`${d.copiati} turni copiati nella settimana successiva.`); caricaDati() }
+    if (d.copiati === 0) mostra('Nessun turno da copiare: tutti i turni della settimana successiva esistono già.', 'errore')
+    else { mostra(`${d.copiati} turni copiati nella settimana successiva.`); caricaDati() }
   }
 
   async function handleEliminaTurno() {
