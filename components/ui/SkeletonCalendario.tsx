@@ -25,7 +25,8 @@ export function SkeletonCalendario({ righe = 5, colonne = 7 }: { righe?: number;
               </td>
               {Array.from({ length: colonne }).map((_, c) => (
                 <td key={c} className="border border-gray-100 p-1 h-14">
-                  {Math.random() > 0.6 && (
+                  {/* pattern deterministico (~40% celle) per evitare mismatch di hydration */}
+                  {((r * 3 + c * 7) % 5 < 2) && (
                     <div className="h-8 bg-gray-200 rounded mx-1" />
                   )}
                 </td>
