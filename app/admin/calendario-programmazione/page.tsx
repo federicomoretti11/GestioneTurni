@@ -28,6 +28,7 @@ export default function CalendarioProgrammazionePage() {
   const [loading, setLoading] = useState(true)
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
+  const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
 
   const dipSelezionato = dipendenti.find(d => d.id === modale.dipendenteId)
 
@@ -38,7 +39,7 @@ export default function CalendarioProgrammazionePage() {
       const [u, tp, tr, po] = await Promise.all([
         fetch('/api/utenti').then(r => r.json()),
         fetch('/api/template').then(r => r.json()),
-        fetch(`/api/turni?stato=bozza&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
+        fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
       ])
       setDipendenti(u.filter((x: Profile) => x.ruolo === 'dipendente' && x.attivo))
@@ -151,7 +152,7 @@ export default function CalendarioProgrammazionePage() {
         onConferma={() => setModaleConferma(true)}
         onCopiaDaPeriodo={() => setModaleCopia(true)}
         onSvuotaBozza={() => setModaleSvuota(true)}
-        bozzeNelPeriodo={turni.length}
+        bozzeNelPeriodo={bozzeNelPeriodo}
       />
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
@@ -200,7 +201,7 @@ export default function CalendarioProgrammazionePage() {
       <ModaleConfermaPeriodo
         open={modaleConferma}
         periodo={periodo}
-        bozze={turni.length}
+        bozze={bozzeNelPeriodo}
         onConferma={handleConferma}
         onAnnulla={() => setModaleConferma(false)}
         loading={loadingAzione}
@@ -215,7 +216,7 @@ export default function CalendarioProgrammazionePage() {
       <ModaleSvuotaBozza
         open={modaleSvuota}
         periodo={periodo}
-        bozze={turni.length}
+        bozze={bozzeNelPeriodo}
         onConferma={handleSvuota}
         onAnnulla={() => setModaleSvuota(false)}
         loading={loadingAzione}

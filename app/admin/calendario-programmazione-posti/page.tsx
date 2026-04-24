@@ -21,10 +21,11 @@ export default function CalendarioProgrammazionePostiPage() {
   const [loadingAzione, setLoadingAzione] = useState(false)
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
+  const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
 
   const caricaDati = useCallback(async () => {
     const [trn, pst] = await Promise.all([
-      fetch(`/api/turni?stato=bozza&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
+      fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
       fetch('/api/posti').then(r => r.json()),
     ])
     setTurni(Array.isArray(trn) ? trn : [])
@@ -112,7 +113,7 @@ export default function CalendarioProgrammazionePostiPage() {
         onConferma={() => setModaleConferma(true)}
         onCopiaDaPeriodo={() => setModaleCopia(true)}
         onSvuotaBozza={() => setModaleSvuota(true)}
-        bozzeNelPeriodo={turni.length}
+        bozzeNelPeriodo={bozzeNelPeriodo}
       />
 
       {postiDisponibili.length > 0 && (
@@ -148,7 +149,7 @@ export default function CalendarioProgrammazionePostiPage() {
       <ModaleConfermaPeriodo
         open={modaleConferma}
         periodo={periodo}
-        bozze={turni.length}
+        bozze={bozzeNelPeriodo}
         onConferma={handleConferma}
         onAnnulla={() => setModaleConferma(false)}
         loading={loadingAzione}
@@ -163,7 +164,7 @@ export default function CalendarioProgrammazionePostiPage() {
       <ModaleSvuotaBozza
         open={modaleSvuota}
         periodo={periodo}
-        bozze={turni.length}
+        bozze={bozzeNelPeriodo}
         onConferma={handleSvuota}
         onAnnulla={() => setModaleSvuota(false)}
         loading={loadingAzione}
