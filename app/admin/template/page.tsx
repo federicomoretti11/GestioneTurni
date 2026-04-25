@@ -42,7 +42,7 @@ export default function TemplatePage() {
   }
 
   async function handleElimina(id: string) {
-    if (!confirm('Eliminare questo template?')) return
+    if (!confirm('Eliminare questo turno?')) return
     await fetch(`/api/template/${id}`, { method: 'DELETE' })
     carica()
   }
@@ -50,8 +50,8 @@ export default function TemplatePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Template Turni</h1>
-        <Button onClick={apriNuovo}>+ Nuovo template</Button>
+        <h1 className="text-xl font-bold text-gray-900">Turni</h1>
+        <Button onClick={apriNuovo}>+ Nuovo turno</Button>
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y">
         {templates.map(t => (
@@ -67,9 +67,9 @@ export default function TemplatePage() {
             </div>
           </div>
         ))}
-        {templates.length === 0 && <EmptyState icon="🏷️" title="Nessun template" description="I template velocizzano la creazione di turni ricorrenti." size="sm" />}
+        {templates.length === 0 && <EmptyState icon="🏷️" title="Nessun turno" description="Crea i tipi di turno ricorrenti per velocizzare la programmazione." size="sm" />}
       </div>
-      <Modal open={modale.open} onClose={() => setModale({ open: false })} title={modale.template ? 'Modifica template' : 'Nuovo template'}>
+      <Modal open={modale.open} onClose={() => setModale({ open: false })} title={modale.template ? 'Modifica turno' : 'Nuovo turno'}>
         <div className="space-y-4">
           <Input label="Nome" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} placeholder="es. Mattina" />
           <div className="grid grid-cols-2 gap-3">

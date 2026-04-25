@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
 import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCalendarioPostiMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
-import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
+import { ModaleTurno } from '@/components/calendario/ModaleTurno'
+import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 
 export default function CalendarioPostiPage() {
@@ -11,20 +12,26 @@ export default function CalendarioPostiPage() {
   const [dataCorrente, setDataCorrente] = useState(new Date())
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
+  const [templates, setTemplates] = useState<TurnoTemplate[]>([])
+  const [dipendenti, setDipendenti] = useState<Profile[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
+  const [modale, setModale] = useState<{ open: boolean; postoId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
 
   const giorni = vista === 'settimana'
     ? getWeekDays(dataCorrente)
     : getMonthDays(dataCorrente.getFullYear(), dataCorrente.getMonth())
 
   const caricaDati = useCallback(async () => {
-    const [turniRes, postiRes] = await Promise.all([
-      fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
-      fetch('/api/posti'),
+    const [trn, pst, tp, utenti] = await Promise.all([
+      fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`).then(r => r.json()),
+      fetch('/api/posti').then(r => r.json()),
+      fetch('/api/template').then(r => r.json()),
+      fetch('/api/utenti').then(r => r.json()),
     ])
-    const [trn, pst] = await Promise.all([turniRes.json(), postiRes.json()])
     setTurni(Array.isArray(trn) ? trn : [])
     setPosti(Array.isArray(pst) ? pst : [])
+    setTemplates(Array.isArray(tp) ? tp : [])
+    setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.ruolo === 'dipendente' && u.attivo) : [])
   }, [dataCorrente, vista])
 
   useEffect(() => { caricaDati() }, [caricaDati])
@@ -44,6 +51,33 @@ export default function CalendarioPostiPage() {
     if (!filtroPosto) return turni
     return turni.filter(t => t.posto_id === filtroPosto)
   }, [turni, filtroPosto])
+
+  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+    const res = modale.turno
+      ? await fetch(`/api/turni/${modale.turno.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, dipendente_id: modale.turno.dipendente_id, data: modale.turno.data }),
+        })
+      : await fetch('/api/turni', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, dipendente_id: payload.dipendente_id, data: modale.data }),
+        })
+    if (!res.ok) {
+      const d = await res.json()
+      return d.error ?? 'Errore nel salvataggio.'
+    }
+    setModale({ open: false })
+    caricaDati()
+  }
+
+  async function handleEliminaTurno() {
+    if (!modale.turno) return
+    await fetch(`/api/turni/${modale.turno.id}`, { method: 'DELETE' })
+    setModale({ open: false })
+    caricaDati()
+  }
 
   return (
     <div className="space-y-4">
@@ -83,11 +117,34 @@ export default function CalendarioPostiPage() {
       )}
 
       <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} />
+        <GrigliaCalendarioPosti
+          giorni={giorni}
+          turni={turniFiltrati}
+          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+          onEditTurno={turno => setModale({ open: true, turno })}
+        />
       </div>
       <div className="md:hidden">
-        <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        <GrigliaCalendarioPostiMobile
+          giorni={giorni}
+          turni={turniFiltrati}
+          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+          onEditTurno={turno => setModale({ open: true, turno })}
+        />
       </div>
+
+      <ModaleTurno
+        open={modale.open}
+        onClose={() => setModale({ open: false })}
+        onSave={handleSalvaTurno}
+        onDelete={modale.turno ? handleEliminaTurno : undefined}
+        turno={modale.turno}
+        templates={templates}
+        posti={posti}
+        dipendenti={dipendenti}
+        data={modale.data ?? modale.turno?.data}
+        postoIdDefault={modale.postoId}
+      />
     </div>
   )
 }

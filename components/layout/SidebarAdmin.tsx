@@ -9,7 +9,7 @@ const BASE_ITEMS = [
   { label: 'Per posto', href: '/admin/calendario-posti', icon: '📍' },
   { label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝' },
   { label: 'Programmazione per posto', href: '/admin/calendario-programmazione-posti', icon: '📝' },
-  { label: 'Template', href: '/admin/template', icon: '🏷️' },
+  { label: 'Turni', href: '/admin/template', icon: '🏷️' },
   { label: 'Export', href: '/admin/export', icon: '📤' },
   { label: 'Utenti', href: '/admin/utenti', icon: '👥' },
   { label: 'Posti', href: '/admin/posti', icon: '📍' },

@@ -18,6 +18,7 @@ interface ModaleTurnoProps {
   dipendenteNome?: string
   dipendenti?: Profile[]
   data?: string   // YYYY-MM-DD (formattata internamente per display)
+  postoIdDefault?: string
 }
 
 function formatDataIT(iso: string): string {
@@ -27,7 +28,7 @@ function formatDataIT(iso: string): string {
   return giorno.charAt(0).toUpperCase() + giorno.slice(1)
 }
 
-export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data }: ModaleTurnoProps) {
+export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault }: ModaleTurnoProps) {
   const [templateId, setTemplateId] = useState<string>('')
   const [oraInizio, setOraInizio] = useState('08:00')
   const [oraFine, setOraFine] = useState('16:00')
@@ -52,7 +53,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
       setTemplateId('')
       setOraInizio('08:00')
       setOraFine('16:00')
-      setPostoId('')
+      setPostoId(postoIdDefault ?? '')
       setNote('')
     }
     setDipendenteId('')
@@ -203,7 +204,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
           </div>
         )}
         <div className="space-y-1.5">
-          <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">Template</label>
+          <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">Tipo turno</label>
           <div className="flex items-center gap-2">
             {templateSelezionato && (
               <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: templateSelezionato.colore }} />

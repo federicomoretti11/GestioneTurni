@@ -9,6 +9,8 @@ const oggi = toDateString(new Date())
 interface GrigliaCalendarioPostiProps {
   giorni: Date[]
   turni: TurnoConDettagli[]
+  onAddTurno?: (postoId: string, data: string) => void
+  onEditTurno?: (turno: TurnoConDettagli) => void
 }
 
 function oreLabel(ore: number) {
@@ -16,7 +18,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPostiProps) {
+export function GrigliaCalendarioPosti({ giorni, turni, onAddTurno, onEditTurno }: GrigliaCalendarioPostiProps) {
   const posti = Array.from(new Map(
     turni
       .filter(t => t.posto)
@@ -77,7 +79,7 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
                 const data = toDateString(g)
                 const turniCella = getTurniCella(posto.id, data)
                 return (
-                  <td key={data} className={`border border-gray-200 p-1 align-top min-w-[100px] ${data === oggi ? 'bg-blue-50/40' : ''}`}>
+                  <td key={data} className={`border border-gray-200 p-1 align-top min-w-[100px] relative group/cella ${data === oggi ? 'bg-blue-50/40' : ''}`}>
                     <div className="space-y-0.5">
                       {turniCella.map(t => {
                         const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
@@ -89,7 +91,8 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
                         return (
                           <div
                             key={t.id}
-                            className="relative rounded px-1.5 py-0.5 text-white text-xs"
+                            onClick={() => onEditTurno?.(t)}
+                            className={`relative rounded px-1.5 py-0.5 text-white text-xs ${onEditTurno ? 'cursor-pointer hover:opacity-80' : ''}`}
                             style={{ backgroundColor: t.template?.colore ?? '#6b7280' }}
                           >
                             <div className="font-medium truncate">
@@ -108,7 +111,15 @@ export function GrigliaCalendarioPosti({ giorni, turni }: GrigliaCalendarioPosti
                           </div>
                         )
                       })}
-                      {turniCella.length === 0 && (
+                      {turniCella.length === 0 && onAddTurno && (
+                        <button
+                          onClick={() => onAddTurno(posto.id, data)}
+                          className="absolute inset-0 flex items-center justify-center text-gray-300 hover:text-blue-500 hover:bg-blue-50 text-xl font-light transition-colors w-full"
+                        >
+                          +
+                        </button>
+                      )}
+                      {turniCella.length === 0 && !onAddTurno && (
                         <span className="text-gray-200 text-lg flex items-center justify-center h-8">—</span>
                       )}
                     </div>

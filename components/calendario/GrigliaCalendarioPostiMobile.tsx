@@ -10,6 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState'
 interface Props {
   giorni: Date[]
   turni: TurnoConDettagli[]
+  onAddTurno?: (postoId: string, data: string) => void
+  onEditTurno?: (turno: TurnoConDettagli) => void
 }
 
 function giornoBreve(d: Date) {
@@ -25,7 +27,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendarioPostiMobile({ giorni, turni }: Props) {
+export function GrigliaCalendarioPostiMobile({ giorni, turni, onAddTurno, onEditTurno }: Props) {
   const oggi = toDateString(new Date())
   const indiceOggi = giorni.findIndex(g => toDateString(g) === oggi)
   const [dataSelezionata, setDataSelezionata] = useState<string>(() =>
@@ -106,6 +108,14 @@ export function GrigliaCalendarioPostiMobile({ giorni, turni }: Props) {
             {oreGiorno > 0 && ` · ${oreLabel(oreGiorno)}`}
           </div>
         </div>
+        {onAddTurno && (
+          <button
+            onClick={() => onAddTurno('', dataSelezionata)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+          >
+            + Turno
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -137,7 +147,8 @@ export function GrigliaCalendarioPostiMobile({ giorni, turni }: Props) {
                   return (
                     <div
                       key={t.id}
-                      className="w-full flex items-stretch gap-3 pr-3 py-2.5"
+                      onClick={() => onEditTurno?.(t)}
+                      className={`w-full flex items-stretch gap-3 pr-3 py-2.5 ${onEditTurno ? 'cursor-pointer hover:bg-gray-50' : ''}`}
                     >
                       <div
                         className="w-1 rounded-full flex-shrink-0 my-0.5"

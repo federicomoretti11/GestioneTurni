@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { notificaTurnoModificato, notificaTurnoEliminato, turnoCambiatoRilevante } from '@/lib/notifiche'
+import { notificaTurnoModificato, notificaTurnoEliminato } from '@/lib/notifiche'
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -47,8 +47,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Notifica solo se il turno è confermato; sulle bozze nessuno dei dipendenti è informato.
-  if (prev?.stato === 'confermato' && turnoCambiatoRilevante(prev, data)) {
+  if (prev?.stato === 'confermato') {
     await notificaTurnoModificato({
       turnoId: data.id,
       dipendenteId: data.dipendente_id,

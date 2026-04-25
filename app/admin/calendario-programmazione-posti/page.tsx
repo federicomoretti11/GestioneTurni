@@ -6,7 +6,9 @@ import { HeaderProgrammazione } from '@/components/programmazione/HeaderProgramm
 import { ModaleConfermaPeriodo } from '@/components/programmazione/ModaleConfermaPeriodo'
 import { ModaleCopiaDaPeriodo } from '@/components/programmazione/ModaleCopiaDaPeriodo'
 import { ModaleSvuotaBozza } from '@/components/programmazione/ModaleSvuotaBozza'
-import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
+import { ModaleConfermaAggiuntaTurno } from '@/components/programmazione/ModaleConfermaAggiuntaTurno'
+import { ModaleTurno } from '@/components/calendario/ModaleTurno'
+import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -16,22 +18,30 @@ export default function CalendarioProgrammazionePostiPage() {
   const [periodo, setPeriodo] = useState<Periodo>(() => presetPeriodo('mese-corrente'))
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
+  const [templates, setTemplates] = useState<TurnoTemplate[]>([])
+  const [dipendenti, setDipendenti] = useState<Profile[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
+  const [modale, setModale] = useState<{ open: boolean; postoId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [modaleConferma, setModaleConferma] = useState(false)
   const [modaleCopia, setModaleCopia] = useState(false)
   const [modaleSvuota, setModaleSvuota] = useState(false)
+  const [modaleAggiunta, setModaleAggiunta] = useState<{ payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }; conflitti: { dipendente: string; orario: string }[]; data: string; dipendenteNome: string } | null>(null)
   const [loadingAzione, setLoadingAzione] = useState(false)
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
   const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
 
   const caricaDati = useCallback(async () => {
-    const [trn, pst] = await Promise.all([
+    const [trn, pst, tp, utenti] = await Promise.all([
       fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
       fetch('/api/posti').then(r => r.json()),
+      fetch('/api/template').then(r => r.json()),
+      fetch('/api/utenti').then(r => r.json()),
     ])
     setTurni(Array.isArray(trn) ? trn : [])
     setPosti(Array.isArray(pst) ? pst : [])
+    setTemplates(Array.isArray(tp) ? tp : [])
+    setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.ruolo === 'dipendente' && u.attivo) : [])
   }, [periodo])
 
   useEffect(() => { caricaDati() }, [caricaDati])
@@ -83,6 +93,62 @@ export default function CalendarioProgrammazionePostiPage() {
     } else {
       mostra(d.error ?? 'Errore durante la copia.', 'errore')
     }
+  }
+
+  async function eseguiSalvataggio(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+    const res = modale.turno
+      ? await fetch(`/api/turni/${modale.turno.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, dipendente_id: modale.turno.dipendente_id, data: modale.turno.data, stato: 'bozza' }),
+        })
+      : await fetch('/api/turni', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, dipendente_id: payload.dipendente_id, data: modale.data, stato: 'bozza' }),
+        })
+    if (!res.ok) {
+      const d = await res.json()
+      return d.error ?? 'Errore nel salvataggio.'
+    }
+    setModale({ open: false })
+    caricaDati()
+  }
+
+  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+    if (!modale.turno && payload.posto_id) {
+      const data = modale.data!
+      const dipId = payload.dipendente_id!
+      const conflitti = turni.filter(t =>
+        t.data === data &&
+        t.dipendente_id !== dipId &&
+        t.posto_id === payload.posto_id
+      )
+      if (conflitti.length > 0) {
+        const dip = dipendenti.find(d => d.id === dipId)
+        setModaleAggiunta({
+          payload,
+          data,
+          dipendenteNome: dip ? `${dip.nome} ${dip.cognome}` : '',
+          conflitti: conflitti.map(t => {
+            const d = dipendenti.find(x => x.id === t.dipendente_id)
+            return {
+              dipendente: d ? `${d.cognome} ${d.nome}` : t.dipendente_id,
+              orario: t.ora_inizio !== t.ora_fine ? `${t.ora_inizio.slice(0,5)}–${t.ora_fine.slice(0,5)}` : '',
+            }
+          }),
+        })
+        return
+      }
+    }
+    return eseguiSalvataggio(payload)
+  }
+
+  async function handleEliminaTurno() {
+    if (!modale.turno) return
+    await fetch(`/api/turni/${modale.turno.id}`, { method: 'DELETE' })
+    setModale({ open: false })
+    caricaDati()
   }
 
   async function handleSvuota() {
@@ -142,11 +208,48 @@ export default function CalendarioProgrammazionePostiPage() {
       )}
 
       <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} />
+        <GrigliaCalendarioPosti
+          giorni={giorni}
+          turni={turniFiltrati}
+          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+          onEditTurno={turno => setModale({ open: true, turno })}
+        />
       </div>
       <div className="md:hidden">
-        <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        <GrigliaCalendarioPostiMobile
+          giorni={giorni}
+          turni={turniFiltrati}
+          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+          onEditTurno={turno => setModale({ open: true, turno })}
+        />
       </div>
+
+      <ModaleTurno
+        open={modale.open}
+        onClose={() => setModale({ open: false })}
+        onSave={handleSalvaTurno}
+        onDelete={modale.turno ? handleEliminaTurno : undefined}
+        turno={modale.turno}
+        templates={templates}
+        posti={posti}
+        dipendenti={dipendenti}
+        data={modale.data ?? modale.turno?.data}
+        postoIdDefault={modale.postoId}
+      />
+
+      {modaleAggiunta && (
+        <ModaleConfermaAggiuntaTurno
+          open
+          data={modaleAggiunta.data}
+          dipendenteNome={modaleAggiunta.dipendenteNome}
+          turniEsistenti={modaleAggiunta.conflitti}
+          onConferma={async () => {
+            setModaleAggiunta(null)
+            await eseguiSalvataggio(modaleAggiunta.payload)
+          }}
+          onAnnulla={() => setModaleAggiunta(null)}
+        />
+      )}
 
       <ModaleConfermaPeriodo
         open={modaleConferma}
