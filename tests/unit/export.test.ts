@@ -15,7 +15,7 @@ function makeTurno(data: string, ora_inizio: string, ora_fine: string): TurnoCon
 }
 
 function makeFestivo(data: string): Festivo {
-  return { id: 'f1', data, nome: 'Festivo', created_at: '' } as Festivo
+  return { id: 'f1', data, nome: 'Festivo', tipo: 'nazionale', created_at: '' } as unknown as Festivo
 }
 
 describe('turniToExcelRows', () => {

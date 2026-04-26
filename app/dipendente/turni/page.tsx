@@ -3,10 +3,13 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
+import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, TurnoConDettagli } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
+import { exportPdf } from '@/lib/utils/export'
+import { useFestivi } from '@/lib/hooks/useFestivi'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { BannerTurnoOggi } from '@/components/dipendente/BannerTurnoOggi'
@@ -31,7 +34,9 @@ export default function MieiTurniPage() {
   const [turnoOggi, setTurnoOggi] = useState<TurnoConDettagli | null>(null)
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
+  const [exportLoading, setExportLoading] = useState(false)
   const supabase = createClient()
+  const festivi = useFestivi()
 
   const giorni = vista === 'settimana'
     ? getWeekDays(dataCorrente)
@@ -98,13 +103,38 @@ export default function MieiTurniPage() {
     turni.filter(t => calcolaOreTurno(t.ora_inizio, t.ora_fine) === 0)
   , [turni])
 
+  const periodoLabel = vista === 'mese'
+    ? giorni[0].toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())
+    : `${toDateString(giorni[0])} – ${toDateString(giorni[giorni.length - 1])}`
+
+  async function handleDownloadPdf() {
+    if (!profilo || !turni.length) return
+    setExportLoading(true)
+    try {
+      const filename = `turni_${profilo.cognome}_${profilo.nome}_${toDateString(giorni[0])}_${toDateString(giorni[giorni.length - 1])}`
+      await exportPdf(turni, filename, periodoLabel, festivi)
+    } finally {
+      setExportLoading(false)
+    }
+  }
+
   if (!profilo) return null
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-xl font-bold text-gray-900">I miei turni</h1>
-        <SwitcherVista vista={vista} onChange={setVista} dataCorrente={dataCorrente} onPrev={() => spostaData(-1)} onNext={() => spostaData(1)} onOggi={() => setDataCorrente(new Date())} />
+        <div className="flex items-center gap-2 flex-wrap">
+          <SwitcherVista vista={vista} onChange={setVista} dataCorrente={dataCorrente} onPrev={() => spostaData(-1)} onNext={() => spostaData(1)} onOggi={() => setDataCorrente(new Date())} />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleDownloadPdf}
+            disabled={exportLoading || loading || turni.length === 0}
+          >
+            {exportLoading ? 'Generazione…' : '⬇ Scarica PDF'}
+          </Button>
+        </div>
       </div>
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaTurni} />}
