@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { useBozzaCount } from './BozzaCounter'
 
@@ -22,9 +23,15 @@ export function SidebarAdmin() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const bozza = useBozzaCount()
+  const pathname = usePathname()
 
-  const items = BASE_ITEMS.map(it => it.href === '/admin/calendario-programmazione' && mounted
-    ? { ...it, badge: bozza }
-    : it)
+  const items = BASE_ITEMS.map(it => {
+    if (it.href === '/admin/calendario-programmazione' && mounted) {
+      // Badge nascosto se l'utente è già sulla pagina programmazione (le vede già lì)
+      const badge = pathname === '/admin/calendario-programmazione' ? 0 : bozza
+      return { ...it, badge }
+    }
+    return it
+  })
   return <Sidebar items={items} title="GestioneTurni" ruolo="admin" />
 }

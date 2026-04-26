@@ -14,6 +14,7 @@ import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { useToast } from '@/components/ui/ToastProvider'
+import { useBozzaCount } from '@/components/layout/BozzaCounter'
 
 export default function CalendarioProgrammazionePage() {
   const { mostra } = useToast()
@@ -33,6 +34,8 @@ export default function CalendarioProgrammazionePage() {
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
   const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
+  const bozzeTotali = useBozzaCount()
+  const bozzeAltrove = bozzeTotali - bozzeNelPeriodo
 
   const dipSelezionato = dipendenti.find(d => d.id === modale.dipendenteId)
 
@@ -107,6 +110,17 @@ export default function CalendarioProgrammazionePage() {
       }
     }
     return eseguiSalvataggio(payload)
+  }
+
+  async function handleVaiAllePrimeBozze() {
+    const res = await fetch('/api/turni/bozza-count')
+    if (!res.ok) return
+    const { primaData } = await res.json()
+    if (!primaData) return
+    const [y, m] = primaData.split('-').map(Number)
+    const inizio = `${y}-${String(m).padStart(2, '0')}-01`
+    const fine = new Date(y, m, 0).toISOString().split('T')[0]
+    setPeriodo({ inizio, fine })
   }
 
   async function handleEliminaTurno() {
@@ -190,6 +204,15 @@ export default function CalendarioProgrammazionePage() {
       />
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
+
+      {bozzeAltrove > 0 && (
+        <div className="flex items-center justify-between gap-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-900">
+          <span>📋 Ci sono <strong>{bozzeAltrove}</strong> {bozzeAltrove === 1 ? 'bozza in un altro periodo' : 'bozze in altri periodi'}.</span>
+          <button onClick={handleVaiAllePrimeBozze} className="font-semibold underline whitespace-nowrap">
+            Vai alle bozze →
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
