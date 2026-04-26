@@ -37,6 +37,31 @@ function giornoBreve(iso: string): string {
   return d.toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '').toUpperCase().slice(0, 3)
 }
 
+// Decompone le ore con priorità festivo > notturno:
+// le ore nella data festiva (dall'inizio turno fino a mezzanotte) sono "festive";
+// le eventuali ore sul giorno successivo (turno che scavalca mezzanotte) vanno in diurne/notturne ordinarie.
+// Garantisce sempre: diurne + notturne + festive = ore totali.
+function calcolaOreFestiveNotturne(
+  oraInizio: string,
+  oraFine: string,
+  isFestivo: boolean
+): { diurne: number; notturne: number; festive: number } {
+  if (!isFestivo) {
+    const { diurne, notturne } = calcolaOreDiurneNotturne(oraInizio, oraFine)
+    return { diurne, notturne, festive: 0 }
+  }
+  const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m }
+  const start = toMin(oraInizio)
+  const endRaw = toMin(oraFine)
+  const scavalcaMezzanotte = endRaw <= start && oraInizio !== oraFine
+  if (scavalcaMezzanotte) {
+    const festive = (24 * 60 - start) / 60
+    const { diurne, notturne } = calcolaOreDiurneNotturne('00:00:00', oraFine)
+    return { diurne, notturne, festive }
+  }
+  return { diurne: 0, notturne: 0, festive: calcolaOreTurno(oraInizio, oraFine) }
+}
+
 interface OpzioniRows {
   compact?: boolean
 }
@@ -76,9 +101,8 @@ export function turniToExcelRows(
     const subtot = { ore: 0, diurne: 0, notturne: 0, festive: 0 }
     for (const t of turniDip) {
       const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
-      const { diurne, notturne } = calcolaOreDiurneNotturne(t.ora_inizio, t.ora_fine)
       const festivo = trovaFestivo(t.data, festivi)
-      const oreFestive = festivo ? ore : 0
+      const { diurne, notturne, festive: oreFestive } = calcolaOreFestiveNotturne(t.ora_inizio, t.ora_fine, !!festivo)
       const tipo = classificaTipo(ore, notturne, oreFestive)
 
       subtot.ore += ore
@@ -160,8 +184,8 @@ function calcolaRiepilogoDipendenti(
   for (const t of turni) {
     const key = `${t.profile.cognome} ${t.profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
-    const { diurne, notturne } = calcolaOreDiurneNotturne(t.ora_inizio, t.ora_fine)
-    const oreFestive = trovaFestivo(t.data, festivi) ? ore : 0
+    const isFestivo = !!trovaFestivo(t.data, festivi)
+    const { diurne, notturne, festive: oreFestive } = calcolaOreFestiveNotturne(t.ora_inizio, t.ora_fine, isFestivo)
     if (!map.has(key)) map.set(key, { nome: key, turni: 0, ore: 0, diurne: 0, notturne: 0, festive: 0 })
     const r = map.get(key)!
     r.turni += 1
