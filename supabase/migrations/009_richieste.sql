@@ -48,34 +48,26 @@ create policy "dipendente_annulla" on richieste
   for update using (
     dipendente_id = auth.uid()
     and stato = 'pending'
+  ) with check (
+    dipendente_id = auth.uid()
+    and stato in ('pending', 'annullata')
   );
 
 -- Manager/Admin: vedono tutto
 create policy "staff_select_all" on richieste
-  for select using (
-    exists (
-      select 1 from profiles
-      where id = auth.uid() and ruolo in ('admin','manager')
-    )
-  );
+  for select using (get_my_role() in ('admin','manager'));
 
 -- Manager/Admin: UPDATE per transizioni stato
 create policy "staff_update" on richieste
   for update using (
-    exists (
-      select 1 from profiles
-      where id = auth.uid() and ruolo in ('admin','manager')
-    )
+    get_my_role() in ('admin','manager')
+  ) with check (
+    get_my_role() in ('admin','manager')
   );
 
 -- Admin: DELETE
 create policy "admin_delete" on richieste
-  for delete using (
-    exists (
-      select 1 from profiles
-      where id = auth.uid() and ruolo = 'admin'
-    )
-  );
+  for delete using (get_my_role() = 'admin');
 
 -- Realtime
 alter publication supabase_realtime add table richieste;
