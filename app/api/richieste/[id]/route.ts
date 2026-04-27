@@ -13,8 +13,11 @@ import type { AzioneRichiesta, RuoloUtente } from '@/lib/types'
 const SELECT = `*, profile:profiles!richieste_dipendente_id_fkey(id, nome, cognome, ruolo),
   turno:turni(id, data, ora_inizio, ora_fine)`
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+
   const { data, error } = await supabase
     .from('richieste').select(SELECT).eq('id', params.id).single()
   if (error) return NextResponse.json({ error: error.message }, { status: 404 })
@@ -30,9 +33,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     .from('profiles').select('ruolo').eq('id', user.id).single()
   const ruolo = profilo?.ruolo as RuoloUtente
 
-  const body: { azione: AzioneRichiesta; motivazione?: string; _sovrascrivi_conflitti?: boolean }
+  const body: { azione: AzioneRichiesta; motivazione?: string; sovrascrivi_conflitti?: boolean }
     = await request.json()
   const { azione, motivazione } = body
+  // sovrascrivi_conflitti handled in Task 14
 
   // Leggi richiesta corrente
   const { data: richiesta, error: fetchErr } = await supabase
