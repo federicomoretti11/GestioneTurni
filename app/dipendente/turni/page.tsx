@@ -35,6 +35,10 @@ export default function MieiTurniPage() {
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
   const [exportLoading, setExportLoading] = useState(false)
+  const [turnoPerCambio, setTurnoPerCambio] = useState<TurnoConDettagli | null>(null)
+  const [motivazioneCambio, setMotivazioneCambio] = useState('')
+  const [erroreCambio, setErroreCambio] = useState('')
+  const [loadingCambio, setLoadingCambio] = useState(false)
   const supabase = createClient()
   const festivi = useFestivi()
 
@@ -107,6 +111,31 @@ export default function MieiTurniPage() {
     ? giorni[0].toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())
     : `${toDateString(giorni[0])} – ${toDateString(giorni[giorni.length - 1])}`
 
+  async function inviaCambioTurno() {
+    if (!turnoPerCambio) return
+    if (!motivazioneCambio.trim()) { setErroreCambio('La motivazione è obbligatoria'); return }
+    setLoadingCambio(true)
+    const res = await fetch('/api/richieste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'cambio_turno',
+        data_inizio: turnoPerCambio.data,
+        data_fine: turnoPerCambio.data,
+        turno_id: turnoPerCambio.id,
+        note_dipendente: motivazioneCambio.trim(),
+      }),
+    })
+    setLoadingCambio(false)
+    if (!res.ok) {
+      const json = await res.json()
+      setErroreCambio(json.error ?? 'Errore invio')
+      return
+    }
+    setTurnoPerCambio(null)
+    setMotivazioneCambio('')
+  }
+
   async function handleDownloadPdf() {
     if (!profilo || !turni.length) return
     setExportLoading(true)
@@ -165,8 +194,46 @@ export default function MieiTurniPage() {
           onAddTurno={() => {}}
           onEditTurno={() => {}}
           readonly
+          onTurnoClick={setTurnoPerCambio}
         />}
       </div>
+
+      {turnoPerCambio && (
+        <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-4">
+            <h2 className="font-bold text-gray-900">Non posso fare questo turno</h2>
+            <p className="text-sm text-gray-600">
+              {turnoPerCambio.data} · {turnoPerCambio.ora_inizio?.slice(0,5)}–{turnoPerCambio.ora_fine?.slice(0,5)}
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Motivazione *</label>
+              <textarea
+                value={motivazioneCambio}
+                onChange={e => setMotivazioneCambio(e.target.value)}
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none"
+                placeholder="Spiega perché non puoi fare questo turno..."
+              />
+            </div>
+            {erroreCambio && <p className="text-red-600 text-sm">{erroreCambio}</p>}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setTurnoPerCambio(null); setMotivazioneCambio(''); setErroreCambio('') }}
+                className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={inviaCambioTurno}
+                disabled={loadingCambio}
+                className="flex-1 bg-orange-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50"
+              >
+                {loadingCambio ? 'Invio...' : 'Invia richiesta'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

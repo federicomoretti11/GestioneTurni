@@ -6,11 +6,12 @@ interface CellaProps {
   onAdd: () => void
   onEdit: (turno: TurnoConDettagli) => void
   readonly?: boolean
+  onReadonlyClick?: (turno: TurnoConDettagli) => void
   isOggi?: boolean
   isPassato?: boolean
 }
 
-export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, isOggi = false, isPassato = false }: CellaProps) {
+export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false }: CellaProps) {
   const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-gray-50' : '')
   return (
     <td className={`border border-gray-200 p-1 align-top min-w-[80px] h-14 group relative ${sfondo}`}>
@@ -23,7 +24,7 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, isOggi
             oraFine={t.ora_fine}
             colore={t.template?.colore ?? '#6b7280'}
             posto={t.posto?.nome ?? ''}
-            onClick={readonly ? undefined : () => onEdit(t)}
+            onClick={readonly ? (onReadonlyClick ? () => onReadonlyClick(t) : undefined) : () => onEdit(t)}
             oraIngressoEffettiva={t.ora_ingresso_effettiva}
             oraUscitaEffettiva={t.ora_uscita_effettiva}
           />

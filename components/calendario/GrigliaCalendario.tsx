@@ -12,6 +12,7 @@ interface GrigliaProps {
   onAddTurno: (dipendenteId: string, data: string) => void
   onEditTurno: (turno: TurnoConDettagli) => void
   readonly?: boolean
+  onTurnoClick?: (turno: TurnoConDettagli) => void
 }
 
 function oreLabel(ore: number) {
@@ -19,7 +20,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly }: GrigliaProps) {
+export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick }: GrigliaProps) {
   function getTurniCella(dipendenteId: string, data: string) {
     return turni.filter(t => t.dipendente_id === dipendenteId && t.data === data)
   }
@@ -76,6 +77,7 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
                     onAdd={() => onAddTurno(d.id, data)}
                     onEdit={onEditTurno}
                     readonly={readonly}
+                    onReadonlyClick={onTurnoClick}
                     isOggi={data === oggi}
                     isPassato={data < oggi}
                   />
