@@ -1,16 +1,16 @@
 import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Richiesta, CategoriaTemplate } from '@/lib/types'
+import type { Richiesta, CategoriaTemplate, TipoRichiesta } from '@/lib/types'
 
 export function dateRange(dataInizio: string, dataFine: string): string[] {
   const result: string[] = []
-  const start = new Date(dataInizio)
-  const end = new Date(dataFine)
+  const start = new Date(dataInizio + 'T00:00:00Z')
+  const end = new Date(dataFine + 'T00:00:00Z')
   if (end < start) return result
   const cur = new Date(start)
   while (cur <= end) {
     result.push(cur.toISOString().slice(0, 10))
-    cur.setDate(cur.getDate() + 1)
+    cur.setUTCDate(cur.getUTCDate() + 1)
   }
   return result
 }
@@ -31,12 +31,14 @@ export async function checkConflitti(
   const giorni = dateRange(dataInizio, dataFine)
   if (!giorni.length) return []
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('turni')
     .select('id, data, ora_inizio, ora_fine')
     .eq('dipendente_id', dipendenteId)
     .eq('stato', 'confermato')
     .in('data', giorni)
+
+  if (error) throw new Error(`checkConflitti: ${error.message}`)
 
   return (data ?? []).map(t => ({
     data: t.data,
@@ -52,7 +54,7 @@ export async function createTurniDaRichiesta(
   adminId: string,
   supabase: SupabaseClient
 ): Promise<{ ok: boolean; error?: string }> {
-  const categoriaMap: Record<string, CategoriaTemplate> = {
+  const categoriaMap: Partial<Record<TipoRichiesta, CategoriaTemplate>> = {
     ferie: 'ferie', permesso: 'permesso', malattia: 'malattia',
   }
   const categoria = categoriaMap[richiesta.tipo]
@@ -72,15 +74,6 @@ export async function createTurniDaRichiesta(
 
   const dataFine = richiesta.data_fine ?? richiesta.data_inizio
   const giorni = dateRange(richiesta.data_inizio, dataFine)
-
-  if (sovrascriviConflitti) {
-    await supabase
-      .from('turni')
-      .delete()
-      .eq('dipendente_id', richiesta.dipendente_id)
-      .eq('stato', 'confermato')
-      .in('data', giorni)
-  }
 
   const oraInizio = (richiesta.tipo === 'permesso' && richiesta.permesso_tipo === 'ore' && richiesta.ora_inizio)
     ? richiesta.ora_inizio
@@ -106,5 +99,16 @@ export async function createTurniDaRichiesta(
 
   const { error } = await supabase.from('turni').insert(righe)
   if (error) return { ok: false, error: error.message }
+
+  // Delete only after successful insert (prevents data loss if insert fails)
+  if (sovrascriviConflitti) {
+    await supabase
+      .from('turni')
+      .delete()
+      .eq('dipendente_id', richiesta.dipendente_id)
+      .eq('stato', 'confermato')
+      .in('data', giorni)
+  }
+
   return { ok: true }
 }
