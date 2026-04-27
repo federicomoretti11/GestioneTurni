@@ -31,7 +31,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
   async function invia() {
     setErrore('')
     if (!dataInizio) { setErrore('Inserisci la data di inizio'); return }
-    if (tipo !== 'malattia' && !openEnded && !dataFine) { setErrore('Inserisci la data di fine'); return }
+    if (tipo === 'ferie' && !dataFine) { setErrore('Inserisci la data di fine'); return }
     if (tipo === 'permesso' && permessoTipo === 'ore' && (!oraInizio || !oraFine)) {
       setErrore('Inserisci orario inizio e fine'); return
     }
