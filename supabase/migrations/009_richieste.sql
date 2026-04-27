@@ -50,7 +50,7 @@ create policy "dipendente_annulla" on richieste
     and stato = 'pending'
   ) with check (
     dipendente_id = auth.uid()
-    and stato in ('pending', 'annullata')
+    and stato = 'annullata'
   );
 
 -- Manager/Admin: vedono tutto
