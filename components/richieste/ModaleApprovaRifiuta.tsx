@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
-import type { Richiesta, AzioneRichiesta } from '@/lib/types'
+import type { Richiesta, AzioneRichiesta, TipoRichiesta } from '@/lib/types'
 import { formatDateIT } from '@/lib/utils/date'
 
-const TIPO_LABEL: Record<string, string> = {
+const TIPO_LABEL: Record<TipoRichiesta, string> = {
   ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
 }
 
@@ -35,18 +35,23 @@ export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess }: 
     const body: { azione: AzioneRichiesta; motivazione?: string } = { azione }
     if (azione === 'rifiuta') body.motivazione = motivazione.trim()
 
-    const res = await fetch(`/api/richieste/${richiesta.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    setLoading(false)
-    if (!res.ok) {
-      const json = await res.json()
-      setErrore(json.error ?? 'Errore')
-      return
+    try {
+      const res = await fetch(`/api/richieste/${richiesta.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        setErrore((json as { error?: string }).error ?? 'Errore')
+        return
+      }
+      onSuccess()
+    } catch {
+      setErrore('Errore di rete')
+    } finally {
+      setLoading(false)
     }
-    onSuccess()
   }
 
   const dateTesto = richiesta.data_fine
