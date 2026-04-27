@@ -23,6 +23,7 @@ export interface TurnoTemplate {
   ora_inizio: string  // "HH:MM:SS"
   ora_fine: string    // "HH:MM:SS"
   colore: string      // hex
+  categoria: CategoriaTemplate
   created_at: string
 }
 
@@ -63,6 +64,12 @@ export type TipoNotifica =
   | 'check_in'
   | 'check_out'
   | 'turni_pubblicati'
+  | 'richiesta_creata'
+  | 'richiesta_approvata_manager'
+  | 'richiesta_approvata'
+  | 'richiesta_rifiutata'
+  | 'richiesta_cancellata'
+  | 'malattia_comunicata'
 
 export interface Notifica {
   id: string
@@ -83,4 +90,34 @@ export interface Festivo {
   nome: string
   tipo: TipoFestivo
   created_at: string
+}
+
+export type TipoRichiesta = 'ferie' | 'permesso' | 'malattia' | 'cambio_turno'
+export type StatoRichiesta = 'pending' | 'approvata_manager' | 'approvata' | 'rifiutata' | 'annullata' | 'comunicata'
+export type PermessoTipo = 'giornata' | 'mezza_mattina' | 'mezza_pomeriggio' | 'ore'
+export type CategoriaTemplate = 'lavoro' | 'ferie' | 'permesso' | 'malattia'
+export type AzioneRichiesta = 'cancella' | 'approva' | 'rifiuta' | 'convalida'
+
+export interface Richiesta {
+  id: string
+  dipendente_id: string
+  tipo: TipoRichiesta
+  data_inizio: string        // "YYYY-MM-DD"
+  data_fine: string | null
+  permesso_tipo: PermessoTipo | null
+  ora_inizio: string | null  // "HH:MM:SS"
+  ora_fine: string | null
+  turno_id: string | null
+  stato: StatoRichiesta
+  note_dipendente: string | null
+  motivazione_decisione: string | null
+  manager_id: string | null
+  manager_decisione_at: string | null
+  admin_id: string | null
+  admin_decisione_at: string | null
+  created_at: string
+  updated_at: string
+  // join opzionali
+  profile?: Profile
+  turno?: Turno | null
 }

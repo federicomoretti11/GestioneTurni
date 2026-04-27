@@ -30,6 +30,12 @@ const iconaPerTipo: Record<Notifica['tipo'], string> = {
   check_in: '🟢',
   check_out: '🔴',
   turni_pubblicati: '📣',
+  richiesta_creata: '📝',
+  richiesta_approvata_manager: '👍',
+  richiesta_approvata: '✅',
+  richiesta_rifiutata: '❌',
+  richiesta_cancellata: '🚫',
+  malattia_comunicata: '🏥',
 }
 
 export function Notifiche({ userId, ruolo }: Props) {
