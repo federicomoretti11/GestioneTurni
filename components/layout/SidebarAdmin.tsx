@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { useBozzaCount } from './BozzaCounter'
+import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 
 const BASE_ITEMS = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
@@ -12,6 +13,7 @@ const BASE_ITEMS = [
   { label: 'Programmazione per posto', href: '/admin/calendario-programmazione-posti', icon: '📝' },
   { label: 'Turni', href: '/admin/template', icon: '🏷️' },
   { label: 'Export', href: '/admin/export', icon: '📤' },
+  { label: 'Richieste', href: '/admin/richieste', icon: '📋' },
   { label: 'Utenti', href: '/admin/utenti', icon: '👥' },
   { label: 'Posti', href: '/admin/posti', icon: '📍' },
   { label: 'Festivi', href: '/admin/festivi', icon: '🎉' },
@@ -23,12 +25,17 @@ export function SidebarAdmin() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const bozza = useBozzaCount()
+  const richieste = useRichiesteCount()
   const pathname = usePathname()
 
   const items = BASE_ITEMS.map(it => {
     if (it.href === '/admin/calendario-programmazione' && mounted) {
       // Badge nascosto se l'utente è già sulla pagina programmazione (le vede già lì)
       const badge = pathname === '/admin/calendario-programmazione' ? 0 : bozza
+      return { ...it, badge }
+    }
+    if (it.href === '/admin/richieste' && mounted) {
+      const badge = pathname === '/admin/richieste' ? 0 : richieste
       return { ...it, badge }
     }
     return it
