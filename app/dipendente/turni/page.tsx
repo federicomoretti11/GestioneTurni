@@ -134,6 +134,7 @@ export default function MieiTurniPage() {
     }
     setTurnoPerCambio(null)
     setMotivazioneCambio('')
+    setErroreCambio('')
   }
 
   async function handleDownloadPdf() {
