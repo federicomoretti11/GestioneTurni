@@ -1,9 +1,11 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 export function useBozzaCount(): number {
   const [count, setCount] = useState(0)
+  const channelId = useRef(`bozza_count_turni_${Math.random().toString(36).slice(2)}`)
+
   useEffect(() => {
     const supabase = createClient()
     let mounted = true
@@ -17,7 +19,7 @@ export function useBozzaCount(): number {
     carica()
 
     const canale = supabase
-      .channel('bozza_count_turni')
+      .channel(channelId.current)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'turni' }, () => carica())
       .subscribe()
 
