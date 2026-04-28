@@ -2,19 +2,25 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { exportExcel, exportCsv, exportPdf } from '@/lib/utils/export'
+import { exportExcel, exportCsv, exportPdf, calcolaAssenzeDipendenti } from '@/lib/utils/export'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 import type { Profile, PostoDiServizio, TurnoConDettagli } from '@/lib/types'
+
+interface RigaAssenza { nome: string; ferie: number; permesso: number; malattia: number }
 
 interface Anteprima {
   totaleOre: number
   totaleTurni: number
   perDipendente: { nome: string; ore: number; turni: number }[]
+  assenze: RigaAssenza[]
 }
 
 function calcolaAnteprima(turni: TurnoConDettagli[]): Anteprima {
+  const isAssenza = (t: TurnoConDettagli) => ['ferie', 'permesso', 'malattia'].includes(t.template?.categoria ?? '')
+  const turniLavoro = turni.filter(t => !isAssenza(t))
+
   const map = new Map<string, { nome: string; ore: number; turni: number }>()
-  for (const t of turni) {
+  for (const t of turniLavoro) {
     const key = t.dipendente_id
     const nome = `${t.profile.cognome} ${t.profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
@@ -26,8 +32,9 @@ function calcolaAnteprima(turni: TurnoConDettagli[]): Anteprima {
   const perDipendente = Array.from(map.values()).sort((a, b) => a.nome.localeCompare(b.nome))
   return {
     totaleOre: perDipendente.reduce((s, d) => s + d.ore, 0),
-    totaleTurni: turni.length,
+    totaleTurni: turniLavoro.length,
     perDipendente,
+    assenze: calcolaAssenzeDipendenti(turni),
   }
 }
 
@@ -158,6 +165,24 @@ export default function ExportPage() {
                   <span className="text-gray-500">{d.turni} turni · <span className="font-medium text-blue-700">{oreLabel(d.ore)}</span></span>
                 </div>
               ))}
+            </div>
+          )}
+
+          {anteprima.assenze.length > 0 && (
+            <div className="border-t border-gray-100 pt-4 space-y-2">
+              <h3 className="text-sm font-semibold text-gray-700">Assenze nel periodo</h3>
+              <div className="divide-y divide-gray-100">
+                {anteprima.assenze.map(a => (
+                  <div key={a.nome} className="py-2 text-sm flex justify-between items-center">
+                    <span className="text-gray-700">{a.nome}</span>
+                    <div className="flex gap-3 text-xs">
+                      {a.ferie > 0 && <span className="text-green-700 font-medium">Ferie: {a.ferie}gg</span>}
+                      {a.permesso > 0 && <span className="text-blue-700 font-medium">Permesso: {a.permesso}</span>}
+                      {a.malattia > 0 && <span className="text-red-700 font-medium">Malattia: {a.malattia}gg</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

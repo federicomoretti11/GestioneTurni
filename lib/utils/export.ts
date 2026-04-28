@@ -5,6 +5,10 @@ import { formatDateIT, formatTimeShort } from './date'
 import { calcolaOreDiurneNotturne, calcolaOreTurno } from './turni'
 import { trovaFestivo } from './maggiorazioni'
 
+function isAssenza(t: TurnoConDettagli): boolean {
+  return ['ferie', 'permesso', 'malattia'].includes(t.template?.categoria ?? '')
+}
+
 // Indici di colonna — usati dal PDF per lo styling condizionale.
 const COL = {
   NOTTURNE: 8,
@@ -88,7 +92,7 @@ export function turniToExcelRows(
   ]
 
   const perDipendente = new Map<string, TurnoConDettagli[]>()
-  for (const t of turni) {
+  for (const t of turni.filter(t => !isAssenza(t))) {
     const key = `${t.profile.cognome} ${t.profile.nome}`
     if (!perDipendente.has(key)) perDipendente.set(key, [])
     perDipendente.get(key)!.push(t)
@@ -181,7 +185,7 @@ function calcolaRiepilogoDipendenti(
   festivi: Festivo[]
 ): { righe: RiepilogoDip[]; totale: Omit<RiepilogoDip, 'nome'> } {
   const map = new Map<string, RiepilogoDip>()
-  for (const t of turni) {
+  for (const t of turni.filter(t => !isAssenza(t))) {
     const key = `${t.profile.cognome} ${t.profile.nome}`
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     const isFestivo = !!trovaFestivo(t.data, festivi)
@@ -208,15 +212,53 @@ function calcolaRiepilogoDipendenti(
   return { righe, totale }
 }
 
+interface RigaAssenzaDip {
+  nome: string
+  ferie: number
+  permesso: number
+  malattia: number
+}
+
+export function calcolaAssenzeDipendenti(turni: TurnoConDettagli[]): RigaAssenzaDip[] {
+  const map = new Map<string, RigaAssenzaDip>()
+  for (const t of turni.filter(isAssenza)) {
+    const nome = `${t.profile.cognome} ${t.profile.nome}`
+    if (!map.has(nome)) map.set(nome, { nome, ferie: 0, permesso: 0, malattia: 0 })
+    const r = map.get(nome)!
+    const cat = t.template?.categoria
+    if (cat === 'ferie') r.ferie++
+    else if (cat === 'permesso') r.permesso++
+    else if (cat === 'malattia') r.malattia++
+  }
+  return Array.from(map.values()).sort((a, b) => a.nome.localeCompare(b.nome))
+}
+
+function assenzeToSheet(turni: TurnoConDettagli[]): (string | number)[][] {
+  const righe = calcolaAssenzeDipendenti(turni)
+  if (!righe.length) return []
+  const header = ['Dipendente', 'Ferie (gg)', 'Permesso', 'Malattia (gg)']
+  const body = righe.map(r => [r.nome, r.ferie || '', r.permesso || '', r.malattia || ''])
+  const totale: (string | number)[] = [
+    'TOTALE',
+    righe.reduce((s, r) => s + r.ferie, 0) || '',
+    righe.reduce((s, r) => s + r.permesso, 0) || '',
+    righe.reduce((s, r) => s + r.malattia, 0) || '',
+  ]
+  return [header, ...body, totale]
+}
+
 export async function exportExcel(
   turni: TurnoConDettagli[],
   filename: string,
   festivi: Festivo[] = []
 ) {
   const { utils, writeFile } = await import('xlsx')
-  const ws = utils.aoa_to_sheet(turniToExcelRows(turni, festivi))
   const wb = utils.book_new()
-  utils.book_append_sheet(wb, ws, 'Turni')
+  utils.book_append_sheet(wb, utils.aoa_to_sheet(turniToExcelRows(turni, festivi)), 'Turni')
+  const assenzeRows = assenzeToSheet(turni)
+  if (assenzeRows.length) {
+    utils.book_append_sheet(wb, utils.aoa_to_sheet(assenzeRows), 'Assenze')
+  }
   writeFile(wb, `${filename}.xlsx`)
 }
 
@@ -226,7 +268,12 @@ export async function exportCsv(
   festivi: Festivo[] = []
 ) {
   const { utils, writeFile } = await import('xlsx')
-  const ws = utils.aoa_to_sheet(turniToExcelRows(turni, festivi))
+  const turniRows = turniToExcelRows(turni, festivi)
+  const assenzeRows = assenzeToSheet(turni)
+  const rows = assenzeRows.length
+    ? [...turniRows, [], ['--- ASSENZE ---'], ...assenzeRows]
+    : turniRows
+  const ws = utils.aoa_to_sheet(rows)
   const wb = utils.book_new()
   utils.book_append_sheet(wb, ws, 'Turni')
   writeFile(wb, `${filename}.csv`, { bookType: 'csv' })
@@ -333,6 +380,55 @@ function renderRiepilogo(
   })
 }
 
+function renderAssenze(
+  doc: jsPDF,
+  autoTable: (doc: jsPDF, options: UserOptions) => void,
+  turni: TurnoConDettagli[],
+  startY: number,
+  fontSize: number
+) {
+  const righe = calcolaAssenzeDipendenti(turni)
+  if (!righe.length) return
+
+  doc.setFontSize(fontSize)
+  doc.setTextColor(15, 23, 42)
+  doc.text('Assenze nel periodo', 10, startY - 3)
+
+  const body: (string | number)[][] = righe.map(r => [r.nome, r.ferie || '—', r.permesso || '—', r.malattia || '—'])
+  body.push([
+    'TOTALE',
+    righe.reduce((s, r) => s + r.ferie, 0) || '—',
+    righe.reduce((s, r) => s + r.permesso, 0) || '—',
+    righe.reduce((s, r) => s + r.malattia, 0) || '—',
+  ])
+
+  autoTable(doc, {
+    head: [['Dipendente', 'Ferie (gg)', 'Permesso', 'Malattia (gg)']],
+    body,
+    startY,
+    margin: { left: 10, right: 10 },
+    tableWidth: 277,
+    styles: { fontSize, cellPadding: 3, lineColor: [226, 232, 240], lineWidth: 0.1 },
+    headStyles: { fillColor: [226, 232, 240], textColor: [30, 41, 59], fontStyle: 'bold', halign: 'left' },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    columnStyles: {
+      0: { cellWidth: 100 },
+      1: { cellWidth: 59, halign: 'right' },
+      2: { cellWidth: 59, halign: 'right' },
+      3: { cellWidth: 59, halign: 'right' },
+    },
+    didParseCell: (data: CellHookData) => {
+      if (data.section !== 'body') return
+      const raw = data.row.raw as (string | number)[]
+      if (raw[0] === 'TOTALE') {
+        data.cell.styles.fontStyle = 'bold'
+        data.cell.styles.fillColor = [219, 234, 254]
+        data.cell.styles.textColor = [30, 58, 138]
+      }
+    },
+  })
+}
+
 export async function exportPdf(
   turni: TurnoConDettagli[],
   filename: string,
@@ -347,6 +443,10 @@ export async function exportPdf(
   if (opzioni.soloRiepilogo) {
     const startY = renderIntestazione(doc, periodo, 'Riepilogo ore')
     renderRiepilogo(doc, autoTable, turni, festivi, startY, 11)
+    if (calcolaAssenzeDipendenti(turni).length > 0) {
+      doc.addPage()
+      renderAssenze(doc, autoTable, turni, 16, 11)
+    }
   } else {
     const startY = renderIntestazione(doc, periodo)
 
@@ -456,6 +556,11 @@ export async function exportPdf(
       doc.setTextColor(15, 23, 42)
       doc.text('Riepilogo ore per dipendente', 10, 12)
       renderRiepilogo(doc, autoTable, turni, festivi, 16, 11)
+    }
+    const assenzeRighe = calcolaAssenzeDipendenti(turni)
+    if (assenzeRighe.length > 0) {
+      doc.addPage()
+      renderAssenze(doc, autoTable, turni, 16, 11)
     }
   }
 
