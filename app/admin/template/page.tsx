@@ -11,7 +11,7 @@ const COLORI_PRESET = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#
 export default function TemplatePage() {
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
   const [modale, setModale] = useState<{ open: boolean; template?: TurnoTemplate | null }>({ open: false })
-  const [form, setForm] = useState({ nome: '', ora_inizio: '08:00', ora_fine: '16:00', colore: '#3b82f6' })
+  const [form, setForm] = useState({ nome: '', ora_inizio: '08:00', ora_fine: '16:00', colore: '#3b82f6', categoria: 'lavoro' })
 
   async function carica() {
     const res = await fetch('/api/template')
@@ -21,17 +21,17 @@ export default function TemplatePage() {
   useEffect(() => { carica() }, [])
 
   function apriNuovo() {
-    setForm({ nome: '', ora_inizio: '08:00', ora_fine: '16:00', colore: '#3b82f6' })
+    setForm({ nome: '', ora_inizio: '08:00', ora_fine: '16:00', colore: '#3b82f6', categoria: 'lavoro' })
     setModale({ open: true, template: null })
   }
 
   function apriModifica(t: TurnoTemplate) {
-    setForm({ nome: t.nome, ora_inizio: t.ora_inizio.slice(0, 5), ora_fine: t.ora_fine.slice(0, 5), colore: t.colore })
+    setForm({ nome: t.nome, ora_inizio: t.ora_inizio.slice(0, 5), ora_fine: t.ora_fine.slice(0, 5), colore: t.colore, categoria: t.categoria ?? 'lavoro' })
     setModale({ open: true, template: t })
   }
 
   async function handleSalva() {
-    const payload = { nome: form.nome, ora_inizio: form.ora_inizio + ':00', ora_fine: form.ora_fine + ':00', colore: form.colore }
+    const payload = { nome: form.nome, ora_inizio: form.ora_inizio + ':00', ora_fine: form.ora_fine + ':00', colore: form.colore, categoria: form.categoria }
     if (modale.template) {
       await fetch(`/api/template/${modale.template.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     } else {
@@ -60,6 +60,9 @@ export default function TemplatePage() {
               <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: t.colore }} />
               <span className="font-medium text-gray-800">{t.nome}</span>
               <span className="text-sm text-gray-500">{t.ora_inizio.slice(0,5)} – {t.ora_fine.slice(0,5)}</span>
+              {t.categoria && t.categoria !== 'lavoro' && (
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full capitalize">{t.categoria}</span>
+              )}
             </div>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => apriModifica(t)}>Modifica</Button>
@@ -75,6 +78,16 @@ export default function TemplatePage() {
           <div className="grid grid-cols-2 gap-3">
             <Input label="Ora inizio" type="time" value={form.ora_inizio} onChange={e => setForm(f => ({ ...f, ora_inizio: e.target.value }))} />
             <Input label="Ora fine" type="time" value={form.ora_fine} onChange={e => setForm(f => ({ ...f, ora_fine: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              <option value="lavoro">Lavoro (normale)</option>
+              <option value="ferie">Ferie</option>
+              <option value="permesso">Permesso</option>
+              <option value="malattia">Malattia</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Colore</label>

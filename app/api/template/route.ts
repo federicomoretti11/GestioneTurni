@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { data, error } = await supabase
     .from('turni_template')
-    .insert({ nome: body.nome, ora_inizio: body.ora_inizio, ora_fine: body.ora_fine, colore: body.colore })
+    .insert({ nome: body.nome, ora_inizio: body.ora_inizio, ora_fine: body.ora_fine, colore: body.colore, categoria: body.categoria ?? 'lavoro' })
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
