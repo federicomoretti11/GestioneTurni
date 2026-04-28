@@ -7,14 +7,22 @@ const TIPO_LABEL: Record<TipoRichiesta, string> = {
   ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
 }
 
+interface Conflitto {
+  data: string
+  turno_id: string
+  ora_inizio: string
+  ora_fine: string
+}
+
 interface Props {
   richiesta: Richiesta
   azione: 'approva' | 'rifiuta' | 'convalida'
   onClose: () => void
   onSuccess: () => void
+  onConflict?: (conflitti: Conflitto[]) => void
 }
 
-export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess }: Props) {
+export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess, onConflict }: Props) {
   const [motivazione, setMotivazione] = useState('')
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(false)
@@ -41,6 +49,13 @@ export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess }: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
+      if (res.status === 409) {
+        const json = await res.json().catch(() => ({}))
+        if ((json as any).conflict && onConflict) {
+          onConflict((json as any).conflitti)
+          return
+        }
+      }
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
         setErrore((json as { error?: string }).error ?? 'Errore')

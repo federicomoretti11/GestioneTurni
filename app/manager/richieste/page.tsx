@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Richiesta } from '@/lib/types'
 import { CardRichiesta } from '@/components/richieste/CardRichiesta'
 import { ModaleApprovaRifiuta } from '@/components/richieste/ModaleApprovaRifiuta'
+import { ModaleConflitti } from '@/components/richieste/ModaleConflitti'
 
 const STATI_ATTIVI = ['pending']
 
@@ -13,6 +14,8 @@ export default function RichiesteManagerPage() {
   const [filtroStato, setFiltroStato] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [modale, setModale] = useState<{ richiesta: Richiesta; azione: 'approva' | 'rifiuta' } | null>(null)
+  const [conflitti, setConflitti] = useState<any[] | null>(null)
+  const [richiestaConflitto, setRichiestaConflitto] = useState<Richiesta | null>(null)
   const supabase = createClient()
 
   const carica = useCallback(async () => {
@@ -116,6 +119,33 @@ export default function RichiesteManagerPage() {
           azione={modale.azione}
           onClose={() => setModale(null)}
           onSuccess={() => { setModale(null); carica() }}
+          onConflict={(c) => {
+            setConflitti(c)
+            setRichiestaConflitto(modale.richiesta)
+            setModale(null)
+          }}
+        />
+      )}
+
+      {conflitti && richiestaConflitto && (
+        <ModaleConflitti
+          nomeDipendente={
+            richiestaConflitto.profile
+              ? `${richiestaConflitto.profile.nome} ${richiestaConflitto.profile.cognome}`
+              : 'Dipendente'
+          }
+          conflitti={conflitti}
+          onAnnulla={() => { setConflitti(null); setRichiestaConflitto(null) }}
+          onConferma={async (sovrascrivi) => {
+            await fetch(`/api/richieste/${richiestaConflitto.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ azione: 'approva', sovrascrivi_conflitti: sovrascrivi }),
+            })
+            setConflitti(null)
+            setRichiestaConflitto(null)
+            carica()
+          }}
         />
       )}
     </div>

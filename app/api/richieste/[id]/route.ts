@@ -1,7 +1,9 @@
 // app/api/richieste/[id]/route.ts
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { validateStatoTransition } from '@/lib/richieste/validations'
+import { checkConflitti, createTurniDaRichiesta } from '@/lib/richieste/turni'
 import {
   notificaRichiestaApprovata,
   notificaRichiestaApprovataManager,
@@ -35,8 +37,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   const body: { azione: AzioneRichiesta; motivazione?: string; sovrascrivi_conflitti?: boolean }
     = await request.json()
-  const { azione, motivazione } = body
-  // sovrascrivi_conflitti handled in Task 14
+  const { azione, motivazione, sovrascrivi_conflitti } = body
 
   // Leggi richiesta corrente
   const { data: richiesta, error: fetchErr } = await supabase
@@ -73,8 +74,18 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     aggiornamenti.admin_decisione_at = new Date().toISOString()
   }
 
-  // Nota: conflict detection per turni viene aggiunta in Fase 4 (Task 14)
-  // Per ora la PATCH aggiorna lo stato senza creare turni
+  // Controlla conflitti prima di approvare definitivamente (non per cambio_turno)
+  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno') {
+    const conflitti = await checkConflitti(
+      richiesta.dipendente_id,
+      richiesta.data_inizio,
+      richiesta.data_fine ?? richiesta.data_inizio,
+      supabase
+    )
+    if (conflitti.length > 0 && sovrascrivi_conflitti === undefined) {
+      return NextResponse.json({ conflict: true, conflitti }, { status: 409 })
+    }
+  }
 
   const { data: updated, error: updateErr } = await supabase
     .from('richieste')
@@ -84,6 +95,21 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     .single()
 
   if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+  // Crea turni automatici su approvazione finale (non per cambio_turno)
+  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno') {
+    const adminSupabase = createAdminClient()
+    const risultato = await createTurniDaRichiesta(
+      { ...richiesta, stato: nuovoStato },
+      sovrascrivi_conflitti ?? false,
+      user.id,
+      adminSupabase
+    )
+    if (!risultato.ok) {
+      await supabase.from('richieste').update({ stato: richiesta.stato }).eq('id', params.id)
+      return NextResponse.json({ error: risultato.error }, { status: 500 })
+    }
+  }
 
   // Notifiche non-bloccanti
   const nomeRichiedente = (updated.profile as any)
