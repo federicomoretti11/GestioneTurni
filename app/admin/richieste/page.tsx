@@ -16,6 +16,9 @@ export default function RichiesteAdminPage() {
   const [modale, setModale] = useState<{ richiesta: Richiesta; azione: 'approva' | 'rifiuta' | 'convalida' } | null>(null)
   const [conflitti, setConflitti] = useState<any[] | null>(null)
   const [richiestaConflitto, setRichiestaConflitto] = useState<Richiesta | null>(null)
+  const [richiestaRientro, setRichiestaRientro] = useState<Richiesta | null>(null)
+  const [dataRientro, setDataRientro] = useState('')
+  const [loadingRientro, setLoadingRientro] = useState(false)
   const supabase = createClient()
 
   const carica = useCallback(async () => {
@@ -59,6 +62,14 @@ export default function RichiesteAdminPage() {
             className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-md hover:bg-red-200"
           >
             Rifiuta
+          </button>
+        )}
+        {r.tipo === 'malattia' && r.stato === 'comunicata' && !r.data_fine && (
+          <button
+            onClick={() => setRichiestaRientro(r)}
+            className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-md hover:bg-purple-200"
+          >
+            Imposta rientro
           </button>
         )}
       </div>
@@ -148,6 +159,47 @@ export default function RichiesteAdminPage() {
             carica()
           }}
         />
+      )}
+      {richiestaRientro && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4">
+            <h2 className="font-bold text-gray-900">Imposta data rientro</h2>
+            <p className="text-sm text-gray-600">
+              Malattia di {richiestaRientro.profile?.nome} {richiestaRientro.profile?.cognome}
+              {' '}dal {richiestaRientro.data_inizio}
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Data rientro</label>
+              <input type="date" min={richiestaRientro.data_inizio} value={dataRientro}
+                onChange={e => setDataRientro(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-2 text-sm" />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setRichiestaRientro(null); setDataRientro('') }}
+                className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg">
+                Annulla
+              </button>
+              <button
+                disabled={!dataRientro || loadingRientro}
+                onClick={async () => {
+                  setLoadingRientro(true)
+                  await fetch(`/api/richieste/${richiestaRientro.id}/rientro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data_fine: dataRientro }),
+                  })
+                  setLoadingRientro(false)
+                  setRichiestaRientro(null)
+                  setDataRientro('')
+                  carica()
+                }}
+                className="flex-1 bg-purple-600 text-white text-sm font-medium py-2 rounded-lg disabled:opacity-50"
+              >
+                {loadingRientro ? 'Salvataggio...' : 'Conferma'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
