@@ -1,6 +1,7 @@
 // app/api/richieste/[id]/route.ts
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendEmailRichiestaApprovata, sendEmailRichiestaRifiutata } from '@/lib/email'
 import { NextResponse } from 'next/server'
 import { validateStatoTransition } from '@/lib/richieste/validations'
 import { checkConflitti, createTurniDaRichiesta } from '@/lib/richieste/turni'
@@ -124,6 +125,27 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     notificaRichiestaRifiutata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, motivazione: motivazione! })
   } else if (nuovoStato === 'annullata') {
     notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente })
+  }
+
+  // Email non-bloccante (sandbox: arriva solo all'indirizzo Resend registrato)
+  const adminClient = createAdminClient()
+  const { data: userData } = await adminClient.auth.admin.getUserById(richiesta.dipendente_id)
+  const emailDipendente = userData?.user?.email
+  if (emailDipendente) {
+    if (nuovoStato === 'approvata') {
+      sendEmailRichiestaApprovata({
+        toEmail: emailDipendente,
+        tipo: richiesta.tipo,
+        dataInizio: richiesta.data_inizio,
+        dataFine: richiesta.data_fine,
+      })
+    } else if (nuovoStato === 'rifiutata' && motivazione) {
+      sendEmailRichiestaRifiutata({
+        toEmail: emailDipendente,
+        tipo: richiesta.tipo,
+        motivazione,
+      })
+    }
   }
 
   return NextResponse.json(updated)
