@@ -24,6 +24,13 @@ export default function RichiesteDipendentePage() {
 
   useEffect(() => {
     carica()
+    // Segna come lette le notifiche richiesta non lette
+    supabase
+      .from('notifiche')
+      .update({ letta: true })
+      .eq('letta', false)
+      .in('tipo', ['richiesta_approvata', 'richiesta_rifiutata'])
+      .then(() => {})
     const channel = supabase
       .channel('richieste-dipendente')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'richieste' }, carica)
