@@ -50,20 +50,20 @@ export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess, on
         body: JSON.stringify(body),
       })
       if (res.status === 409) {
-        const json = await res.json().catch(() => ({}))
-        if ((json as any).conflict && onConflict) {
-          onConflict((json as any).conflitti)
+        const json = await res.json().catch(() => ({})) as { conflict?: boolean; conflitti?: Conflitto[] }
+        if (json.conflict && onConflict) {
+          onConflict(json.conflitti ?? [])
           return
         }
       }
       if (!res.ok) {
-        const json = await res.json().catch(() => ({}))
-        setErrore((json as { error?: string }).error ?? 'Errore')
+        const json = await res.json().catch(() => ({})) as { error?: string }
+        setErrore(json.error ?? 'Errore')
         return
       }
-      const json = await res.json().catch(() => ({}))
-      if ((json as any).avviso) {
-        alert((json as any).avviso)
+      const json = await res.json().catch(() => ({})) as { avviso?: string }
+      if (json.avviso) {
+        alert(json.avviso)
       }
       onSuccess()
     } catch {

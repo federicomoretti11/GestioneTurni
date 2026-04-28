@@ -41,7 +41,7 @@ export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
       </div>
 
       {richiesta.note_dipendente && (
-        <p className="text-xs text-gray-600 italic">"{richiesta.note_dipendente}"</p>
+        <p className="text-xs text-gray-600 italic">&quot;{richiesta.note_dipendente}&quot;</p>
       )}
 
       {richiesta.stato === 'rifiutata' && richiesta.motivazione_decisione && (
@@ -52,7 +52,7 @@ export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
 
       {richiesta.turno && (
         <p className="text-xs text-gray-500">
-          Turno: {formatDateIT((richiesta.turno as any).data)} · {(richiesta.turno as any).ora_inizio?.slice(0,5)}–{(richiesta.turno as any).ora_fine?.slice(0,5)}
+          Turno: {formatDateIT(richiesta.turno.data)} · {richiesta.turno.ora_inizio?.slice(0,5)}–{richiesta.turno.ora_fine?.slice(0,5)}
         </p>
       )}
 

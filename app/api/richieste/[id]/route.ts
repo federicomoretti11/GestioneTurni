@@ -11,7 +11,7 @@ import {
   notificaRichiestaRifiutata,
   notificaRichiestaCancellata,
 } from '@/lib/richieste/notifiche'
-import type { AzioneRichiesta, RuoloUtente } from '@/lib/types'
+import type { AzioneRichiesta, RuoloUtente, StatoRichiesta, Profile } from '@/lib/types'
 
 const SELECT = `*, profile:profiles!richieste_dipendente_id_fkey(id, nome, cognome, ruolo),
   turno:turni(id, data, ora_inizio, ora_fine)`
@@ -52,7 +52,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     rifiuta:   'rifiutata',
     convalida: 'approvata',
   }
-  const nuovoStato = mappaStato[azione] as any
+  const nuovoStato = mappaStato[azione] as StatoRichiesta
 
   // Valida transizione
   const err = validateStatoTransition(richiesta.stato, nuovoStato, ruolo)
@@ -117,9 +117,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 
   // Notifiche non-bloccanti
-  const nomeRichiedente = (updated.profile as any)
-    ? `${(updated.profile as any).nome} ${(updated.profile as any).cognome}`
-    : 'Dipendente'
+  const profile = updated.profile as Profile | undefined
+  const nomeRichiedente = profile ? `${profile.nome} ${profile.cognome}` : 'Dipendente'
 
   if (nuovoStato === 'approvata_manager') {
     notificaRichiestaApprovataManager({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente })

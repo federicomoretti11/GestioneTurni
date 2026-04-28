@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Richiesta } from '@/lib/types'
+
+interface Conflitto { data: string; turno_id: string; ora_inizio: string; ora_fine: string }
 import { CardRichiesta } from '@/components/richieste/CardRichiesta'
 import { ModaleApprovaRifiuta } from '@/components/richieste/ModaleApprovaRifiuta'
 import { ModaleConflitti } from '@/components/richieste/ModaleConflitti'
@@ -14,7 +16,7 @@ export default function RichiesteManagerPage() {
   const [filtroStato, setFiltroStato] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [modale, setModale] = useState<{ richiesta: Richiesta; azione: 'approva' | 'rifiuta' } | null>(null)
-  const [conflitti, setConflitti] = useState<any[] | null>(null)
+  const [conflitti, setConflitti] = useState<Conflitto[] | null>(null)
   const [richiestaConflitto, setRichiestaConflitto] = useState<Richiesta | null>(null)
   const [richiestaRientro, setRichiestaRientro] = useState<Richiesta | null>(null)
   const [dataRientro, setDataRientro] = useState('')
