@@ -2,8 +2,11 @@ import 'server-only'
 import { Resend } from 'resend'
 import type { TipoRichiesta } from '@/lib/types'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = process.env.RESEND_FROM ?? 'onboarding@resend.dev'
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? '')
+}
 
 const TIPO_LABEL: Record<TipoRichiesta, string> = {
   ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
@@ -39,7 +42,7 @@ export async function sendEmailRichiestaApprovata(params: {
   dataFine: string | null
 }) {
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: params.toEmail,
       subject: `Richiesta ${TIPO_LABEL[params.tipo]} approvata`,
@@ -56,7 +59,7 @@ export async function sendEmailRichiestaRifiutata(params: {
   motivazione: string
 }) {
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: params.toEmail,
       subject: `Richiesta ${TIPO_LABEL[params.tipo]} rifiutata`,
