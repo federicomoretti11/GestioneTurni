@@ -84,12 +84,22 @@ export function Notifiche({ userId, ruolo }: Props) {
     return () => document.removeEventListener('mousedown', onClick)
   }, [aperto])
 
+  const TIPI_RICHIESTA: Notifica['tipo'][] = [
+    'richiesta_creata', 'richiesta_approvata_manager', 'richiesta_approvata',
+    'richiesta_rifiutata', 'richiesta_cancellata', 'malattia_comunicata',
+  ]
+
   async function handleClickNotifica(n: Notifica) {
     if (!n.letta) {
       setNotifiche(prev => prev.map(x => x.id === n.id ? { ...x, letta: true } : x))
       fetch(`/api/notifiche/${n.id}`, { method: 'PATCH' }).catch(() => {})
     }
     setAperto(false)
+    if (TIPI_RICHIESTA.includes(n.tipo)) {
+      const paginaRichieste = ruolo === 'dipendente' ? '/dipendente/richieste' : `/${ruolo}/richieste`
+      router.push(paginaRichieste)
+      return
+    }
     const base = ruolo === 'dipendente' ? '/dipendente/turni' : `/${ruolo}/calendario`
     const destinazione = n.data_turno ? `${base}?data=${n.data_turno}` : base
     router.push(destinazione)
