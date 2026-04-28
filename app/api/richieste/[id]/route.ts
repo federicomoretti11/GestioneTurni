@@ -98,6 +98,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
   // Crea turni automatici su approvazione finale (non per cambio_turno)
+  let avviso: string | undefined
   if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno') {
     const adminSupabase = createAdminClient()
     const risultato = await createTurniDaRichiesta(
@@ -109,6 +110,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (!risultato.ok) {
       await supabase.from('richieste').update({ stato: richiesta.stato }).eq('id', params.id)
       return NextResponse.json({ error: risultato.error }, { status: 500 })
+    }
+    if (risultato.skipped) {
+      avviso = 'Permesso ore approvato. Il calendario non è stato modificato automaticamente — gestisci il turno a mano se necessario.'
     }
   }
 
@@ -148,5 +152,5 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
   }
 
-  return NextResponse.json(updated)
+  return NextResponse.json(avviso ? { ...updated, avviso } : updated)
 }

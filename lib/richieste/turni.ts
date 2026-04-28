@@ -53,7 +53,12 @@ export async function createTurniDaRichiesta(
   sovrascriviConflitti: boolean,
   adminId: string,
   supabase: SupabaseClient
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; error?: string; skipped?: boolean }> {
+  // Permesso ore: il dipendente lavora comunque, non tocchiamo il calendario
+  if (richiesta.tipo === 'permesso' && richiesta.permesso_tipo === 'ore') {
+    return { ok: true, skipped: true }
+  }
+
   const categoriaMap: Partial<Record<TipoRichiesta, CategoriaTemplate>> = {
     ferie: 'ferie', permesso: 'permesso', malattia: 'malattia',
   }

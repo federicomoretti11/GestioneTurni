@@ -61,6 +61,10 @@ export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess, on
         setErrore((json as { error?: string }).error ?? 'Errore')
         return
       }
+      const json = await res.json().catch(() => ({}))
+      if ((json as any).avviso) {
+        alert((json as any).avviso)
+      }
       onSuccess()
     } catch {
       setErrore('Errore di rete')
