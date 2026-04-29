@@ -30,7 +30,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const adminClient = createAdminClient()
-  const { error } = await adminClient.auth.admin.deleteUser(params.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  const { error: authError } = await adminClient.auth.admin.deleteUser(params.id)
+  if (authError) {
+    // Profilo orfano: l'utente auth non esiste più, cancella solo il record profiles
+    const { error: profileError } = await adminClient
+      .from('profiles')
+      .delete()
+      .eq('id', params.id)
+    if (profileError) return NextResponse.json({ error: profileError.message }, { status: 500 })
+  }
   return new NextResponse(null, { status: 204 })
 }
