@@ -89,6 +89,7 @@ export function turniToExcelRows(
     compact ? 'Festive' : 'Ore festive',
     'Tipo',
     'Note',
+    'Firma',
   ]
 
   const perDipendente = new Map<string, TurnoConDettagli[]>()
@@ -130,6 +131,7 @@ export function turniToExcelRows(
         oreFestive > 0 ? formatOre(oreFestive) : '',
         tipo,
         t.note ?? '',
+        '',
       ])
     }
     tot.ore += subtot.ore
@@ -150,6 +152,7 @@ export function turniToExcelRows(
       subtot.festive > 0 ? formatOre(subtot.festive) : '',
       '',
       '',
+      '',
     ])
   }
 
@@ -164,6 +167,7 @@ export function turniToExcelRows(
     formatOre(tot.diurne),
     formatOre(tot.notturne),
     tot.festive > 0 ? formatOre(tot.festive) : '',
+    '',
     '',
     '',
   ])
@@ -476,7 +480,7 @@ export async function exportPdf(
           { content: row[7], styles: { ...stileAggregato, halign: 'right' } },
           { content: row[8], styles: { ...stileAggregato, halign: 'right' } },
           { content: row[9], styles: { ...stileAggregato, halign: 'right' } },
-          { content: '', colSpan: 2, styles: stileAggregato },
+          { content: '', colSpan: 3, styles: stileAggregato },
         ]
       }
       return row as CellDef[]
@@ -503,7 +507,8 @@ export async function exportPdf(
         8: { cellWidth: 16, halign: 'right' },  // Notturne
         9: { cellWidth: 14, halign: 'right' },  // Festive
         10: { cellWidth: 35 },                  // Tipo
-        11: { cellWidth: 32 },                  // Note (ellipsize)
+        11: { cellWidth: 22 },                  // Note (ellipsize)
+        12: { cellWidth: 20 },                  // Firma
       },
       didParseCell: (data: CellHookData) => {
         if (data.section !== 'body') return
