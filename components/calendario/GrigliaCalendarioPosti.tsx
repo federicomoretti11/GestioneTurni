@@ -1,4 +1,4 @@
-import { TurnoConDettagli } from '@/lib/types'
+import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
 import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
@@ -9,6 +9,7 @@ const oggi = toDateString(new Date())
 interface GrigliaCalendarioPostiProps {
   giorni: Date[]
   turni: TurnoConDettagli[]
+  posti?: PostoDiServizio[]
   onAddTurno?: (postoId: string, data: string) => void
   onEditTurno?: (turno: TurnoConDettagli) => void
 }
@@ -18,12 +19,12 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendarioPosti({ giorni, turni, onAddTurno, onEditTurno }: GrigliaCalendarioPostiProps) {
-  const posti = Array.from(new Map(
-    turni
-      .filter(t => t.posto)
-      .map(t => [t.posto_id, t.posto!])
-  ).values()).sort((a, b) => a.nome.localeCompare(b.nome))
+export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddTurno, onEditTurno }: GrigliaCalendarioPostiProps) {
+  const posti = postiProp
+    ? postiProp.filter(p => p.attivo).sort((a, b) => a.nome.localeCompare(b.nome))
+    : Array.from(new Map(
+        turni.filter(t => t.posto).map(t => [t.posto_id, t.posto!])
+      ).values()).sort((a, b) => a.nome.localeCompare(b.nome))
 
   function getTurniCella(postoId: string, data: string) {
     return turni.filter(t => t.posto_id === postoId && t.data === data)

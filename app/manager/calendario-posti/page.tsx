@@ -37,8 +37,8 @@ export default function CalendarioPostiPage() {
   }
 
   const postiDisponibili = useMemo(() =>
-    posti.filter(p => turni.some(t => t.posto_id === p.id))
-  , [turni, posti])
+    posti.filter(p => p.attivo)
+  , [posti])
 
   const turniFiltrati = useMemo(() => {
     if (!filtroPosto) return turni
@@ -83,7 +83,7 @@ export default function CalendarioPostiPage() {
       )}
 
       <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} />
+        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiDisponibili} />
       </div>
       <div className="md:hidden">
         <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />

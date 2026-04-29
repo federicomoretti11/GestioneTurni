@@ -44,8 +44,8 @@ export default function CalendarioPostiPage() {
   }
 
   const postiDisponibili = useMemo(() =>
-    posti.filter(p => turni.some(t => t.posto_id === p.id))
-  , [turni, posti])
+    posti.filter(p => p.attivo)
+  , [posti])
 
   const turniFiltrati = useMemo(() => {
     if (!filtroPosto) return turni
@@ -120,6 +120,7 @@ export default function CalendarioPostiPage() {
         <GrigliaCalendarioPosti
           giorni={giorni}
           turni={turniFiltrati}
+          posti={postiDisponibili}
           onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
           onEditTurno={turno => setModale({ open: true, turno })}
         />
