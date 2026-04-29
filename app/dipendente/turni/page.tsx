@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
+import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
@@ -188,7 +189,7 @@ export default function MieiTurniPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
         {loading ? <SkeletonCalendario righe={1} colonne={giorni.length} /> : <GrigliaCalendario
           giorni={giorni}
           dipendenti={[profilo]}
@@ -197,6 +198,16 @@ export default function MieiTurniPage() {
           onEditTurno={() => {}}
           readonly
           onTurnoClick={t => isTurnoBloccato(t) ? setTurnoDettaglio(t) : setTurnoPerCambio(t)}
+        />}
+      </div>
+      <div className="md:hidden">
+        {loading ? <SkeletonCalendario righe={1} colonne={giorni.length} /> : <GrigliaCalendarioMobile
+          giorni={giorni}
+          dipendenti={[profilo]}
+          turni={turni}
+          onAddTurno={() => {}}
+          onEditTurno={t => isTurnoBloccato(t) ? setTurnoDettaglio(t) : setTurnoPerCambio(t)}
+          readonly
         />}
       </div>
 

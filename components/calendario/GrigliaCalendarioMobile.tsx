@@ -149,9 +149,8 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
                 return (
                   <button
                     key={t.id}
-                    onClick={readonly ? undefined : () => onEditTurno(t)}
-                    disabled={readonly}
-                    className="w-full flex items-stretch gap-3 pr-3 py-2.5 text-left hover:bg-gray-50 disabled:hover:bg-transparent transition-colors"
+                    onClick={() => onEditTurno(t)}
+                    className="w-full flex items-stretch gap-3 pr-3 py-2.5 text-left hover:bg-gray-50 transition-colors"
                   >
                     <div
                       className="w-1 rounded-full flex-shrink-0 my-0.5"
