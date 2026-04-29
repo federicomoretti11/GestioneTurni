@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-interface NavItem { label: string; href: string; icon: string; badge?: number }
+interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string }
 
 interface SidebarProps { items: NavItem[]; title: string; ruolo?: string }
 
@@ -15,26 +15,33 @@ export function Sidebar({ items, title, ruolo }: SidebarProps) {
         {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
       </div>
       <nav className="flex-1 p-2">
-        {items.map(item => {
+        {items.map((item, i) => {
+          const showSection = item.section && item.section !== items[i - 1]?.section
           const isActive = pathname === item.href
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-colors mb-0.5 ${
-                isActive
-                  ? 'bg-blue-600 text-white font-semibold'
-                  : 'text-slate-500 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="text-[15px] leading-none">{item.icon}</span>
-              <span className="flex-1">{item.label}</span>
-              {typeof item.badge === 'number' && item.badge > 0 && (
-                <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-semibold flex items-center justify-center">
-                  {item.badge > 99 ? '99+' : item.badge}
-                </span>
+            <div key={item.href}>
+              {showSection && (
+                <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  {item.section}
+                </div>
               )}
-            </Link>
+              <Link
+                href={item.href}
+                className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-colors mb-0.5 ${
+                  isActive
+                    ? 'bg-blue-600 text-white font-semibold'
+                    : 'text-slate-500 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <span className="text-[15px] leading-none">{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                {typeof item.badge === 'number' && item.badge > 0 && (
+                  <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
+              </Link>
+            </div>
           )
         })}
       </nav>
