@@ -7,6 +7,16 @@ const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome),
 
 export async function GET(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('ruolo')
+    .eq('id', user.id)
+    .single()
+  const ruolo = (profile as { ruolo?: string } | null)?.ruolo
+
   const { searchParams } = new URL(request.url)
   const dataInizio = searchParams.get('data_inizio')
   const dataFine = searchParams.get('data_fine')
@@ -16,6 +26,7 @@ export async function GET(request: Request) {
   let query = queryTurni(supabase, filtro, SELECT).order('data')
   if (dataInizio) query = query.gte('data', dataInizio)
   if (dataFine) query = query.lte('data', dataFine)
+  if (ruolo === 'dipendente') query = query.eq('dipendente_id', user.id)
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
