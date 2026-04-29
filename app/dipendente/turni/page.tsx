@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, TurnoConDettagli } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreTurno, isTurnoBloccato, statoTimbratura } from '@/lib/utils/turni'
 import { exportPdf } from '@/lib/utils/export'
 import { useFestivi } from '@/lib/hooks/useFestivi'
 import { AlertErrore } from '@/components/ui/AlertErrore'
@@ -39,6 +39,7 @@ export default function MieiTurniPage() {
   const [motivazioneCambio, setMotivazioneCambio] = useState('')
   const [erroreCambio, setErroreCambio] = useState('')
   const [loadingCambio, setLoadingCambio] = useState(false)
+  const [turnoDettaglio, setTurnoDettaglio] = useState<TurnoConDettagli | null>(null)
   const supabase = createClient()
   const festivi = useFestivi()
 
@@ -195,9 +196,76 @@ export default function MieiTurniPage() {
           onAddTurno={() => {}}
           onEditTurno={() => {}}
           readonly
-          onTurnoClick={setTurnoPerCambio}
+          onTurnoClick={t => isTurnoBloccato(t) ? setTurnoDettaglio(t) : setTurnoPerCambio(t)}
         />}
       </div>
+
+      {turnoDettaglio && (
+        <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-4">
+            <h2 className="font-bold text-gray-900">Dettaglio turno</h2>
+            <p className="text-sm text-gray-500">
+              {turnoDettaglio.data} · {turnoDettaglio.ora_inizio?.slice(0,5)}–{turnoDettaglio.ora_fine?.slice(0,5)}
+            </p>
+            {turnoDettaglio.posto && (
+              <p className="text-sm text-gray-700">
+                <span className="text-gray-500">Posto:</span> {turnoDettaglio.posto.nome}
+              </p>
+            )}
+            {(() => {
+              const isRiposo = calcolaOreTurno(turnoDettaglio.ora_inizio, turnoDettaglio.ora_fine) === 0
+              const stato = isRiposo ? null : statoTimbratura({
+                ora_ingresso_effettiva: turnoDettaglio.ora_ingresso_effettiva,
+                ora_uscita_effettiva: turnoDettaglio.ora_uscita_effettiva,
+              })
+              const oraDaISO = (iso: string) => {
+                const d = new Date(iso)
+                return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+              }
+              return (
+                <>
+                  {!isRiposo && (
+                    <div className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 space-y-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Timbratura</p>
+                      <div className="flex gap-6 text-sm">
+                        <span className="flex items-center gap-1.5 text-gray-700">
+                          <span className="w-2 h-2 rounded-full bg-green-500" />
+                          <span className="text-gray-400">Ingresso</span>
+                          <span className="font-semibold">{turnoDettaglio.ora_ingresso_effettiva ? oraDaISO(turnoDettaglio.ora_ingresso_effettiva) : '—'}</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 text-gray-700">
+                          <span className="w-2 h-2 rounded-full bg-red-500" />
+                          <span className="text-gray-400">Uscita</span>
+                          <span className="font-semibold">{turnoDettaglio.ora_uscita_effettiva ? oraDaISO(turnoDettaglio.ora_uscita_effettiva) : '—'}</span>
+                        </span>
+                      </div>
+                      {stato && (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                          stato === 'completato' ? 'bg-green-100 text-green-700' :
+                          stato === 'in_corso' ? 'bg-amber-100 text-amber-700' :
+                          'bg-red-100 text-red-600'
+                        }`}>
+                          {stato === 'completato' ? 'Timbrato' : stato === 'in_corso' ? 'Uscita mancante' : 'Non timbrato'}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {isRiposo && <p className="text-sm text-gray-500 italic">Giorno di riposo</p>}
+                </>
+              )
+            })()}
+            {turnoDettaglio.note && (
+              <p className="text-sm text-gray-700"><span className="text-gray-500">Note:</span> {turnoDettaglio.note}</p>
+            )}
+            <button
+              onClick={() => setTurnoDettaglio(null)}
+              className="w-full border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50"
+            >
+              Chiudi
+            </button>
+          </div>
+        </div>
+      )}
 
       {turnoPerCambio && (
         <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-4">

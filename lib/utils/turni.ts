@@ -46,6 +46,17 @@ export function calcolaOreDiurneNotturne(oraInizio: string, oraFine: string): { 
   }
 }
 
+export function isTurnoBloccato(turno: { data: string; ora_inizio: string }): boolean {
+  const now = new Date()
+  const oggi = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  if (turno.data < oggi) return true
+  if (turno.data === oggi) {
+    const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+    return turno.ora_inizio.slice(0, 5) <= hhmm
+  }
+  return false
+}
+
 export type StatoTimbratura = 'non_iniziato' | 'in_corso' | 'completato'
 
 export function statoTimbratura(t: {

@@ -7,6 +7,7 @@ import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
+import { isTurnoBloccato } from '@/lib/utils/turni'
 import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
@@ -252,6 +253,7 @@ export default function CalendarioPage() {
         dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
         dipendenti={dipendentiFiltrati}
         data={modale.data}
+        readOnly={!!(modale.turno && isTurnoBloccato(modale.turno))}
       />
     </div>
   )

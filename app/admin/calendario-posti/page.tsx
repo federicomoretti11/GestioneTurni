@@ -6,6 +6,7 @@ import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
+import { isTurnoBloccato } from '@/lib/utils/turni'
 
 export default function CalendarioPostiPage() {
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
@@ -145,6 +146,7 @@ export default function CalendarioPostiPage() {
         dipendenti={dipendenti}
         data={modale.data ?? modale.turno?.data}
         postoIdDefault={modale.postoId}
+        readOnly={!!(modale.turno && isTurnoBloccato(modale.turno))}
       />
     </div>
   )

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
 import { useFestivi } from '@/lib/hooks/useFestivi'
 import { classificaOre, formatOre } from '@/lib/utils/maggiorazioni'
+import { statoTimbratura } from '@/lib/utils/turni'
 
 interface ModaleTurnoProps {
   open: boolean
@@ -19,6 +20,7 @@ interface ModaleTurnoProps {
   dipendenti?: Profile[]
   data?: string   // YYYY-MM-DD (formattata internamente per display)
   postoIdDefault?: string
+  readOnly?: boolean
 }
 
 function formatDataIT(iso: string): string {
@@ -28,7 +30,7 @@ function formatDataIT(iso: string): string {
   return giorno.charAt(0).toUpperCase() + giorno.slice(1)
 }
 
-export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault }: ModaleTurnoProps) {
+export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault, readOnly }: ModaleTurnoProps) {
   const [templateId, setTemplateId] = useState<string>('')
   const [oraInizio, setOraInizio] = useState('08:00')
   const [oraFine, setOraFine] = useState('16:00')
@@ -114,6 +116,123 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const classificazione = dataISO ? classificaOre(dataISO, oraInizio, oraFine, festivi) : null
   const mostraMaggiorazioni = !!classificazione && classificazione.ore > 0 && !isRiposo
   const festivoDelGiorno = classificazione?.festivo ?? null
+
+  if (readOnly && turno) {
+    const statoDB = isRiposo ? 'non_iniziato' : statoTimbratura({
+      ora_ingresso_effettiva: turno.ora_ingresso_effettiva,
+      ora_uscita_effettiva: turno.ora_uscita_effettiva,
+    })
+    const statoBadge = statoDB === 'completato'
+      ? { label: 'Timbrato', cls: 'bg-green-100 text-green-700' }
+      : statoDB === 'in_corso'
+      ? { label: 'Uscita mancante', cls: 'bg-amber-100 text-amber-700' }
+      : isRiposo
+      ? { label: 'Riposo', cls: 'bg-gray-100 text-gray-500' }
+      : { label: 'Non timbrato', cls: 'bg-red-100 text-red-600' }
+
+    return (
+      <Modal open={open} onClose={onClose} title="Dettaglio turno">
+        {dataISO && (
+          <div className="flex items-center gap-2 flex-wrap mb-5 text-[11px] font-semibold tracking-wider uppercase text-gray-500">
+            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span>{formatDataIT(dataISO)}</span>
+            {festivoDelGiorno && (
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold normal-case tracking-normal ${festivoDelGiorno.tipo === 'nazionale' ? 'bg-red-100 text-red-700' : festivoDelGiorno.tipo === 'patronale' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'}`}>
+                🎉 {festivoDelGiorno.nome}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500">Dipendente</span>
+            <span className="font-medium text-gray-900">{turno.profile.cognome} {turno.profile.nome}</span>
+          </div>
+          {turno.posto && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Posto di servizio</span>
+              <span className="font-medium text-gray-900">{turno.posto.nome}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500">Orario programmato</span>
+            <span className="font-medium text-gray-900">
+              {isRiposo ? 'Riposo' : `${turno.ora_inizio.slice(0,5)} – ${turno.ora_fine.slice(0,5)}`}
+            </span>
+          </div>
+          {turno.template && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Tipo turno</span>
+              <span className="inline-flex items-center gap-1.5 font-medium text-gray-900">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: turno.template.colore }} />
+                {turno.template.nome}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500">Timbratura</span>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${statoBadge.cls}`}>
+              {statoBadge.label}
+            </span>
+          </div>
+        </div>
+
+        {(timbroIngresso || timbroUscita) && (
+          <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature effettive</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-2 text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-slate-400">Ingresso</span>
+                <span className="font-semibold">{timbroIngresso ? oraDaISO(timbroIngresso) : '—'}</span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <span className="text-slate-400">Uscita</span>
+                <span className="font-semibold">{timbroUscita ? oraDaISO(timbroUscita) : '—'}</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {mostraMaggiorazioni && (
+          <div className="mt-3 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Ore e maggiorazioni</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-2 text-slate-700">
+                <span className="text-slate-400">Totale</span>
+                <span className="font-semibold">{formatOre(classificazione!.ore)}</span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className="text-slate-400">Diurne</span>
+                <span className="font-semibold">{formatOre(classificazione!.diurne)}</span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                <span className="text-slate-400">Notturne</span>
+                <span className={`font-semibold ${classificazione!.notturne > 0 ? 'text-indigo-700' : ''}`}>
+                  {formatOre(classificazione!.notturne)}
+                </span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {turno.note && (
+          <div className="mt-3">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-1">Note</p>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">{turno.note}</p>
+          </div>
+        )}
+
+        <div className="sticky bottom-0 -mx-5 md:-mx-6 -mb-7 md:-mb-6 px-5 md:px-6 pt-4 pb-5 md:pb-4 mt-5 bg-white border-t border-gray-100 flex justify-end">
+          <Button onClick={onClose}>Chiudi</Button>
+        </div>
+      </Modal>
+    )
+  }
 
   return (
     <Modal open={open} onClose={onClose} onCloseRequest={handleCloseRequest} title={title}>
