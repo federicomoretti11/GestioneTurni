@@ -6,17 +6,17 @@ import { useBozzaCount } from './BozzaCounter'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 
 const BASE_ITEMS = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
-  { label: 'Calendario', href: '/admin/calendario', icon: '📅' },
-  { label: 'Per posto', href: '/admin/calendario-posti', icon: '📍' },
-  { label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝' },
-  { label: 'Programmazione per posto', href: '/admin/calendario-programmazione-posti', icon: '📝' },
-  { label: 'Turni', href: '/admin/template', icon: '🏷️' },
-  { label: 'Export', href: '/admin/export', icon: '📤' },
-  { label: 'Richieste', href: '/admin/richieste', icon: '📋' },
-  { label: 'Utenti', href: '/admin/utenti', icon: '👥' },
-  { label: 'Posti', href: '/admin/posti', icon: '📍' },
-  { label: 'Festivi', href: '/admin/festivi', icon: '🎉' },
+  { label: 'Dashboard',        href: '/admin/dashboard',                        icon: '📊' },
+  { section: 'Calendario',     label: 'Per dipendente', href: '/admin/calendario',                       icon: '📅' },
+  {                             label: 'Per posto',       href: '/admin/calendario-posti',                icon: '📍' },
+  { section: 'Programmazione', label: 'Per dipendente', href: '/admin/calendario-programmazione',       icon: '📝' },
+  {                             label: 'Per posto',       href: '/admin/calendario-programmazione-posti', icon: '🗂️' },
+  { section: 'Gestione',       label: 'Modelli turno',   href: '/admin/template',                        icon: '🏷️' },
+  {                             label: 'Richieste',       href: '/admin/richieste',                       icon: '📋' },
+  {                             label: 'Export',          href: '/admin/export',                          icon: '📤' },
+  { section: 'Configurazione', label: 'Utenti',          href: '/admin/utenti',                          icon: '👥' },
+  {                             label: 'Posti',           href: '/admin/posti',                           icon: '🏢' },
+  {                             label: 'Festivi',         href: '/admin/festivi',                         icon: '🎉' },
 ]
 
 export function SidebarAdmin() {
