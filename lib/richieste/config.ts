@@ -2,17 +2,19 @@
 import type { TipoRichiesta, StatoRichiesta, AzioneRichiesta } from '@/lib/types'
 
 export const LEAD_TIMES_MS: Record<TipoRichiesta, number> = {
-  ferie:        7 * 24 * 60 * 60 * 1000,
-  permesso:         24 * 60 * 60 * 1000,
-  cambio_turno: 2 * 24 * 60 * 60 * 1000,
-  malattia:                            0,
+  ferie:            7 * 24 * 60 * 60 * 1000,
+  permesso:             24 * 60 * 60 * 1000,
+  cambio_turno:     2 * 24 * 60 * 60 * 1000,
+  malattia:                                0,
+  sblocco_checkin:                         0,
 }
 
 export const LEAD_TIME_LABEL: Record<TipoRichiesta, string> = {
-  ferie:        '7 giorni',
-  permesso:     '24 ore',
-  cambio_turno: '48 ore',
-  malattia:     '',
+  ferie:           '7 giorni',
+  permesso:        '24 ore',
+  cambio_turno:    '48 ore',
+  malattia:        '',
+  sblocco_checkin: '',
 }
 
 export const TRANSIZIONI_VALIDE: Array<{

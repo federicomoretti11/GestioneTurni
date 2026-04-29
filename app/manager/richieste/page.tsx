@@ -99,6 +99,7 @@ export default function RichiesteManagerPage() {
           <option value="permesso">Permesso</option>
           <option value="malattia">Malattia</option>
           <option value="cambio_turno">Cambio turno</option>
+          <option value="sblocco_checkin">Sblocco check-in</option>
         </select>
       </div>
 

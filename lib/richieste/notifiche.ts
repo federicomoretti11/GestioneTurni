@@ -40,7 +40,7 @@ async function idAdmin(): Promise<string[]> {
 
 function labelTipo(tipo: TipoRichiesta): string {
   const map: Record<TipoRichiesta, string> = {
-    ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
+    ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno', sblocco_checkin: 'Sblocco check-in',
   }
   return map[tipo]
 }
@@ -115,6 +115,17 @@ export async function notificaMalattiaComunicata(params: {
     titolo: 'Malattia comunicata',
     messaggio: `${params.nomeDipendente} · da ${formatDateIT(params.dataInizio)}`,
   })))
+}
+
+export async function notificaSbloccoApprovato(params: {
+  dipendenteId: string
+}) {
+  await insert([{
+    destinatario_id: params.dipendenteId,
+    tipo: 'sblocco_approvato',
+    titolo: 'Sblocco check-in approvato',
+    messaggio: 'Puoi effettuare il check-in nei prossimi 30 minuti anche senza GPS.',
+  }])
 }
 
 export async function notificaRichiestaCancellata(params: {

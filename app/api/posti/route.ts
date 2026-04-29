@@ -16,7 +16,14 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { data, error } = await supabase
     .from('posti_di_servizio')
-    .insert({ nome: body.nome, descrizione: body.descrizione ?? null })
+    .insert({
+      nome: body.nome,
+      descrizione: body.descrizione ?? null,
+      latitudine: body.latitudine ?? null,
+      longitudine: body.longitudine ?? null,
+      raggio_metri: body.raggio_metri ?? 200,
+      geo_check_abilitato: body.geo_check_abilitato ?? false,
+    })
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

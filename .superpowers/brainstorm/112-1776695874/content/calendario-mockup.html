@@ -1,0 +1,117 @@
+<h2>Mockup — Calendario Turni (Manager)</h2>
+<p class="subtitle">Vista settimanale con assegnazione turni. Clicca l'opzione che preferisci.</p>
+
+<div class="options" style="flex-direction: column; gap: 1.5rem;">
+
+  <!-- OPZIONE A: Griglia dipendenti x giorni -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)" style="flex-direction: column; align-items: flex-start; width: 100%;">
+    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.75rem; width:100%;">
+      <div class="letter">A</div>
+      <div class="content"><h3>Griglia: Dipendenti × Giorni</h3><p>Ogni riga è un dipendente, ogni colonna è un giorno</p></div>
+    </div>
+    <div style="width:100%; overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+        <thead>
+          <tr>
+            <th style="padding:6px 10px; text-align:left; background:rgba(255,255,255,0.08); border-radius:6px 0 0 0; color:var(--text-secondary); font-weight:600; min-width:120px;">Dipendente</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Lun 14</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Mar 15</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Mer 16</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Gio 17</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Ven 18</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); color:var(--text-secondary); font-weight:600;">Sab 19</th>
+            <th style="padding:6px 8px; text-align:center; background:rgba(255,255,255,0.08); border-radius:0 6px 0 0; color:var(--text-secondary); font-weight:600;">Dom 20</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:6px 10px; border-top:1px solid rgba(255,255,255,0.06); font-weight:500;">Mario Rossi</td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#3b82f6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Mattina<br/>6–14</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#3b82f6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Mattina<br/>6–14</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#8b5cf6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Notte<br/>22–6</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#8b5cf6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Notte<br/>22–6</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+          </tr>
+          <tr>
+            <td style="padding:6px 10px; border-top:1px solid rgba(255,255,255,0.06); font-weight:500;">Giulia Bianchi</td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#10b981; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Pom.<br/>14–22</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#10b981; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Pom.<br/>14–22</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#10b981; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Pom.<br/>14–22</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#3b82f6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Mattina<br/>6–14</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+          </tr>
+          <tr>
+            <td style="padding:6px 10px; border-top:1px solid rgba(255,255,255,0.06); font-weight:500;">Luca Verdi</td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#f59e0b; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Custom<br/>9–17</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#f59e0b; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Custom<br/>9–17</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="background:#3b82f6; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.75rem; display:inline-block;">Mattina<br/>6–14</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+            <td style="padding:4px 6px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;"><span style="color:var(--text-secondary); font-size:0.75rem;">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:0.75rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <span style="font-size:0.75rem; color:var(--text-secondary);">Azioni cella:</span>
+        <span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:0.75rem;">+ Aggiungi turno</span>
+        <span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:0.75rem;">✏️ Modifica</span>
+        <span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:0.75rem;">🗑 Rimuovi</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPZIONE B: Calendario stile Google Calendar -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)" style="flex-direction: column; align-items: flex-start; width: 100%;">
+    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.75rem; width:100%;">
+      <div class="letter">B</div>
+      <div class="content"><h3>Stile Google Calendar</h3><p>Colonne per giorno, eventi sovrapposti per orario — più visivo ma meno compatto</p></div>
+    </div>
+    <div style="display:grid; grid-template-columns: 50px repeat(7, 1fr); gap:2px; font-size:0.75rem; background:rgba(255,255,255,0.04); border-radius:8px; padding:8px; overflow:hidden;">
+      <div></div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Lun 14</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Mar 15</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Mer 16</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Gio 17</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Ven 18</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Sab 19</div>
+      <div style="text-align:center; font-weight:600; color:var(--text-secondary); padding:4px;">Dom 20</div>
+
+      <div style="color:var(--text-secondary); padding:4px; text-align:right;">6:00</div>
+      <div style="background:#3b82f6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Mario R.<br/>6–14</div>
+      <div style="background:#3b82f6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Mario R.<br/>6–14</div>
+      <div></div>
+      <div></div>
+      <div style="background:#3b82f6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Luca V.<br/>6–14</div>
+      <div style="background:#3b82f6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Giulia B.<br/>6–14</div>
+      <div></div>
+
+      <div style="color:var(--text-secondary); padding:4px; text-align:right;">14:00</div>
+      <div style="background:#10b981; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Giulia B.<br/>14–22</div>
+      <div></div>
+      <div style="background:#10b981; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Giulia B.<br/>14–22</div>
+      <div style="background:#10b981; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Giulia B.<br/>14–22</div>
+      <div></div>
+      <div></div>
+      <div></div>
+
+      <div style="color:var(--text-secondary); padding:4px; text-align:right;">22:00</div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div style="background:#8b5cf6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Mario R.<br/>22–6</div>
+      <div style="background:#8b5cf6; border-radius:4px; padding:3px 4px; color:#fff; font-size:0.7rem; margin:1px;">Mario R.<br/>22–6</div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:1.5rem; padding:0.75rem 1rem; background:rgba(255,255,255,0.04); border-radius:8px; font-size:0.85rem; color:var(--text-secondary);">
+  💡 <strong>Nota:</strong> Entrambe le viste saranno disponibili (settimanale + mensile). Questa scelta riguarda il <em>layout principale</em> del calendario.
+</div>

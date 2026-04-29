@@ -1,0 +1,95 @@
+<h2>Anteprima menu Admin — proposta finale</h2>
+<p class="subtitle">Struttura con sezioni etichettate e "Modelli turno". Clicca per confermare oppure dimmi cosa cambiare.</p>
+
+<style>
+.preview-wrap { display: flex; gap: 32px; justify-content: center; align-items: flex-start; flex-wrap: wrap; margin-top: 12px; }
+.sb { width: 210px; background: #0f172a; border-radius: 12px; padding: 12px 0; font-family: sans-serif; font-size: 13px; color: #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.45); flex-shrink: 0; }
+.sb-header { padding: 4px 14px 12px; border-bottom: 1px solid #1e293b; margin-bottom: 8px; }
+.sb-header .app-name { font-size: 15px; font-weight: 700; color: #f8fafc; }
+.sb-header .role { font-size: 11px; color: #64748b; margin-top: 1px; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; border-radius: 6px; margin: 1px 6px; }
+.sb-item.active { background: #1d4ed8; color: #fff; }
+.sb-section { padding: 10px 14px 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; }
+.sb-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; border-radius: 9px; padding: 1px 6px; }
+.sb-ico { font-size: 15px; width: 20px; text-align: center; }
+.change-list { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; max-width: 300px; }
+.change-list h3 { margin: 0 0 10px; font-size: 14px; color: #1e293b; }
+.change-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; color: #374151; }
+.change-item .tag { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 1px; }
+.tag-new { background: #dcfce7; color: #166534; }
+.tag-rename { background: #dbeafe; color: #1e40af; }
+.tag-same { background: #f1f5f9; color: #64748b; }
+</style>
+
+<div class="preview-wrap">
+
+  <div class="sb">
+    <div class="sb-header">
+      <div class="app-name">GestioneTurni</div>
+      <div class="role">Admin</div>
+    </div>
+
+    <div class="sb-item active"><span class="sb-ico">📊</span> Dashboard</div>
+
+    <div class="sb-section">Calendario</div>
+    <div class="sb-item"><span class="sb-ico">📅</span> Per dipendente</div>
+    <div class="sb-item"><span class="sb-ico">📍</span> Per posto</div>
+
+    <div class="sb-section">Programmazione</div>
+    <div class="sb-item"><span class="sb-ico">📝</span> Per dipendente <span class="sb-badge">3</span></div>
+    <div class="sb-item"><span class="sb-ico">🗂️</span> Per posto</div>
+
+    <div class="sb-section">Gestione</div>
+    <div class="sb-item"><span class="sb-ico">🏷️</span> Modelli turno</div>
+    <div class="sb-item"><span class="sb-ico">📋</span> Richieste <span class="sb-badge">2</span></div>
+    <div class="sb-item"><span class="sb-ico">📤</span> Export</div>
+
+    <div class="sb-section">Configurazione</div>
+    <div class="sb-item"><span class="sb-ico">👥</span> Utenti</div>
+    <div class="sb-item"><span class="sb-ico">🏢</span> Posti</div>
+    <div class="sb-item"><span class="sb-ico">🎉</span> Festivi</div>
+  </div>
+
+  <div class="change-list">
+    <h3>Modifiche rispetto all'attuale</h3>
+
+    <div class="change-item">
+      <span class="tag tag-new">NUOVO</span>
+      <span>Sezioni etichettate: <strong>Calendario, Programmazione, Gestione, Configurazione</strong></span>
+    </div>
+    <div class="change-item">
+      <span class="tag tag-rename">RINOMINA</span>
+      <span>"Calendario" → <strong>Per dipendente</strong> (sotto sezione Calendario)</span>
+    </div>
+    <div class="change-item">
+      <span class="tag tag-rename">RINOMINA</span>
+      <span>"Programmazione" → <strong>Per dipendente</strong> (sotto sezione Programmazione)</span>
+    </div>
+    <div class="change-item">
+      <span class="tag tag-rename">RINOMINA</span>
+      <span>"Programmazione per posto" → <strong>Per posto</strong></span>
+    </div>
+    <div class="change-item">
+      <span class="tag tag-rename">RINOMINA</span>
+      <span>"Turni" → <strong>Modelli turno</strong></span>
+    </div>
+    <div class="change-item">
+      <span class="tag tag-same">INVARIATO</span>
+      <span>Richieste, Export, Utenti, Posti, Festivi, Dashboard</span>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 20px; text-align: center;">
+  <div class="options" style="display: inline-flex; gap: 12px;">
+    <div class="option" data-choice="ok" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content"><h3>Va bene così</h3><p>Procediamo con questa struttura</p></div>
+    </div>
+    <div class="option" data-choice="modifica" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content"><h3>Voglio cambiare qualcosa</h3><p>Dimmi cosa nel terminale</p></div>
+    </div>
+  </div>
+</div>

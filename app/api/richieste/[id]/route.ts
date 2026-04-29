@@ -10,6 +10,7 @@ import {
   notificaRichiestaApprovataManager,
   notificaRichiestaRifiutata,
   notificaRichiestaCancellata,
+  notificaSbloccoApprovato,
 } from '@/lib/richieste/notifiche'
 import type { AzioneRichiesta, RuoloUtente, StatoRichiesta, Profile } from '@/lib/types'
 
@@ -75,8 +76,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     aggiornamenti.admin_decisione_at = new Date().toISOString()
   }
 
-  // Controlla conflitti prima di approvare definitivamente (non per cambio_turno)
-  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno') {
+  // Controlla conflitti prima di approvare definitivamente (non per cambio_turno né sblocco_checkin)
+  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno' && richiesta.tipo !== 'sblocco_checkin') {
     const conflitti = await checkConflitti(
       richiesta.dipendente_id,
       richiesta.data_inizio,
@@ -97,9 +98,19 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
 
-  // Crea turni automatici su approvazione finale (non per cambio_turno)
+  // Sblocco check-in: scrivi token 30 min sul turno
+  if (nuovoStato === 'approvata' && richiesta.tipo === 'sblocco_checkin' && richiesta.turno_id) {
+    const validoFino = new Date(Date.now() + 30 * 60 * 1000).toISOString()
+    await createAdminClient()
+      .from('turni')
+      .update({ sblocco_checkin_valido_fino: validoFino })
+      .eq('id', richiesta.turno_id)
+    notificaSbloccoApprovato({ dipendenteId: richiesta.dipendente_id })
+  }
+
+  // Crea turni automatici su approvazione finale (non per cambio_turno né sblocco_checkin)
   let avviso: string | undefined
-  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno') {
+  if (nuovoStato === 'approvata' && richiesta.tipo !== 'cambio_turno' && richiesta.tipo !== 'sblocco_checkin') {
     const adminSupabase = createAdminClient()
     const risultato = await createTurniDaRichiesta(
       { ...richiesta, stato: nuovoStato },

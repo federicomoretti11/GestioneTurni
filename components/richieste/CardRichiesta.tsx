@@ -12,7 +12,7 @@ const STATO_CONFIG = {
 }
 
 const TIPO_LABEL = {
-  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
+  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno', sblocco_checkin: 'Sblocco check-in',
 }
 
 function dateRange(r: Richiesta): string {

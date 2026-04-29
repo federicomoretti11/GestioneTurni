@@ -15,6 +15,10 @@ export interface PostoDiServizio {
   descrizione: string | null
   attivo: boolean
   created_at: string
+  latitudine: number | null
+  longitudine: number | null
+  raggio_metri: number
+  geo_check_abilitato: boolean
 }
 
 export interface TurnoTemplate {
@@ -44,6 +48,10 @@ export interface Turno {
   ora_ingresso_effettiva: string | null  // ISO timestamptz
   ora_uscita_effettiva: string | null    // ISO timestamptz
   stato: StatoTurno
+  lat_checkin: number | null
+  lng_checkin: number | null
+  geo_anomalia: boolean
+  sblocco_checkin_valido_fino: string | null
   // join opzionali
   profile?: Profile
   template?: TurnoTemplate | null | undefined
@@ -70,6 +78,7 @@ export type TipoNotifica =
   | 'richiesta_rifiutata'
   | 'richiesta_cancellata'
   | 'malattia_comunicata'
+  | 'sblocco_approvato'
 
 export interface Notifica {
   id: string
@@ -92,7 +101,7 @@ export interface Festivo {
   created_at: string
 }
 
-export type TipoRichiesta = 'ferie' | 'permesso' | 'malattia' | 'cambio_turno'
+export type TipoRichiesta = 'ferie' | 'permesso' | 'malattia' | 'cambio_turno' | 'sblocco_checkin'
 export type StatoRichiesta = 'pending' | 'approvata_manager' | 'approvata' | 'rifiutata' | 'annullata' | 'comunicata'
 export type PermessoTipo = 'giornata' | 'mezza_mattina' | 'mezza_pomeriggio' | 'ore'
 export type CategoriaTemplate = 'lavoro' | 'ferie' | 'permesso' | 'malattia'

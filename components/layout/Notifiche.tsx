@@ -36,6 +36,7 @@ const iconaPerTipo: Record<Notifica['tipo'], string> = {
   richiesta_rifiutata: '❌',
   richiesta_cancellata: '🚫',
   malattia_comunicata: '🏥',
+  sblocco_approvato: '🔓',
 }
 
 export function Notifiche({ userId, ruolo }: Props) {

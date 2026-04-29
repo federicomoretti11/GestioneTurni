@@ -4,7 +4,7 @@ import type { Richiesta, AzioneRichiesta, TipoRichiesta } from '@/lib/types'
 import { formatDateIT } from '@/lib/utils/date'
 
 const TIPO_LABEL: Record<TipoRichiesta, string> = {
-  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
+  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno', sblocco_checkin: 'Sblocco check-in',
 }
 
 interface Conflitto {

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { TipoRichiesta, PermessoTipo } from '@/lib/types'
 
 interface Props {
-  tipo: Exclude<TipoRichiesta, 'cambio_turno'>
+  tipo: Exclude<TipoRichiesta, 'cambio_turno' | 'sblocco_checkin'>
   onClose: () => void
   onSuccess: () => void
 }
@@ -21,7 +21,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
 
   function dataMin(): string {
     const ora = new Date()
-    const leadMap: Record<Exclude<TipoRichiesta, 'cambio_turno'>, number> = {
+    const leadMap: Record<Exclude<TipoRichiesta, 'cambio_turno' | 'sblocco_checkin'>, number> = {
       ferie: 7, permesso: 1, malattia: 0,
     }
     ora.setDate(ora.getDate() + leadMap[tipo])

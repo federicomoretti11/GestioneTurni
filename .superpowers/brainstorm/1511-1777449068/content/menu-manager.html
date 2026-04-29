@@ -1,0 +1,79 @@
+<h2>Stesso stile anche per il menu Manager?</h2>
+<p class="subtitle">Il Manager ha un menu ridotto (no Dashboard, Utenti, Posti, Festivi). Applichiamo la stessa struttura a sezioni?</p>
+
+<style>
+.preview-wrap { display: flex; gap: 48px; justify-content: center; align-items: flex-start; flex-wrap: wrap; margin-top: 12px; }
+.sb { width: 210px; background: #0f172a; border-radius: 12px; padding: 12px 0; font-family: sans-serif; font-size: 13px; color: #cbd5e1; box-shadow: 0 4px 24px rgba(0,0,0,0.45); flex-shrink: 0; }
+.sb-header { padding: 4px 14px 12px; border-bottom: 1px solid #1e293b; margin-bottom: 8px; }
+.sb-header .app-name { font-size: 15px; font-weight: 700; color: #f8fafc; }
+.sb-header .role { font-size: 11px; color: #64748b; margin-top: 1px; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; border-radius: 6px; margin: 1px 6px; }
+.sb-item.active { background: #1d4ed8; color: #fff; }
+.sb-section { padding: 10px 14px 3px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; }
+.sb-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; border-radius: 9px; padding: 1px 6px; }
+.sb-ico { font-size: 15px; width: 20px; text-align: center; }
+.sb-sep { height: 1px; background: #1e293b; margin: 8px 14px; }
+.card-label { text-align: center; margin-top: 10px; font-size: 13px; color: #374151; font-weight: 600; }
+.card-sub { text-align: center; font-size: 12px; color: #6b7280; margin-top: 3px; }
+</style>
+
+<div class="preview-wrap">
+
+  <!-- ATTUALE manager -->
+  <div>
+    <div class="sb" style="opacity: 0.6;">
+      <div class="sb-header">
+        <div class="app-name">GestioneTurni</div>
+        <div class="role" style="color:#f59e0b">Manager</div>
+      </div>
+      <div class="sb-item active"><span class="sb-ico">📅</span> Calendario</div>
+      <div class="sb-item"><span class="sb-ico">📍</span> Per posto</div>
+      <div class="sb-item"><span class="sb-ico">📝</span> Programmazione</div>
+      <div class="sb-item"><span class="sb-ico">📝</span> Programmazione per posto</div>
+      <div class="sb-item"><span class="sb-ico">📋</span> Richieste <span class="sb-badge">2</span></div>
+      <div class="sb-item"><span class="sb-ico">🏷️</span> Turni</div>
+      <div class="sb-item"><span class="sb-ico">📤</span> Export</div>
+    </div>
+    <div class="card-label">Attuale</div>
+    <div class="card-sub">7 voci piatte</div>
+  </div>
+
+  <!-- PROPOSTA manager -->
+  <div>
+    <div class="sb">
+      <div class="sb-header">
+        <div class="app-name">GestioneTurni</div>
+        <div class="role" style="color:#f59e0b">Manager</div>
+      </div>
+
+      <div class="sb-section">Calendario</div>
+      <div class="sb-item active"><span class="sb-ico">📅</span> Per dipendente</div>
+      <div class="sb-item"><span class="sb-ico">📍</span> Per posto</div>
+
+      <div class="sb-section">Programmazione</div>
+      <div class="sb-item"><span class="sb-ico">📝</span> Per dipendente</div>
+      <div class="sb-item"><span class="sb-ico">🗂️</span> Per posto</div>
+
+      <div class="sb-section">Gestione</div>
+      <div class="sb-item"><span class="sb-ico">📋</span> Richieste <span class="sb-badge">2</span></div>
+      <div class="sb-item"><span class="sb-ico">🏷️</span> Modelli turno</div>
+      <div class="sb-item"><span class="sb-ico">📤</span> Export</div>
+    </div>
+    <div class="card-label">Proposta</div>
+    <div class="card-sub">Stessa struttura Admin, senza Configurazione</div>
+  </div>
+
+</div>
+
+<div style="margin-top: 24px; text-align: center;">
+  <div class="options" style="display: inline-flex; gap: 12px;">
+    <div class="option" data-choice="si" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content"><h3>Sì, stesso stile</h3><p>Coerente con Admin</p></div>
+    </div>
+    <div class="option" data-choice="no" onclick="toggleSelect(this)">
+      <div class="letter">✗</div>
+      <div class="content"><h3>No, lascia il Manager com'è</h3><p>Modifica solo Admin</p></div>
+    </div>
+  </div>
+</div>

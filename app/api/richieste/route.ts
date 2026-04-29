@@ -53,9 +53,11 @@ export async function POST(request: Request) {
   const { tipo, data_inizio, data_fine, permesso_tipo, ora_inizio, ora_fine,
           turno_id, note_dipendente } = body
 
-  // Validazione lead time
-  const leadError = validateLeadTime(tipo, data_inizio)
-  if (leadError) return NextResponse.json({ error: leadError }, { status: 422 })
+  // Validazione lead time (non si applica a sblocco_checkin)
+  if (tipo !== 'sblocco_checkin') {
+    const leadError = validateLeadTime(tipo, data_inizio)
+    if (leadError) return NextResponse.json({ error: leadError }, { status: 422 })
+  }
 
   // Validazioni specifiche per tipo
   if (tipo === 'cambio_turno' && !turno_id) {
@@ -64,16 +66,23 @@ export async function POST(request: Request) {
   if (tipo === 'cambio_turno' && !note_dipendente?.trim()) {
     return NextResponse.json({ error: 'La motivazione è obbligatoria per il cambio turno' }, { status: 422 })
   }
+  if (tipo === 'sblocco_checkin' && !turno_id) {
+    return NextResponse.json({ error: 'turno_id obbligatorio per sblocco check-in' }, { status: 422 })
+  }
+  if (tipo === 'sblocco_checkin' && !note_dipendente?.trim()) {
+    return NextResponse.json({ error: 'La motivazione è obbligatoria per lo sblocco' }, { status: 422 })
+  }
 
   // Malattia → stato = 'comunicata' direttamente
   const statoIniziale = tipo === 'malattia' ? 'comunicata' : 'pending'
+  const dataInizioEffettiva = data_inizio ?? new Date().toISOString().slice(0, 10)
 
   const { data, error } = await supabase
     .from('richieste')
     .insert({
       dipendente_id: user.id,
       tipo,
-      data_inizio,
+      data_inizio: dataInizioEffettiva,
       data_fine: data_fine ?? null,
       permesso_tipo: permesso_tipo ?? null,
       ora_inizio: ora_inizio ?? null,

@@ -1,0 +1,135 @@
+<h2>Come raggruppare le voci del menu?</h2>
+<p class="subtitle">Il menu attuale ha 11 voci piatte. Le 3 opzioni le raggruppano logicamente — scegli la struttura che preferisci.</p>
+
+<style>
+.sb-wrap { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.sb { width: 200px; background: #0f172a; border-radius: 12px; padding: 12px 0; font-family: sans-serif; font-size: 13px; color: #cbd5e1; box-shadow: 0 4px 20px rgba(0,0,0,0.4); flex-shrink: 0; }
+.sb-header { padding: 4px 14px 12px; border-bottom: 1px solid #1e293b; margin-bottom: 8px; }
+.sb-header .app-name { font-size: 15px; font-weight: 700; color: #f8fafc; }
+.sb-header .role { font-size: 11px; color: #64748b; margin-top: 1px; }
+.sb-item { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; border-radius: 6px; margin: 1px 6px; transition: background 0.15s; }
+.sb-item:hover { background: #1e293b; }
+.sb-item.active { background: #1d4ed8; color: #fff; }
+.sb-item .ico { font-size: 15px; width: 20px; text-align: center; }
+.sb-item .lbl { font-size: 12.5px; }
+.sb-sep { height: 1px; background: #1e293b; margin: 8px 14px; }
+.sb-section { padding: 8px 14px 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; }
+.sb-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; border-radius: 9px; padding: 1px 6px; }
+.sb-chevron { margin-left: auto; font-size: 10px; color: #475569; }
+.sb-sub { padding-left: 8px; }
+.sb-sub .sb-item .lbl { font-size: 12px; color: #94a3b8; }
+</style>
+
+<div class="sb-wrap">
+
+  <!-- OPZIONE A: Sezioni con etichette -->
+  <div class="cards" style="flex-direction: column; gap: 0; width: 200px;">
+    <div class="card" data-choice="a" onclick="toggleSelect(this)" style="padding: 0; overflow: hidden; border-radius: 16px;">
+      <div class="sb">
+        <div class="sb-header">
+          <div class="app-name">GestioneTurni</div>
+          <div class="role">Admin</div>
+        </div>
+
+        <div class="sb-item active"><span class="ico">📊</span><span class="lbl">Dashboard</span></div>
+
+        <div class="sb-section">Calendario</div>
+        <div class="sb-item"><span class="ico">📅</span><span class="lbl">Per dipendente</span></div>
+        <div class="sb-item"><span class="ico">📍</span><span class="lbl">Per posto</span></div>
+
+        <div class="sb-section">Programmazione</div>
+        <div class="sb-item"><span class="ico">📝</span><span class="lbl">Per dipendente</span><span class="sb-badge">3</span></div>
+        <div class="sb-item"><span class="ico">📝</span><span class="lbl">Per posto</span></div>
+
+        <div class="sb-section">Gestione</div>
+        <div class="sb-item"><span class="ico">🏷️</span><span class="lbl">Turni</span></div>
+        <div class="sb-item"><span class="ico">📋</span><span class="lbl">Richieste</span><span class="sb-badge">2</span></div>
+        <div class="sb-item"><span class="ico">📤</span><span class="lbl">Export</span></div>
+
+        <div class="sb-section">Configurazione</div>
+        <div class="sb-item"><span class="ico">👥</span><span class="lbl">Utenti</span></div>
+        <div class="sb-item"><span class="ico">📍</span><span class="lbl">Posti</span></div>
+        <div class="sb-item"><span class="ico">🎉</span><span class="lbl">Festivi</span></div>
+      </div>
+      <div class="card-body" style="padding: 12px 14px;">
+        <h3 style="margin:0 0 4px">A — Sezioni etichettate</h3>
+        <p style="margin:0; font-size:12px; color: #6b7280">Gruppi visibili con intestazione. Chiaro, sempre espanso.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPZIONE B: Separatori senza etichette -->
+  <div class="cards" style="flex-direction: column; gap: 0; width: 200px;">
+    <div class="card" data-choice="b" onclick="toggleSelect(this)" style="padding: 0; overflow: hidden; border-radius: 16px;">
+      <div class="sb">
+        <div class="sb-header">
+          <div class="app-name">GestioneTurni</div>
+          <div class="role">Admin</div>
+        </div>
+
+        <div class="sb-item active"><span class="ico">📊</span><span class="lbl">Dashboard</span></div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item"><span class="ico">📅</span><span class="lbl">Calendario</span></div>
+        <div class="sb-item"><span class="ico">📍</span><span class="lbl">Per posto</span></div>
+        <div class="sb-item"><span class="ico">📝</span><span class="lbl">Programmazione</span><span class="sb-badge">3</span></div>
+        <div class="sb-item"><span class="ico">📝</span><span class="lbl">Prog. per posto</span></div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item"><span class="ico">🏷️</span><span class="lbl">Turni</span></div>
+        <div class="sb-item"><span class="ico">📋</span><span class="lbl">Richieste</span><span class="sb-badge">2</span></div>
+        <div class="sb-item"><span class="ico">📤</span><span class="lbl">Export</span></div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item"><span class="ico">👥</span><span class="lbl">Utenti</span></div>
+        <div class="sb-item"><span class="ico">📍</span><span class="lbl">Posti</span></div>
+        <div class="sb-item"><span class="ico">🎉</span><span class="lbl">Festivi</span></div>
+      </div>
+      <div class="card-body" style="padding: 12px 14px;">
+        <h3 style="margin:0 0 4px">B — Separatori sottili</h3>
+        <p style="margin:0; font-size:12px; color: #6b7280">Gruppi impliciti, look minimalista. Stessi nomi attuali.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPZIONE C: Collassabile con sottovoci -->
+  <div class="cards" style="flex-direction: column; gap: 0; width: 200px;">
+    <div class="card" data-choice="c" onclick="toggleSelect(this)" style="padding: 0; overflow: hidden; border-radius: 16px;">
+      <div class="sb">
+        <div class="sb-header">
+          <div class="app-name">GestioneTurni</div>
+          <div class="role">Admin</div>
+        </div>
+
+        <div class="sb-item active"><span class="ico">📊</span><span class="lbl">Dashboard</span></div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item" style="font-weight:600; color:#e2e8f0"><span class="ico">📅</span><span class="lbl">Calendario</span><span class="sb-chevron">▾</span></div>
+        <div class="sb-sub">
+          <div class="sb-item"><span class="ico">👤</span><span class="lbl">Per dipendente</span></div>
+          <div class="sb-item"><span class="ico">📍</span><span class="lbl">Per posto</span></div>
+        </div>
+        <div class="sb-item" style="font-weight:600; color:#e2e8f0"><span class="ico">📝</span><span class="lbl">Programmazione</span><span class="sb-badge">3</span></div>
+        <div class="sb-sub">
+          <div class="sb-item"><span class="ico">👤</span><span class="lbl">Per dipendente</span></div>
+          <div class="sb-item"><span class="ico">📍</span><span class="lbl">Per posto</span></div>
+        </div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item"><span class="ico">🏷️</span><span class="lbl">Turni</span></div>
+        <div class="sb-item"><span class="ico">📋</span><span class="lbl">Richieste</span><span class="sb-badge">2</span></div>
+        <div class="sb-item"><span class="ico">📤</span><span class="lbl">Export</span></div>
+
+        <div class="sb-sep"></div>
+        <div class="sb-item"><span class="ico">👥</span><span class="lbl">Utenti</span></div>
+        <div class="sb-item"><span class="ico">📍</span><span class="lbl">Posti</span></div>
+        <div class="sb-item"><span class="ico">🎉</span><span class="lbl">Festivi</span></div>
+      </div>
+      <div class="card-body" style="padding: 12px 14px;">
+        <h3 style="margin:0 0 4px">C — Gerarchia a sottovoci</h3>
+        <p style="margin:0; font-size:12px; color: #6b7280">Calendario e Programmazione diventano voci padre con figli indentati.</p>
+      </div>
+    </div>
+  </div>
+
+</div>

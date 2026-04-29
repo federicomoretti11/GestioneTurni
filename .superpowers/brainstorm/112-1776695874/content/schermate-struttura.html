@@ -1,0 +1,101 @@
+<h2>Struttura delle schermate</h2>
+<p class="subtitle">Organizzazione delle pagine per ruolo — clicca su una sezione per selezionarla</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+
+  <!-- ADMIN -->
+  <div class="option" data-choice="admin" onclick="toggleSelect(this)" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+    <div style="display:flex; align-items:center; gap: 0.5rem; width:100%;">
+      <div class="letter">A</div>
+      <h3 style="margin:0;">Admin</h3>
+    </div>
+    <div class="content" style="width:100%;">
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="label">Gestione utenti</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Crea / modifica / disattiva utenti</li>
+          <li>Assegna ruolo e reparto</li>
+        </ul>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="label">Gestione reparti</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Crea / modifica reparti</li>
+          <li>Assegna manager al reparto</li>
+        </ul>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem;">
+        <div class="label">Dashboard riepilogo</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Overview turni aziendali</li>
+          <li>Statistiche ore per reparto</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGER -->
+  <div class="option" data-choice="manager" onclick="toggleSelect(this)" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+    <div style="display:flex; align-items:center; gap: 0.5rem; width:100%;">
+      <div class="letter">B</div>
+      <h3 style="margin:0;">Manager</h3>
+    </div>
+    <div class="content" style="width:100%;">
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="label">Calendario turni</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Vista settimanale / mensile</li>
+          <li>Assegna turni a dipendenti</li>
+          <li>Modifica / elimina turni</li>
+        </ul>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="label">Template turni</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Crea / modifica template</li>
+          <li>Definisce orari e colore</li>
+        </ul>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem;">
+        <div class="label">Export</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Export PDF piano turni</li>
+          <li>Export Excel / CSV</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIPENDENTE -->
+  <div class="option" data-choice="dipendente" onclick="toggleSelect(this)" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+    <div style="display:flex; align-items:center; gap: 0.5rem; width:100%;">
+      <div class="letter">C</div>
+      <h3 style="margin:0;">Dipendente</h3>
+    </div>
+    <div class="content" style="width:100%;">
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="label">I miei turni</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Vista calendario personale</li>
+          <li>Vista settimanale / mensile</li>
+          <li>Dettaglio singolo turno</li>
+        </ul>
+      </div>
+      <div style="background: rgba(255,255,255,0.07); border-radius: 8px; padding: 0.75rem;">
+        <div class="label">Profilo</div>
+        <ul style="margin: 0.4rem 0 0 1rem; padding:0; font-size: 0.85rem; color: var(--text-secondary);">
+          <li>Visualizza dati personali</li>
+          <li>Cambia password</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid rgba(99,179,237,0.5);">
+  <div class="label" style="margin-bottom: 0.4rem;">Pagine comuni a tutti i ruoli</div>
+  <p style="margin:0; font-size: 0.9rem; color: var(--text-secondary);">
+    Login · Profilo personale · Cambio password
+  </p>
+</div>

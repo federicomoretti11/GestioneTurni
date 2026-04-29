@@ -9,7 +9,7 @@ function getResend() {
 }
 
 const TIPO_LABEL: Record<TipoRichiesta, string> = {
-  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno',
+  ferie: 'Ferie', permesso: 'Permesso', malattia: 'Malattia', cambio_turno: 'Cambio turno', sblocco_checkin: 'Sblocco check-in',
 }
 
 function htmlApprovata(tipo: TipoRichiesta, dataInizio: string, dataFine: string | null): string {

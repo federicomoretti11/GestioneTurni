@@ -6,7 +6,15 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   const body = await request.json()
   const { data, error } = await supabase
     .from('posti_di_servizio')
-    .update({ nome: body.nome, descrizione: body.descrizione ?? null, attivo: body.attivo ?? true })
+    .update({
+      nome: body.nome,
+      descrizione: body.descrizione ?? null,
+      attivo: body.attivo ?? true,
+      latitudine: body.latitudine ?? null,
+      longitudine: body.longitudine ?? null,
+      raggio_metri: body.raggio_metri ?? 200,
+      geo_check_abilitato: body.geo_check_abilitato ?? false,
+    })
     .eq('id', params.id)
     .select()
     .single()
