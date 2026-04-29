@@ -1,3 +1,5 @@
+'use client'
+import { useRef, useEffect } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { CellaCalendario } from './CellaCalendario'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
@@ -21,6 +23,11 @@ function oreLabel(ore: number) {
 }
 
 export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick }: GrigliaProps) {
+  const todayRef = useRef<HTMLTableCellElement>(null)
+  useEffect(() => {
+    todayRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [giorni])
+
   function getTurniCella(dipendenteId: string, data: string) {
     return turni.filter(t => t.dipendente_id === dipendenteId && t.data === data)
   }
@@ -51,7 +58,7 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
             {giorni.map(g => {
               const isOggi = toDateString(g) === oggi
               return (
-                <th key={g.toISOString()} className={`border border-gray-200 px-2 py-2 text-center font-medium min-w-[80px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600'}`}>
+                <th ref={isOggi ? todayRef : undefined} key={g.toISOString()} className={`border border-gray-200 px-2 py-2 text-center font-medium min-w-[80px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600'}`}>
                   {formatDayLabel(g)}
                   {isOggi && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mx-auto mt-0.5" />}
                 </th>

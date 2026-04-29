@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
@@ -38,6 +38,10 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
       ? toDateString(giorni[indiceOggiNeiGiorni >= 0 ? indiceOggiNeiGiorni : 0])
       : ''
   )
+  const selectedButtonRef = useRef<HTMLButtonElement>(null)
+  const scrollToSelected = useCallback(() => {
+    selectedButtonRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [])
 
   useEffect(() => {
     if (!giorni.some(g => toDateString(g) === dataSelezionata)) {
@@ -49,6 +53,10 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
   useEffect(() => {
     onDataSelezionataChange?.(dataSelezionata)
   }, [dataSelezionata, onDataSelezionataChange])
+
+  useEffect(() => {
+    scrollToSelected()
+  }, [dataSelezionata, scrollToSelected])
 
   const giornoSelezionato = useMemo(
     () => giorni.find(g => toDateString(g) === dataSelezionata) ?? giorni[0],
@@ -97,6 +105,7 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
           return (
             <button
               key={dataStr}
+              ref={isSel ? selectedButtonRef : undefined}
               onClick={() => setDataSelezionata(dataStr)}
               className={`flex-shrink-0 flex flex-col items-center gap-0.5 py-2 px-2.5 rounded-lg min-w-[52px] transition-colors ${
                 isSel ? 'bg-blue-600' : isToday ? 'bg-blue-50' : 'bg-gray-50 hover:bg-gray-100'

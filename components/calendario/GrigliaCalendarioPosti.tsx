@@ -1,3 +1,5 @@
+'use client'
+import { useRef, useEffect } from 'react'
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
@@ -20,6 +22,11 @@ function oreLabel(ore: number) {
 }
 
 export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddTurno, onEditTurno }: GrigliaCalendarioPostiProps) {
+  const todayRef = useRef<HTMLTableCellElement>(null)
+  useEffect(() => {
+    todayRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [giorni])
+
   const posti = postiProp
     ? postiProp.filter(p => p.attivo).sort((a, b) => a.nome.localeCompare(b.nome))
     : Array.from(new Map(
@@ -59,7 +66,7 @@ export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddT
             {giorni.map(g => {
               const isOggi = toDateString(g) === oggi
               return (
-                <th key={g.toISOString()} className={`border border-gray-200 px-2 py-2 text-center font-medium min-w-[100px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600'}`}>
+                <th ref={isOggi ? todayRef : undefined} key={g.toISOString()} className={`border border-gray-200 px-2 py-2 text-center font-medium min-w-[100px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600'}`}>
                   {formatDayLabel(g)}
                   {isOggi && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mx-auto mt-0.5" />}
                 </th>
