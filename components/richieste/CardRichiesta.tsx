@@ -58,7 +58,7 @@ export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
 
       <div className="flex items-center justify-between mt-1">
         {actions ?? null}
-        {onCancella && richiesta.stato === 'pending' && (
+        {onCancella && (richiesta.stato === 'pending' || richiesta.stato === 'comunicata') && (
           <button
             onClick={() => onCancella(richiesta.id)}
             className="text-xs text-red-600 hover:underline ml-auto"

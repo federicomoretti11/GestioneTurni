@@ -46,7 +46,7 @@ export default function RichiesteManagerPage() {
 
   function actions(r: Richiesta) {
     const isPending = r.stato === 'pending'
-    const isFinal = ['approvata','rifiutata','annullata','comunicata','approvata_manager'].includes(r.stato)
+    const isFinal = ['approvata','rifiutata','annullata','approvata_manager'].includes(r.stato)
     return (
       <div className="flex gap-1 flex-wrap">
         {isPending && (

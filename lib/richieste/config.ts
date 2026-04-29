@@ -29,4 +29,6 @@ export const TRANSIZIONI_VALIDE: Array<{
   { da: 'approvata_manager', a: 'approvata',          ruoli: ['admin'],               azione: 'convalida' },
   { da: 'pending',           a: 'rifiutata',          ruoli: ['manager', 'admin'],    azione: 'rifiuta'   },
   { da: 'approvata_manager', a: 'rifiutata',          ruoli: ['manager', 'admin'],    azione: 'rifiuta'   },
+  { da: 'comunicata',        a: 'rifiutata',          ruoli: ['manager', 'admin'],    azione: 'rifiuta'   },
+  { da: 'comunicata',        a: 'annullata',          ruoli: ['dipendente'],          azione: 'cancella'  },
 ]

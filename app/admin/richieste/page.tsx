@@ -47,7 +47,7 @@ export default function RichiesteAdminPage() {
   function actions(r: Richiesta) {
     const isPending = r.stato === 'pending'
     const isAttesaConvalida = r.stato === 'approvata_manager'
-    const isFinal = ['approvata','rifiutata','annullata','comunicata'].includes(r.stato)
+    const isFinal = ['approvata','rifiutata','annullata'].includes(r.stato)
     return (
       <div className="flex gap-1 flex-wrap">
         {(isPending || isAttesaConvalida) && (
