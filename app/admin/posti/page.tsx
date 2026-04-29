@@ -15,6 +15,8 @@ export default function PostiPage() {
   const [form, setForm] = useState(FORM_VUOTO)
   const [editing, setEditing] = useState<PostoDiServizio | null>(null)
   const [errore, setErrore] = useState('')
+  const [gpsGlobale, setGpsGlobale] = useState<boolean | null>(null)
+  const [loadingGps, setLoadingGps] = useState(false)
 
   async function carica() {
     const res = await fetch('/api/posti')
@@ -22,7 +24,28 @@ export default function PostiPage() {
     setPosti(Array.isArray(data) ? data : [])
   }
 
-  useEffect(() => { carica() }, [])
+  async function caricaImpostazioni() {
+    const res = await fetch('/api/impostazioni')
+    if (res.ok) {
+      const d = await res.json()
+      setGpsGlobale(d.gps_checkin_abilitato)
+    }
+  }
+
+  async function toggleGpsGlobale() {
+    if (gpsGlobale === null) return
+    setLoadingGps(true)
+    const nuovoValore = !gpsGlobale
+    await fetch('/api/impostazioni', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gps_checkin_abilitato: nuovoValore }),
+    })
+    setGpsGlobale(nuovoValore)
+    setLoadingGps(false)
+  }
+
+  useEffect(() => { carica(); caricaImpostazioni() }, [])
 
   function apriModifica(p: PostoDiServizio) {
     setEditing(p)
@@ -101,6 +124,30 @@ export default function PostiPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <h1 className="text-xl font-bold text-gray-900">Posti di servizio</h1>
+
+      {/* Toggle GPS globale */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-800">GPS check-in globale</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {gpsGlobale === false
+              ? 'Disattivato — il pulsante "Inizia turno" è sempre abilitato per tutti'
+              : 'Attivato — la verifica GPS è attiva per i posti configurati'}
+          </p>
+        </div>
+        <button
+          onClick={toggleGpsGlobale}
+          disabled={loadingGps || gpsGlobale === null}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50 ${
+            gpsGlobale ? 'bg-green-500' : 'bg-gray-300'
+          }`}
+          aria-label="Toggle GPS globale"
+        >
+          <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+            gpsGlobale ? 'translate-x-5' : 'translate-x-0'
+          }`} />
+        </button>
+      </div>
 
       <form onSubmit={handleSalva} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
         <h2 className="font-semibold text-gray-800">{editing ? 'Modifica posto' : 'Nuovo posto'}</h2>

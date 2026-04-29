@@ -23,6 +23,7 @@ function salutoOggi(): string {
 export function BannerTurnoOggi({ turno, onRefresh }: Props) {
   const [loading, setLoading] = useState(false)
   const [errore, setErrore] = useState('')
+  const [gpsGlobaleAbilitato, setGpsGlobaleAbilitato] = useState(true)
   const [geoStato, setGeoStato] = useState<GeoStato>('idle')
   const [distanzaMetri, setDistanzaMetri] = useState<number | null>(null)
   const [latPos, setLatPos] = useState<number | null>(null)
@@ -33,8 +34,15 @@ export function BannerTurnoOggi({ turno, onRefresh }: Props) {
   const [erroreSblocco, setErroreSblocco] = useState('')
   const [sbloccoComunicato, setSbloccoComunicato] = useState(false)
 
+  useEffect(() => {
+    fetch('/api/impostazioni')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setGpsGlobaleAbilitato(d.gps_checkin_abilitato) })
+      .catch(() => {})
+  }, [])
+
   const posto = turno?.posto
-  const geoRichiesta = !!(posto?.geo_check_abilitato && posto.latitudine != null && posto.longitudine != null)
+  const geoRichiesta = gpsGlobaleAbilitato && !!(posto?.geo_check_abilitato && posto.latitudine != null && posto.longitudine != null)
   const sbloccato = !!(turno?.sblocco_checkin_valido_fino &&
     new Date(turno.sblocco_checkin_valido_fino) > new Date())
   const haIngresso = !!turno?.ora_ingresso_effettiva
