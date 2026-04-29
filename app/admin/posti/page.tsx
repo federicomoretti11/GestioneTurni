@@ -60,6 +60,17 @@ export default function PostiPage() {
     carica()
   }
 
+  async function elimina(p: PostoDiServizio) {
+    if (!confirm(`Eliminare "${p.nome}"? L'operazione è irreversibile.`)) return
+    const res = await fetch(`/api/posti/${p.id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      alert(json.error ?? 'Impossibile eliminare. Verifica che il posto non abbia turni associati.')
+      return
+    }
+    carica()
+  }
+
   return (
     <div className="space-y-6 max-w-2xl">
       <h1 className="text-xl font-bold text-gray-900">Posti di servizio</h1>
@@ -100,6 +111,7 @@ export default function PostiPage() {
               <button onClick={() => toggleAttivo(p)} className="text-sm text-gray-500 hover:underline">
                 {p.attivo ? 'Disattiva' : 'Riattiva'}
               </button>
+              <button onClick={() => elimina(p)} className="text-sm text-red-600 hover:underline">Elimina</button>
             </div>
           </div>
         ))}

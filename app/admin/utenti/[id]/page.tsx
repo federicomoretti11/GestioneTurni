@@ -37,6 +37,17 @@ export default function ModificaUtentePage() {
     setForm(f => ({ ...f, attivo: !f.attivo }))
   }
 
+  async function elimina() {
+    if (!confirm(`Eliminare definitivamente l'utente ${form.nome} ${form.cognome}?\n\nVerranno cancellati tutti i turni e le richieste associate. Questa operazione è irreversibile.`)) return
+    const res = await fetch(`/api/utenti/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      alert(json.error ?? 'Impossibile eliminare l\'utente.')
+      return
+    }
+    router.push('/admin/utenti')
+  }
+
   return (
     <div className="max-w-md space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Modifica utente</h1>
@@ -51,9 +62,12 @@ export default function ModificaUtentePage() {
           <option value="admin">Admin</option>
         </Select>
         <div className="flex justify-between items-center pt-2">
-          <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
-            {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
+              {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}
+            </Button>
+            <Button variant="danger" type="button" onClick={elimina}>Elimina</Button>
+          </div>
           <div className="flex gap-2">
             <Button variant="secondary" type="button" onClick={() => router.back()}>Annulla</Button>
             <Button type="submit">Salva</Button>
