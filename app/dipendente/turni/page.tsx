@@ -28,7 +28,7 @@ function parseDataParam(s: string | null): Date | null {
 
 export default function MieiTurniPage() {
   const searchParams = useSearchParams()
-  const [vista, setVista] = useState<'settimana' | 'mese'>('mese')
+  const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
   const [dataCorrente, setDataCorrente] = useState(() => parseDataParam(searchParams.get('data')) ?? new Date())
   const [profilo, setProfilo] = useState<Profile | null>(null)
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
