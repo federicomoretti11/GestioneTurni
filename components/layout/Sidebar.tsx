@@ -19,7 +19,7 @@ export function Sidebar({ items, title, ruolo }: SidebarProps) {
           const showSection = item.section && item.section !== items[i - 1]?.section
           const isActive = pathname === item.href
           return (
-            <div key={item.href}>
+            <div key={`${item.section ?? ''}-${item.href}`}>
               {showSection && (
                 <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                   {item.section}
