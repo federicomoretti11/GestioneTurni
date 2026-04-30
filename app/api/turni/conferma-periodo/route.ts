@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { notificaTurniPubblicati } from '@/lib/notifiche'
 import { sendEmailTurniPubblicati } from '@/lib/email'
+import { isEmailAbilitata } from '@/lib/impostazioni'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -64,7 +65,9 @@ export async function POST(request: Request) {
   })
 
   // Email non-bloccante per ogni dipendente con il riepilogo dei propri turni
+  const emailOn = await isEmailAbilitata()
   for (const dipendenteId of dipendenteIds) {
+    if (!emailOn) break
     if (dipendenteId === user.id) continue
     const { data: userData } = await admin.auth.admin.getUserById(dipendenteId)
     const email = userData?.user?.email

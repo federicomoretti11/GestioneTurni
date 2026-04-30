@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmailRichiestaApprovata, sendEmailRichiestaRifiutata, sendEmailSbloccoApprovato } from '@/lib/email'
+import { isEmailAbilitata } from '@/lib/impostazioni'
 import { NextResponse } from 'next/server'
 import { validateStatoTransition } from '@/lib/richieste/validations'
 import { checkConflitti, createTurniDaRichiesta } from '@/lib/richieste/turni'
@@ -142,11 +143,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente })
   }
 
-  // Email non-bloccante (sandbox: arriva solo all'indirizzo Resend registrato)
-  const adminClient = createAdminClient()
-  const { data: userData } = await adminClient.auth.admin.getUserById(richiesta.dipendente_id)
+  // Email non-bloccante
+  const [emailOn, { data: userData }] = await Promise.all([
+    isEmailAbilitata(),
+    createAdminClient().auth.admin.getUserById(richiesta.dipendente_id),
+  ])
+
   const emailDipendente = userData?.user?.email
-  if (emailDipendente) {
+  if (emailOn && emailDipendente) {
     if (nuovoStato === 'approvata' && richiesta.tipo === 'sblocco_checkin') {
       sendEmailSbloccoApprovato({ toEmail: emailDipendente, dataTurno: richiesta.data_inizio })
     } else if (nuovoStato === 'approvata') {
