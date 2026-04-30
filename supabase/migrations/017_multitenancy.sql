@@ -28,8 +28,8 @@ ALTER TABLE profiles ADD COLUMN is_super_admin BOOLEAN NOT NULL DEFAULT false;
 -- =====================================================================
 -- 3. TENANT_ID (nullable inizialmente, poi NOT NULL dopo migrazione dati)
 -- =====================================================================
+-- Nota: la tabella reparti non esiste in questo schema (mai utilizzata)
 ALTER TABLE profiles          ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
-ALTER TABLE reparti           ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
 ALTER TABLE turni             ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
 ALTER TABLE turni_template    ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
 ALTER TABLE posti_di_servizio ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
@@ -61,7 +61,6 @@ BEGIN
 
   -- Assegna a tutte le tabelle
   UPDATE profiles          SET tenant_id = tid;
-  UPDATE reparti           SET tenant_id = tid;
   UPDATE turni             SET tenant_id = tid;
   UPDATE turni_template    SET tenant_id = tid;
   UPDATE posti_di_servizio SET tenant_id = tid;
@@ -92,7 +91,6 @@ ALTER TABLE festivi           ALTER COLUMN tenant_id SET NOT NULL;
 -- 6. INDICI SU TENANT_ID (performance RLS)
 -- =====================================================================
 CREATE INDEX idx_profiles_tenant          ON profiles(tenant_id);
-CREATE INDEX idx_reparti_tenant           ON reparti(tenant_id);
 CREATE INDEX idx_turni_tenant             ON turni(tenant_id);
 CREATE INDEX idx_turni_template_tenant    ON turni_template(tenant_id);
 CREATE INDEX idx_posti_tenant             ON posti_di_servizio(tenant_id);
@@ -133,39 +131,22 @@ $$ LANGUAGE plpgsql SECURITY DEFINER
 -- =====================================================================
 
 -- === PROFILES ===
-DROP POLICY IF EXISTS "admin_profiles_all"        ON profiles;
-DROP POLICY IF EXISTS "manager_profiles_select"   ON profiles;
+DROP POLICY IF EXISTS "admin_profiles_all"         ON profiles;
+DROP POLICY IF EXISTS "manager_profiles_select"    ON profiles;
 DROP POLICY IF EXISTS "dipendente_profiles_select" ON profiles;
 
 CREATE POLICY "admin_profiles_all" ON profiles FOR ALL
   USING (get_my_role() = 'admin' AND tenant_id = get_my_tenant_id());
 
+-- Manager vede tutti i profili del proprio tenant (nessuna colonna reparto_id)
 CREATE POLICY "manager_profiles_select" ON profiles FOR SELECT
-  USING (
-    get_my_role() = 'manager'
-    AND tenant_id = get_my_tenant_id()
-    AND (reparto_id = get_my_reparto() OR id = auth.uid())
-  );
+  USING (get_my_role() = 'manager' AND tenant_id = get_my_tenant_id());
 
 CREATE POLICY "dipendente_profiles_select" ON profiles FOR SELECT
   USING (id = auth.uid());
 
 CREATE POLICY "super_admin_profiles_all" ON profiles FOR ALL
   USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.is_super_admin = true));
-
--- === REPARTI ===
-DROP POLICY IF EXISTS "admin_reparti_all"       ON reparti;
-DROP POLICY IF EXISTS "manager_reparti_select"  ON reparti;
-DROP POLICY IF EXISTS "dipendente_reparti_select" ON reparti;
-
-CREATE POLICY "admin_reparti_all" ON reparti FOR ALL
-  USING (get_my_role() = 'admin' AND tenant_id = get_my_tenant_id());
-
-CREATE POLICY "manager_reparti_select" ON reparti FOR SELECT
-  USING (get_my_role() = 'manager' AND tenant_id = get_my_tenant_id() AND id = get_my_reparto());
-
-CREATE POLICY "dipendente_reparti_select" ON reparti FOR SELECT
-  USING (get_my_role() = 'dipendente' AND tenant_id = get_my_tenant_id() AND id = get_my_reparto());
 
 -- === TURNI_TEMPLATE ===
 DROP POLICY IF EXISTS "authenticated_template_select" ON turni_template;
@@ -185,14 +166,9 @@ DROP POLICY IF EXISTS "dipendente_turni_select"  ON turni;
 CREATE POLICY "admin_turni_all" ON turni FOR ALL
   USING (get_my_role() = 'admin' AND tenant_id = get_my_tenant_id());
 
+-- Manager gestisce tutti i turni del tenant (nessuna colonna reparto_id)
 CREATE POLICY "manager_turni_all" ON turni FOR ALL
-  USING (
-    get_my_role() = 'manager'
-    AND tenant_id = get_my_tenant_id()
-    AND dipendente_id IN (
-      SELECT id FROM profiles WHERE reparto_id = get_my_reparto()
-    )
-  );
+  USING (get_my_role() = 'manager' AND tenant_id = get_my_tenant_id());
 
 CREATE POLICY "dipendente_turni_select" ON turni FOR SELECT
   USING (
