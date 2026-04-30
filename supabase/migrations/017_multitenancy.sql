@@ -14,11 +14,10 @@ CREATE TABLE tenants (
 );
 
 ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
--- Solo super_admin legge/modifica (tutto il resto via service_role)
+-- Solo super_admin legge/modifica (tutto il resto via service_role).
+-- Usa get_is_super_admin() definita nella sezione 7 (applicare dopo).
 CREATE POLICY "tenants_super_admin" ON tenants
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_super_admin = true)
-  );
+  FOR ALL USING (get_is_super_admin());
 
 -- =====================================================================
 -- 2. FLAG SUPER_ADMIN SU PROFILES
@@ -99,12 +98,20 @@ CREATE INDEX idx_notifiche_tenant         ON notifiche(tenant_id);
 CREATE INDEX idx_audit_log_tenant         ON audit_log(tenant_id);
 
 -- =====================================================================
--- 7. FUNZIONE HELPER get_my_tenant_id()
+-- 7. FUNZIONI HELPER
 -- =====================================================================
 CREATE OR REPLACE FUNCTION get_my_tenant_id()
 RETURNS UUID LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path = public, pg_temp AS $$
   SELECT tenant_id FROM profiles WHERE id = auth.uid()
+$$;
+
+-- Necessario per evitare ricorsione RLS: la policy super_admin su profiles
+-- non può fare subquery su profiles (stessa tabella), usa questa funzione SECURITY DEFINER
+CREATE OR REPLACE FUNCTION get_is_super_admin()
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public, pg_temp AS $$
+  SELECT COALESCE(is_super_admin, false) FROM profiles WHERE id = auth.uid()
 $$;
 
 -- =====================================================================
@@ -146,7 +153,7 @@ CREATE POLICY "dipendente_profiles_select" ON profiles FOR SELECT
   USING (id = auth.uid());
 
 CREATE POLICY "super_admin_profiles_all" ON profiles FOR ALL
-  USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.is_super_admin = true));
+  USING (get_is_super_admin());
 
 -- === TURNI_TEMPLATE ===
 DROP POLICY IF EXISTS "authenticated_template_select" ON turni_template;
