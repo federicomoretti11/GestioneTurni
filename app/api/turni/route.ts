@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { notificaTurnoAssegnato } from '@/lib/notifiche'
 import { queryTurni, type FiltroTurni } from '@/lib/supabase/turni'
 import { logAzione } from '@/lib/audit'
+import { requireTenantId } from '@/lib/tenant'
 
 const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
 
@@ -37,6 +38,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const tenantId = requireTenantId()
   const body = await request.json()
   const stato: 'bozza' | 'confermato' = body.stato === 'bozza' ? 'bozza' : 'confermato'
 
@@ -67,6 +69,7 @@ export async function POST(request: Request) {
       note: body.note ?? null,
       creato_da: user!.id,
       stato,
+      tenant_id: tenantId,
     })
     .select(SELECT)
     .single()
@@ -82,12 +85,14 @@ export async function POST(request: Request) {
       oraInizio: data.ora_inizio,
       oraFine: data.ora_fine,
       actorId: user!.id,
+      tenantId,
     })
   }
 
   logAzione({
     tabella: 'turni', recordId: data.id, azione: 'creato', utenteId: user!.id,
     dettagli: { dipendente_id: data.dipendente_id, data: data.data, stato },
+    tenantId,
   })
 
   return NextResponse.json(data, { status: 201 })

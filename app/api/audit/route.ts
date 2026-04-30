@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function GET(request: Request) {
   const supabase = createClient()
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   }
 
+  const tenantId = requireTenantId()
   const { searchParams } = new URL(request.url)
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '100'), 500)
   const tabella = searchParams.get('tabella')
@@ -19,6 +21,7 @@ export async function GET(request: Request) {
   let query = createAdminClient()
     .from('audit_log')
     .select('*, utente:profiles!audit_log_utente_id_fkey(nome, cognome)')
+    .eq('tenant_id', tenantId)
     .order('created_at', { ascending: false })
     .limit(limit)
 

@@ -15,6 +15,7 @@ import {
 } from '@/lib/richieste/notifiche'
 import type { AzioneRichiesta, RuoloUtente, StatoRichiesta, Profile } from '@/lib/types'
 import { logAzione } from '@/lib/audit'
+import { requireTenantId } from '@/lib/tenant'
 
 const SELECT = `*, profile:profiles!richieste_dipendente_id_fkey(id, nome, cognome, ruolo),
   turno:turni(id, data, ora_inizio, ora_fine)`
@@ -34,6 +35,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+
+  const tenantId = requireTenantId()
 
   const { data: profilo } = await supabase
     .from('profiles').select('ruolo').eq('id', user.id).single()
@@ -107,7 +110,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       .from('turni')
       .update({ sblocco_checkin_valido_fino: validoFino })
       .eq('id', richiesta.turno_id)
-    notificaSbloccoApprovato({ dipendenteId: richiesta.dipendente_id })
+      .eq('tenant_id', tenantId)
+    notificaSbloccoApprovato({ dipendenteId: richiesta.dipendente_id, tenantId })
   }
 
   // Crea turni automatici su approvazione finale (non per cambio_turno né sblocco_checkin)
@@ -118,7 +122,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       { ...richiesta, stato: nuovoStato },
       sovrascrivi_conflitti ?? false,
       user.id,
-      adminSupabase
+      adminSupabase,
+      tenantId
     )
     if (!risultato.ok) {
       await supabase.from('richieste').update({ stato: richiesta.stato }).eq('id', params.id)
@@ -134,13 +139,13 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const nomeRichiedente = profile ? `${profile.nome} ${profile.cognome}` : 'Dipendente'
 
   if (nuovoStato === 'approvata_manager') {
-    notificaRichiestaApprovataManager({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente })
+    notificaRichiestaApprovataManager({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId })
   } else if (nuovoStato === 'approvata') {
-    notificaRichiestaApprovata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, dataFine: richiesta.data_fine })
+    notificaRichiestaApprovata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, dataFine: richiesta.data_fine, tenantId })
   } else if (nuovoStato === 'rifiutata') {
-    notificaRichiestaRifiutata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, motivazione: motivazione! })
+    notificaRichiestaRifiutata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, motivazione: motivazione!, tenantId })
   } else if (nuovoStato === 'annullata') {
-    notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente })
+    notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId })
   }
 
   // Email non-bloccante
@@ -172,6 +177,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   logAzione({
     tabella: 'richieste', recordId: params.id, azione: nuovoStato, utenteId: user.id,
     dettagli: { tipo: richiesta.tipo, da_stato: richiesta.stato, motivazione: motivazione ?? null },
+    tenantId,
   })
 
   return NextResponse.json(avviso ? { ...updated, avviso } : updated)

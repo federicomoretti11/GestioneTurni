@@ -3,12 +3,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { notificaCheckIn } from '@/lib/notifiche'
 import { haversineMetri } from '@/lib/utils/geo'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
+  const tenantId = requireTenantId()
   const body = await req.json().catch(() => ({})) as { latitudine?: number; longitudine?: number }
 
   const admin = createAdminClient()
@@ -19,6 +21,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       profile:profiles!turni_dipendente_id_fkey(nome, cognome),
       posto:posti_di_servizio(id, latitudine, longitudine, raggio_metri, geo_check_abilitato)`)
     .eq('id', params.id)
+    .eq('tenant_id', tenantId)
     .single()
   if (readErr || !turno) return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
   if (turno.stato === 'bozza') return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
@@ -53,6 +56,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     .from('turni')
     .update(updatePayload)
     .eq('id', params.id)
+    .eq('tenant_id', tenantId)
     .select('*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo, latitudine, longitudine, raggio_metri, geo_check_abilitato)')
     .single()
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
@@ -63,6 +67,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     dataTurno: turno.data,
     oraIngressoISO: now,
     nomeDipendente: profile ? `${profile.nome} ${profile.cognome}` : 'Dipendente',
+    tenantId,
   })
 
   return NextResponse.json(updated)

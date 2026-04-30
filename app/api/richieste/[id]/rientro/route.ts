@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { dateRange } from '@/lib/richieste/turni'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -13,6 +14,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   }
 
+  const tenantId = requireTenantId()
   const { data_fine } = await request.json()
   if (!data_fine) return NextResponse.json({ error: 'data_fine obbligatoria' }, { status: 422 })
 
@@ -44,6 +46,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     .delete()
     .eq('dipendente_id', richiesta.dipendente_id)
     .eq('stato', 'confermato')
+    .eq('tenant_id', tenantId)
     .gt('data', data_fine)
     .like('note', `Da richiesta malattia #${richiesta.id.slice(0, 8)}%`)
 
@@ -52,6 +55,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     tipo: 'richiesta_approvata',
     titolo: 'Data rientro malattia aggiornata',
     messaggio: `Il tuo rientro dalla malattia è stato impostato al ${data_fine}`,
+    tenant_id: tenantId,
   })
 
   return NextResponse.json({ ok: true })

@@ -7,6 +7,7 @@ export async function logAzione(params: {
   azione: string
   utenteId: string
   dettagli?: Record<string, unknown>
+  tenantId?: string
 }) {
   try {
     await createAdminClient().from('audit_log').insert({
@@ -15,6 +16,7 @@ export async function logAzione(params: {
       azione: params.azione,
       utente_id: params.utenteId,
       dettagli: params.dettagli ?? null,
+      tenant_id: params.tenantId ?? null,
     })
   } catch {
     // non bloccante — l'audit non deve mai rompere il flusso principale

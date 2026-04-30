@@ -9,15 +9,17 @@ type Riga = {
   messaggio: string
   turno_id?: string | null
   data_turno?: string | null
+  tenant_id: string
 }
 
-async function destinatariStaff(): Promise<string[]> {
+async function destinatariStaff(tenantId: string): Promise<string[]> {
   const admin = createAdminClient()
   const { data } = await admin
     .from('profiles')
     .select('id')
     .in('ruolo', ['admin', 'manager'])
     .eq('attivo', true)
+    .eq('tenant_id', tenantId)
   return (data ?? []).map(r => r.id)
 }
 
@@ -43,6 +45,7 @@ export async function notificaTurnoAssegnato(params: {
   oraInizio: string
   oraFine: string
   actorId: string
+  tenantId: string
 }) {
   if (params.actorId === params.dipendenteId) return
   await insertNotifiche([{
@@ -52,6 +55,7 @@ export async function notificaTurnoAssegnato(params: {
     messaggio: `${formatDateIT(params.data)} · ${formatTimeShort(params.oraInizio)}–${formatTimeShort(params.oraFine)}`,
     turno_id: params.turnoId,
     data_turno: params.data,
+    tenant_id: params.tenantId,
   }])
 }
 
@@ -62,6 +66,7 @@ export async function notificaTurnoModificato(params: {
   oraInizio: string
   oraFine: string
   actorId: string
+  tenantId: string
 }) {
   if (params.actorId === params.dipendenteId) return
   await insertNotifiche([{
@@ -71,6 +76,7 @@ export async function notificaTurnoModificato(params: {
     messaggio: `${formatDateIT(params.data)} · ${formatTimeShort(params.oraInizio)}–${formatTimeShort(params.oraFine)}`,
     turno_id: params.turnoId,
     data_turno: params.data,
+    tenant_id: params.tenantId,
   }])
 }
 
@@ -78,6 +84,7 @@ export async function notificaTurnoEliminato(params: {
   dipendenteId: string
   data: string
   actorId: string
+  tenantId: string
 }) {
   if (params.actorId === params.dipendenteId) return
   await insertNotifiche([{
@@ -87,6 +94,7 @@ export async function notificaTurnoEliminato(params: {
     messaggio: `Il turno del ${formatDateIT(params.data)} è stato eliminato`,
     turno_id: null,
     data_turno: params.data,
+    tenant_id: params.tenantId,
   }])
 }
 
@@ -95,6 +103,7 @@ export async function notificaSettimanaPianificata(params: {
   dataInizio: string
   actorId: string
   conteggioPerDipendente: Record<string, number>
+  tenantId: string
 }) {
   const righe: Riga[] = params.dipendenteIds
     .filter(id => id !== params.actorId)
@@ -105,6 +114,7 @@ export async function notificaSettimanaPianificata(params: {
       messaggio: `${params.conteggioPerDipendente[id] ?? 0} turni dalla settimana del ${formatDateIT(params.dataInizio)}`,
       turno_id: null,
       data_turno: params.dataInizio,
+      tenant_id: params.tenantId,
     }))
   await insertNotifiche(righe)
 }
@@ -114,8 +124,9 @@ export async function notificaCheckIn(params: {
   dataTurno: string
   oraIngressoISO: string
   nomeDipendente: string
+  tenantId: string
 }) {
-  const ids = await destinatariStaff()
+  const ids = await destinatariStaff(params.tenantId)
   await insertNotifiche(ids.map(id => ({
     destinatario_id: id,
     tipo: 'check_in' as const,
@@ -123,6 +134,7 @@ export async function notificaCheckIn(params: {
     messaggio: `${params.nomeDipendente} ha iniziato il turno (${formatOraISO(params.oraIngressoISO)})`,
     turno_id: params.turnoId,
     data_turno: params.dataTurno,
+    tenant_id: params.tenantId,
   })))
 }
 
@@ -131,8 +143,9 @@ export async function notificaCheckOut(params: {
   dataTurno: string
   oraUscitaISO: string
   nomeDipendente: string
+  tenantId: string
 }) {
-  const ids = await destinatariStaff()
+  const ids = await destinatariStaff(params.tenantId)
   await insertNotifiche(ids.map(id => ({
     destinatario_id: id,
     tipo: 'check_out' as const,
@@ -140,6 +153,7 @@ export async function notificaCheckOut(params: {
     messaggio: `${params.nomeDipendente} ha terminato il turno (${formatOraISO(params.oraUscitaISO)})`,
     turno_id: params.turnoId,
     data_turno: params.dataTurno,
+    tenant_id: params.tenantId,
   })))
 }
 
@@ -149,6 +163,7 @@ export async function notificaTurniPubblicati(params: {
   dataFine: string
   actorId: string
   conteggioPerDipendente: Record<string, number>
+  tenantId: string
 }) {
   const righe: Riga[] = params.dipendenteIds
     .filter(id => id !== params.actorId)
@@ -159,6 +174,7 @@ export async function notificaTurniPubblicati(params: {
       messaggio: `${params.conteggioPerDipendente[id] ?? 0} turni dal ${formatDateIT(params.dataInizio)} al ${formatDateIT(params.dataFine)}`,
       turno_id: null,
       data_turno: params.dataInizio,
+      tenant_id: params.tenantId,
     }))
   await insertNotifiche(righe)
 }

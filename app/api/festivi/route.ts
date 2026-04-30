@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function GET(request: Request) {
   const supabase = createClient()
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const tenantId = requireTenantId()
   const body = await request.json()
   if (!body.data || !body.nome) {
     return NextResponse.json({ error: 'data e nome sono obbligatori' }, { status: 400 })
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
       data: body.data,
       nome: body.nome.trim(),
       tipo: body.tipo ?? 'patronale',
+      tenant_id: tenantId,
     })
     .select()
     .single()

@@ -52,7 +52,8 @@ export async function createTurniDaRichiesta(
   richiesta: Richiesta,
   sovrascriviConflitti: boolean,
   adminId: string,
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  tenantId: string
 ): Promise<{ ok: boolean; error?: string; skipped?: boolean }> {
   // Permesso ore: il dipendente lavora comunque, non tocchiamo il calendario
   if (richiesta.tipo === 'permesso' && richiesta.permesso_tipo === 'ore') {
@@ -98,6 +99,7 @@ export async function createTurniDaRichiesta(
     stato: 'confermato' as const,
     creato_da: adminId,
     note: `Da richiesta ${richiesta.tipo} #${richiesta.id.slice(0, 8)}`,
+    tenant_id: tenantId,
   }))
 
   if (!righe.length) return { ok: true }

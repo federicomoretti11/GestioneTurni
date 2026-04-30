@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
   const { data: profile } = await supabase.from('profiles').select('ruolo').eq('id', user.id).single()
   if (profile?.ruolo !== 'admin') return NextResponse.json({ error: 'Accesso negato' }, { status: 403 })
 
+  const tenantId = requireTenantId()
   const body = await request.json().catch(() => ({}))
   const { data_inizio, data_fine } = body
   const re = /^\d{4}-\d{2}-\d{2}$/
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
     .from('turni')
     .delete()
     .eq('stato', 'bozza')
+    .eq('tenant_id', tenantId)
     .gte('data', data_inizio)
     .lte('data', data_fine)
     .select('id')

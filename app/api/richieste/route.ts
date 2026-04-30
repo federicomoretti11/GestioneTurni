@@ -6,6 +6,7 @@ import {
   notificaRichiestaCreata,
   notificaMalattiaComunicata,
 } from '@/lib/richieste/notifiche'
+import { requireTenantId } from '@/lib/tenant'
 
 const SELECT = `*, profile:profiles!richieste_dipendente_id_fkey(id, nome, cognome, ruolo),
   turno:turni(id, data, ora_inizio, ora_fine)`
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
+  const tenantId = requireTenantId()
   const body = await request.json()
   const { tipo, data_inizio, data_fine, permesso_tipo, ora_inizio, ora_fine,
           turno_id, note_dipendente } = body
@@ -90,6 +92,7 @@ export async function POST(request: Request) {
       turno_id: turno_id ?? null,
       note_dipendente: note_dipendente ?? null,
       stato: statoIniziale,
+      tenant_id: tenantId,
     })
     .select(SELECT)
     .single()
@@ -102,9 +105,9 @@ export async function POST(request: Request) {
   const nome = profilo ? `${profilo.nome} ${profilo.cognome}` : 'Dipendente'
 
   if (tipo === 'malattia') {
-    notificaMalattiaComunicata({ tipo: 'malattia', dataInizio: data_inizio, nomeDipendente: nome })
+    notificaMalattiaComunicata({ tipo: 'malattia', dataInizio: data_inizio, nomeDipendente: nome, tenantId })
   } else {
-    notificaRichiestaCreata({ tipo, dataInizio: data_inizio, dataFine: data_fine ?? null, nomeDipendente: nome })
+    notificaRichiestaCreata({ tipo, dataInizio: data_inizio, dataFine: data_fine ?? null, nomeDipendente: nome, tenantId })
   }
 
   return NextResponse.json(data, { status: 201 })

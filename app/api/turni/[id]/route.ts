@@ -2,10 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { notificaTurnoModificato, notificaTurnoEliminato } from '@/lib/notifiche'
 import { logAzione } from '@/lib/audit'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const tenantId = requireTenantId()
   const body = await request.json()
 
   // Snapshot prima della modifica per confronto
@@ -56,12 +58,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       oraInizio: data.ora_inizio,
       oraFine: data.ora_fine,
       actorId: user!.id,
+      tenantId,
     })
   }
 
   logAzione({
     tabella: 'turni', recordId: params.id, azione: 'modificato', utenteId: user!.id,
     dettagli: { data: body.data, ora_inizio: body.ora_inizio, ora_fine: body.ora_fine },
+    tenantId,
   })
 
   return NextResponse.json(data)
@@ -70,6 +74,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const tenantId = requireTenantId()
 
   const { data: turno } = await supabase
     .from('turni')
@@ -85,12 +90,14 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
       dipendenteId: turno.dipendente_id,
       data: turno.data,
       actorId: user!.id,
+      tenantId,
     })
   }
 
   logAzione({
     tabella: 'turni', recordId: params.id, azione: 'eliminato', utenteId: user!.id,
     dettagli: { dipendente_id: turno?.dipendente_id, data: turno?.data, stato: turno?.stato },
+    tenantId,
   })
 
   return new NextResponse(null, { status: 204 })

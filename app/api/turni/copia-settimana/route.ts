@@ -1,10 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { notificaSettimanaPianificata } from '@/lib/notifiche'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const tenantId = requireTenantId()
   const body = await request.json()
   const { data_inizio_origine } = body
   const stato: 'bozza' | 'confermato' = body.stato === 'bozza' ? 'bozza' : 'confermato'
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
     const dataOrig = new Date(t.data)
     const dataDest = new Date(dataOrig)
     dataDest.setDate(dataOrig.getDate() + 7)
-    return { ...t, data: dataDest.toISOString().slice(0, 10), creato_da: user!.id, stato }
+    return { ...t, data: dataDest.toISOString().slice(0, 10), creato_da: user!.id, stato, tenant_id: tenantId }
   })
 
   const dateDest = Array.from(new Set(nuoviTurni.map(t => t.data)))
@@ -68,6 +70,7 @@ export async function POST(request: Request) {
       dataInizio: destinazione.toISOString().slice(0, 10),
       actorId: user!.id,
       conteggioPerDipendente,
+      tenantId,
     })
   }
 

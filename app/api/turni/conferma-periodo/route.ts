@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { notificaTurniPubblicati } from '@/lib/notifiche'
 import { sendEmailTurniPubblicati } from '@/lib/email'
 import { isEmailAbilitata } from '@/lib/impostazioni'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -13,6 +14,7 @@ export async function POST(request: Request) {
   const { data: profile } = await supabase.from('profiles').select('ruolo').eq('id', user.id).single()
   if (profile?.ruolo !== 'admin') return NextResponse.json({ error: 'Accesso negato' }, { status: 403 })
 
+  const tenantId = requireTenantId()
   const body = await request.json().catch(() => ({}))
   const { data_inizio, data_fine } = body
   if (typeof data_inizio !== 'string' || typeof data_fine !== 'string' ||
@@ -30,6 +32,7 @@ export async function POST(request: Request) {
     .from('turni')
     .select('dipendente_id, data, ora_inizio, ora_fine')
     .eq('stato', 'bozza')
+    .eq('tenant_id', tenantId)
     .gte('data', data_inizio)
     .lte('data', data_fine)
   if (readErr) return NextResponse.json({ error: readErr.message }, { status: 500 })
@@ -52,6 +55,7 @@ export async function POST(request: Request) {
     .from('turni')
     .update({ stato: 'confermato' })
     .eq('stato', 'bozza')
+    .eq('tenant_id', tenantId)
     .gte('data', data_inizio)
     .lte('data', data_fine)
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
@@ -62,6 +66,7 @@ export async function POST(request: Request) {
     dataFine: data_fine,
     actorId: user.id,
     conteggioPerDipendente: conteggio,
+    tenantId,
   })
 
   // Email non-bloccante per ogni dipendente con il riepilogo dei propri turni

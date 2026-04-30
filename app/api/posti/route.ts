@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function GET() {
   const supabase = createClient()
@@ -13,6 +14,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const tenantId = requireTenantId()
   const body = await request.json()
   const { data, error } = await supabase
     .from('posti_di_servizio')
@@ -23,6 +25,7 @@ export async function POST(request: Request) {
       longitudine: body.longitudine ?? null,
       raggio_metri: body.raggio_metri ?? 200,
       geo_check_abilitato: body.geo_check_abilitato ?? false,
+      tenant_id: tenantId,
     })
     .select()
     .single()

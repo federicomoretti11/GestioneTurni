@@ -2,17 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { notificaCheckOut } from '@/lib/notifiche'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
+  const tenantId = requireTenantId()
   const admin = createAdminClient()
   const { data: turno, error: readErr } = await admin
     .from('turni')
     .select('id, dipendente_id, data, stato, ora_ingresso_effettiva, ora_uscita_effettiva, profile:profiles!turni_dipendente_id_fkey(nome, cognome)')
     .eq('id', params.id)
+    .eq('tenant_id', tenantId)
     .single()
   if (readErr || !turno) return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
   // 404 sulle bozze per non rivelarne l'esistenza al dipendente.
@@ -26,6 +29,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     .from('turni')
     .update({ ora_uscita_effettiva: now })
     .eq('id', params.id)
+    .eq('tenant_id', tenantId)
     .select('*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)')
     .single()
   if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
@@ -36,6 +40,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     dataTurno: turno.data,
     oraUscitaISO: now,
     nomeDipendente: profile ? `${profile.nome} ${profile.cognome}` : 'Dipendente',
+    tenantId,
   })
 
   return NextResponse.json(updated)

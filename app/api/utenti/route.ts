@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
+import { requireTenantId } from '@/lib/tenant'
 
 export async function GET() {
   const supabase = createClient()
@@ -14,13 +15,14 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const tenantId = requireTenantId()
   const body = await request.json()
 
   const adminClient = createAdminClient()
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
     email: body.email,
     password: body.password,
-    user_metadata: { nome: body.nome, cognome: body.cognome, ruolo: body.ruolo },
+    user_metadata: { nome: body.nome, cognome: body.cognome, ruolo: body.ruolo, tenant_id: tenantId },
   })
 
   if (authError) return NextResponse.json({ error: authError.message }, { status: 500 })
