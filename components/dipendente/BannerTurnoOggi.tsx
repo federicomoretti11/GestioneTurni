@@ -33,6 +33,7 @@ export function BannerTurnoOggi({ turno, onRefresh }: Props) {
   const [loadingSblocco, setLoadingSblocco] = useState(false)
   const [erroreSblocco, setErroreSblocco] = useState('')
   const [sbloccoComunicato, setSbloccoComunicato] = useState(false)
+  const [anomaliaGeo, setAnomaliaGeo] = useState(false)
 
   useEffect(() => {
     fetch('/api/impostazioni')
@@ -85,6 +86,10 @@ export function BannerTurnoOggi({ turno, onRefresh }: Props) {
       const d = await res.json().catch(() => ({}))
       setErrore(d.error ?? 'Errore durante la timbratura')
       return
+    }
+    if (endpoint === 'check-in') {
+      const data = await res.json().catch(() => ({}))
+      if (data.geo_anomalia) setAnomaliaGeo(true)
     }
     onRefresh()
   }
@@ -181,6 +186,12 @@ export function BannerTurnoOggi({ turno, onRefresh }: Props) {
       {sbloccoComunicato && !sbloccato && !haIngresso && (
         <div className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
           Richiesta sblocco inviata — attendi l&apos;approvazione
+        </div>
+      )}
+
+      {anomaliaGeo && (
+        <div className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          Check-in registrato. Nota: la tua posizione risultava lontana dal posto di servizio.
         </div>
       )}
 

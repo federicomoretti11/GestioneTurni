@@ -52,6 +52,7 @@ export interface Turno {
   lng_checkin: number | null
   geo_anomalia: boolean
   sblocco_checkin_valido_fino: string | null
+  sblocco_usato_at: string | null
   // join opzionali
   profile?: Profile
   template?: TurnoTemplate | null | undefined

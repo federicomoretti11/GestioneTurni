@@ -1,7 +1,7 @@
 // app/api/richieste/[id]/route.ts
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendEmailRichiestaApprovata, sendEmailRichiestaRifiutata } from '@/lib/email'
+import { sendEmailRichiestaApprovata, sendEmailRichiestaRifiutata, sendEmailSbloccoApprovato } from '@/lib/email'
 import { NextResponse } from 'next/server'
 import { validateStatoTransition } from '@/lib/richieste/validations'
 import { checkConflitti, createTurniDaRichiesta } from '@/lib/richieste/turni'
@@ -147,7 +147,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const { data: userData } = await adminClient.auth.admin.getUserById(richiesta.dipendente_id)
   const emailDipendente = userData?.user?.email
   if (emailDipendente) {
-    if (nuovoStato === 'approvata') {
+    if (nuovoStato === 'approvata' && richiesta.tipo === 'sblocco_checkin') {
+      sendEmailSbloccoApprovato({ toEmail: emailDipendente, dataTurno: richiesta.data_inizio })
+    } else if (nuovoStato === 'approvata') {
       sendEmailRichiestaApprovata({
         toEmail: emailDipendente,
         tipo: richiesta.tipo,

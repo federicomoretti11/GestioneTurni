@@ -42,6 +42,7 @@ export default function AuditPage() {
   const [voci, setVoci] = useState<VoceAudit[]>([])
   const [loading, setLoading] = useState(true)
   const [filtroTabella, setFiltroTabella] = useState('')
+  const [emailMsg, setEmailMsg] = useState('')
 
   const carica = useCallback(async () => {
     setLoading(true)
@@ -54,9 +55,27 @@ export default function AuditPage() {
 
   useEffect(() => { carica() }, [carica])
 
+  async function handleTestEmail() {
+    setEmailMsg('')
+    const res = await fetch('/api/admin/test-email', { method: 'POST' })
+    const d = await res.json()
+    setEmailMsg(res.ok ? `Email inviata a ${d.sentTo}` : d.error ?? 'Errore')
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <h1 className="text-lg font-bold text-gray-900">Audit log</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-lg font-bold text-gray-900">Audit log</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleTestEmail}
+            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors"
+          >
+            Test email
+          </button>
+          {emailMsg && <span className="text-xs text-gray-600">{emailMsg}</span>}
+        </div>
+      </div>
 
       <div className="flex gap-2">
         <select

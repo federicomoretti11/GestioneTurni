@@ -44,7 +44,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     lng_checkin: body.longitudine ?? null,
     geo_anomalia: geoAnomalia,
   }
-  if (sbloccato) updatePayload.sblocco_checkin_valido_fino = null
+  if (sbloccato) {
+    updatePayload.sblocco_checkin_valido_fino = null
+    updatePayload.sblocco_usato_at = now
+  }
 
   const { data: updated, error: updErr } = await admin
     .from('turni')

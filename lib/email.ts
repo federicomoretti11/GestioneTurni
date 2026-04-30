@@ -69,3 +69,25 @@ export async function sendEmailRichiestaRifiutata(params: {
     console.error('[email] sendEmailRichiestaRifiutata fallita', e)
   }
 }
+
+export async function sendEmailSbloccoApprovato(params: {
+  toEmail: string
+  dataTurno: string
+}) {
+  try {
+    await getResend().emails.send({
+      from: FROM,
+      to: params.toEmail,
+      subject: 'Sblocco check-in approvato — hai 30 minuti',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#d97706">Sblocco check-in approvato 🔓</h2>
+          <p>Il tuo sblocco per il turno del <strong>${params.dataTurno}</strong> è stato approvato.</p>
+          <p>Hai <strong>30 minuti</strong> per effettuare il check-in dall'app.</p>
+          <p style="color:#6b7280;font-size:14px">Passati i 30 minuti il token scade e dovrai richiedere un nuovo sblocco.</p>
+        </div>`,
+    })
+  } catch (e) {
+    console.error('[email] sendEmailSbloccoApprovato fallita', e)
+  }
+}

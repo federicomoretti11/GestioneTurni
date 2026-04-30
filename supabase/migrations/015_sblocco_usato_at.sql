@@ -1,0 +1,1 @@
+ALTER TABLE turni ADD COLUMN sblocco_usato_at TIMESTAMPTZ;

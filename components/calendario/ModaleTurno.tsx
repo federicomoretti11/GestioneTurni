@@ -178,7 +178,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
           </div>
         </div>
 
-        {(timbroIngresso || timbroUscita) && (
+        {(timbroIngresso || timbroUscita || turno.sblocco_usato_at) && (
           <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
             <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature effettive</p>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
@@ -192,6 +192,13 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
                 <span className="text-slate-400">Uscita</span>
                 <span className="font-semibold">{timbroUscita ? oraDaISO(timbroUscita) : '—'}</span>
               </span>
+              {turno.sblocco_usato_at && (
+                <span className="inline-flex items-center gap-2 text-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="text-slate-400">Sblocco usato</span>
+                  <span className="font-semibold text-amber-700">{oraDaISO(turno.sblocco_usato_at)}</span>
+                </span>
+              )}
             </div>
           </div>
         )}
