@@ -70,6 +70,57 @@ export async function sendEmailRichiestaRifiutata(params: {
   }
 }
 
+export async function sendEmailTurniPubblicati(params: {
+  toEmail: string
+  dataInizio: string
+  dataFine: string
+  turni: Array<{ data: string; ora_inizio: string; ora_fine: string }>
+}) {
+  const formatData = (s: string) => {
+    const [y, m, d] = s.split('-').map(Number)
+    return new Date(y, m - 1, d).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })
+  }
+  const formatPeriodo = (s: string) => {
+    const [y, m, d] = s.split('-').map(Number)
+    return new Date(y, m - 1, d).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+  const righe = params.turni
+    .sort((a, b) => a.data.localeCompare(b.data))
+    .map(t => {
+      const isRiposo = t.ora_inizio === t.ora_fine
+      const orario = isRiposo ? 'Riposo' : `${t.ora_inizio.slice(0, 5)} – ${t.ora_fine.slice(0, 5)}`
+      return `<tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">${formatData(t.data)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">${orario}</td>
+      </tr>`
+    })
+    .join('')
+  try {
+    await getResend().emails.send({
+      from: FROM,
+      to: params.toEmail,
+      subject: `Turni pubblicati — dal ${formatPeriodo(params.dataInizio)} al ${formatPeriodo(params.dataFine)}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+          <h2 style="color:#1e40af;margin-bottom:4px">Turni pubblicati 📅</h2>
+          <p style="color:#6b7280;margin-top:0">Dal <strong>${formatPeriodo(params.dataInizio)}</strong> al <strong>${formatPeriodo(params.dataFine)}</strong></p>
+          <table style="width:100%;border-collapse:collapse;margin-top:16px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+            <thead>
+              <tr style="background:#f8fafc">
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Giorno</th>
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Orario</th>
+              </tr>
+            </thead>
+            <tbody>${righe}</tbody>
+          </table>
+          <p style="color:#6b7280;font-size:14px;margin-top:20px">Accedi all'app per visualizzare tutti i dettagli.</p>
+        </div>`,
+    })
+  } catch (e) {
+    console.error('[email] sendEmailTurniPubblicati fallita', e)
+  }
+}
+
 export async function sendEmailSbloccoApprovato(params: {
   toEmail: string
   dataTurno: string

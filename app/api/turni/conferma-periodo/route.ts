@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { notificaTurniPubblicati } from '@/lib/notifiche'
+import { sendEmailTurniPubblicati } from '@/lib/email'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -23,10 +24,10 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient()
 
-  // Conta i turni bozza nel periodo, raggruppati per dipendente.
+  // Legge i turni bozza nel periodo con dettagli per le email.
   const { data: bozze, error: readErr } = await admin
     .from('turni')
-    .select('dipendente_id')
+    .select('dipendente_id, data, ora_inizio, ora_fine')
     .eq('stato', 'bozza')
     .gte('data', data_inizio)
     .lte('data', data_fine)
@@ -35,11 +36,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ confermati: 0, dipendenti: 0 })
   }
 
-  const conteggio: Record<string, number> = {}
+  // Raggruppa per dipendente
+  const turniPerDipendente: Record<string, Array<{ data: string; ora_inizio: string; ora_fine: string }>> = {}
   for (const t of bozze) {
-    conteggio[t.dipendente_id] = (conteggio[t.dipendente_id] ?? 0) + 1
+    if (!turniPerDipendente[t.dipendente_id]) turniPerDipendente[t.dipendente_id] = []
+    turniPerDipendente[t.dipendente_id].push({ data: t.data, ora_inizio: t.ora_inizio, ora_fine: t.ora_fine })
   }
-  const dipendenteIds = Object.keys(conteggio)
+  const dipendenteIds = Object.keys(turniPerDipendente)
+  const conteggio: Record<string, number> = Object.fromEntries(
+    dipendenteIds.map(id => [id, turniPerDipendente[id].length])
+  )
 
   const { error: updErr } = await admin
     .from('turni')
@@ -56,6 +62,21 @@ export async function POST(request: Request) {
     actorId: user.id,
     conteggioPerDipendente: conteggio,
   })
+
+  // Email non-bloccante per ogni dipendente con il riepilogo dei propri turni
+  for (const dipendenteId of dipendenteIds) {
+    if (dipendenteId === user.id) continue
+    const { data: userData } = await admin.auth.admin.getUserById(dipendenteId)
+    const email = userData?.user?.email
+    if (email) {
+      sendEmailTurniPubblicati({
+        toEmail: email,
+        dataInizio: data_inizio,
+        dataFine: data_fine,
+        turni: turniPerDipendente[dipendenteId],
+      })
+    }
+  }
 
   return NextResponse.json({ confermati: bozze.length, dipendenti: dipendenteIds.length })
 }
