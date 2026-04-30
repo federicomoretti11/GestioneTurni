@@ -10,7 +10,7 @@ async function resolveTenantId(host: string): Promise<string | null> {
   }
 
   const slug = host.split('.')[0]
-  if (!slug || slug === 'www') return null
+  if (!slug || slug === 'www') return process.env.NEXT_PUBLIC_DEV_TENANT_ID ?? null
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +25,8 @@ async function resolveTenantId(host: string): Promise<string | null> {
     .eq('attivo', true)
     .single()
 
-  return data?.id ?? null
+  // Fallback per URL Vercel preview (es. gestione-turni.vercel.app) senza dominio custom
+  return data?.id ?? process.env.NEXT_PUBLIC_DEV_TENANT_ID ?? null
 }
 
 export async function middleware(request: NextRequest) {
