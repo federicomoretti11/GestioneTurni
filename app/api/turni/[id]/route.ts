@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { notificaTurnoModificato, notificaTurnoEliminato } from '@/lib/notifiche'
+import { logAzione } from '@/lib/audit'
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -58,6 +59,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     })
   }
 
+  logAzione({
+    tabella: 'turni', recordId: params.id, azione: 'modificato', utenteId: user!.id,
+    dettagli: { data: body.data, ora_inizio: body.ora_inizio, ora_fine: body.ora_fine },
+  })
+
   return NextResponse.json(data)
 }
 
@@ -81,6 +87,11 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
       actorId: user!.id,
     })
   }
+
+  logAzione({
+    tabella: 'turni', recordId: params.id, azione: 'eliminato', utenteId: user!.id,
+    dettagli: { dipendente_id: turno?.dipendente_id, data: turno?.data, stato: turno?.stato },
+  })
 
   return new NextResponse(null, { status: 204 })
 }

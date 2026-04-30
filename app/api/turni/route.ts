@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { notificaTurnoAssegnato } from '@/lib/notifiche'
 import { queryTurni, type FiltroTurni } from '@/lib/supabase/turni'
+import { logAzione } from '@/lib/audit'
 
 const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
 
@@ -83,6 +84,11 @@ export async function POST(request: Request) {
       actorId: user!.id,
     })
   }
+
+  logAzione({
+    tabella: 'turni', recordId: data.id, azione: 'creato', utenteId: user!.id,
+    dettagli: { dipendente_id: data.dipendente_id, data: data.data, stato },
+  })
 
   return NextResponse.json(data, { status: 201 })
 }

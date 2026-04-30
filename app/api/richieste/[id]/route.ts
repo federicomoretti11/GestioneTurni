@@ -13,6 +13,7 @@ import {
   notificaSbloccoApprovato,
 } from '@/lib/richieste/notifiche'
 import type { AzioneRichiesta, RuoloUtente, StatoRichiesta, Profile } from '@/lib/types'
+import { logAzione } from '@/lib/audit'
 
 const SELECT = `*, profile:profiles!richieste_dipendente_id_fkey(id, nome, cognome, ruolo),
   turno:turni(id, data, ora_inizio, ora_fine)`
@@ -161,6 +162,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       })
     }
   }
+
+  logAzione({
+    tabella: 'richieste', recordId: params.id, azione: nuovoStato, utenteId: user.id,
+    dettagli: { tipo: richiesta.tipo, da_stato: richiesta.stato, motivazione: motivazione ?? null },
+  })
 
   return NextResponse.json(avviso ? { ...updated, avviso } : updated)
 }

@@ -90,6 +90,15 @@ export default function MieiTurniPage() {
   useEffect(() => { caricaTurni() }, [caricaTurni])
   useEffect(() => { caricaTurnoOggi() }, [caricaTurnoOggi])
 
+  useEffect(() => {
+    if (!profilo) return
+    const ch = supabase.channel('turni-dipendente')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'turni',
+        filter: `dipendente_id=eq.${profilo.id}` }, () => { caricaTurni(); caricaTurnoOggi() })
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [caricaTurni, caricaTurnoOggi, profilo])
+
   function spostaData(direzione: 1 | -1) {
     const d = new Date(dataCorrente)
     if (vista === 'settimana') d.setDate(d.getDate() + direzione * 7)

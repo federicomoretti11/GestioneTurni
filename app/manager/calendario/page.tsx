@@ -6,6 +6,7 @@ import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendar
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { createClient } from '@/lib/supabase/client'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { isTurnoBloccato } from '@/lib/utils/turni'
 import { AlertErrore } from '@/components/ui/AlertErrore'
@@ -74,6 +75,14 @@ export default function CalendarioPage() {
   }, [dataCorrente, vista])
 
   useEffect(() => { caricaDati() }, [caricaDati])
+
+  useEffect(() => {
+    const supabase = createClient()
+    const ch = supabase.channel('turni-manager')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'turni' }, caricaDati)
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [caricaDati])
 
   function spostaData(direzione: 1 | -1) {
     const d = new Date(dataCorrente)
