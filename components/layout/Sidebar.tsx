@@ -42,8 +42,8 @@ export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
                 href={item.href}
                 className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-colors mb-0.5 ${
                   isActive
-                    ? 'bg-blue-600 text-white font-semibold'
-                    : 'text-slate-500 hover:text-white hover:bg-white/5'
+                    ? 'bg-blue-600 text-white font-bold'
+                    : 'text-white font-medium hover:bg-white/10'
                 }`}
               >
                 <span className="text-[15px] leading-none">{item.icon}</span>
