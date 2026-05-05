@@ -38,6 +38,8 @@ export default function DocumentiPage() {
   const [addingCategoria, setAddingCategoria] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [erroreUpload, setErroreUpload] = useState('')
+  const [rinominando, setRinominando] = useState<string | null>(null)
+  const [nuovoNome, setNuovoNome] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function caricaCategorie() {
@@ -114,6 +116,17 @@ export default function DocumentiPage() {
     if (!confirm(`Eliminare "${doc.nome}"?`)) return
     const res = await fetch(`/api/admin/documenti/${doc.id}`, { method: 'DELETE' })
     if (res.ok && categoriaAttiva) await caricaDocumenti(categoriaAttiva)
+  }
+
+  async function rinominaDocumento(doc: Documento) {
+    if (!nuovoNome.trim() || nuovoNome.trim() === doc.nome) { setRinominando(null); return }
+    await fetch(`/api/admin/documenti/${doc.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: nuovoNome.trim() }),
+    })
+    setRinominando(null)
+    if (categoriaAttiva) await caricaDocumenti(categoriaAttiva)
   }
 
   async function apriUrl(docId: string, tipo: 'preview' | 'download') {
@@ -214,7 +227,21 @@ export default function DocumentiPage() {
                     <div key={doc.id} className="flex items-center gap-3 py-3">
                       <span className="text-xl">{iconaFile(doc.mime_type)}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{doc.nome}</p>
+                        {rinominando === doc.id ? (
+                          <input
+                            autoFocus
+                            value={nuovoNome}
+                            onChange={e => setNuovoNome(e.target.value)}
+                            onBlur={() => rinominaDocumento(doc)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') rinominaDocumento(doc)
+                              if (e.key === 'Escape') setRinominando(null)
+                            }}
+                            className="w-full border border-blue-300 rounded px-2 py-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                          />
+                        ) : (
+                          <p className="text-sm font-medium text-gray-900 truncate">{doc.nome}</p>
+                        )}
                         <p className="text-xs text-gray-400">
                           {formatBytes(doc.dimensione_bytes)} · {new Date(doc.created_at).toLocaleDateString('it-IT')}
                         </p>
@@ -228,6 +255,10 @@ export default function DocumentiPage() {
                           onClick={() => apriUrl(doc.id, 'download')}
                           className="text-xs text-blue-600 hover:underline"
                         >Scarica</button>
+                        <button
+                          onClick={() => { setRinominando(doc.id); setNuovoNome(doc.nome) }}
+                          className="text-xs text-gray-500 hover:underline"
+                        >Rinomina</button>
                         <button
                           onClick={() => eliminaDocumento(doc)}
                           className="text-xs text-red-500 hover:underline"

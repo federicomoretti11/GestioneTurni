@@ -12,6 +12,23 @@ async function checkAdmin() {
   return { supabase }
 }
 
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  const ctx = await checkAdmin()
+  if (!ctx) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+
+  const { nome } = await request.json()
+  if (!nome?.trim()) return NextResponse.json({ error: 'nome obbligatorio' }, { status: 400 })
+
+  const { data, error } = await ctx.supabase
+    .from('documenti')
+    .update({ nome: nome.trim() })
+    .eq('id', params.id)
+    .select()
+    .single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
+}
+
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const ctx = await checkAdmin()
   if (!ctx) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
