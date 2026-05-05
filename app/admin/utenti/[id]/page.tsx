@@ -64,7 +64,7 @@ export default function ModificaUtentePage() {
   }
 
   return (
-    <div className="max-w-md space-y-4">
+    <div className="max-w-2xl space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Modifica utente</h1>
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
         <div className="grid grid-cols-2 gap-3">
