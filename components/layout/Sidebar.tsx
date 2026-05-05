@@ -4,15 +4,27 @@ import { usePathname } from 'next/navigation'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string }
 
-interface SidebarProps { items: NavItem[]; title: string; ruolo?: string }
+interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string }
 
-export function Sidebar({ items, title, ruolo }: SidebarProps) {
+export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
   const pathname = usePathname()
   return (
     <aside className="hidden md:flex flex-col w-56 bg-slate-900 text-white flex-shrink-0">
       <div className="px-4 py-4 border-b border-white/5">
-        <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
-        {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
+        {logoSrc ? (
+          <div className="flex items-center gap-2.5">
+            <img src={logoSrc} alt={title} className="h-7 w-7 shrink-0" />
+            <div>
+              <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
+              {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
+            {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
+          </>
+        )}
       </div>
       <nav className="flex-1 p-2">
         {items.map((item, i) => {

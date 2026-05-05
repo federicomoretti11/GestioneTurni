@@ -28,5 +28,5 @@ export function SidebarManager() {
     }
     return it
   })
-  return <Sidebar items={items} title="Opero Hub" ruolo="manager" />
+  return <Sidebar items={items} title="Opero Hub" ruolo="manager" logoSrc="/logo-white.svg" />
 }

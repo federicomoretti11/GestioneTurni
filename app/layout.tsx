@@ -13,6 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Opero Hub",
   description: "Opero Hub — gestione turni e operatività aziendale",
+  icons: { icon: '/logo.svg' },
 };
 
 export default function RootLayout({

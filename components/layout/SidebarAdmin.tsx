@@ -53,5 +53,5 @@ export function SidebarAdmin() {
     }
     return it
   })
-  return <Sidebar items={items} title="Opero Hub" ruolo="admin" />
+  return <Sidebar items={items} title="Opero Hub" ruolo="admin" logoSrc="/logo-white.svg" />
 }
