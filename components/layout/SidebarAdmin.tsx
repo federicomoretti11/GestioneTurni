@@ -14,6 +14,7 @@ const BASE_ITEMS = [
   {                             label: 'Per posto',      href: '/admin/calendario-programmazione-posti',   icon: '🗂️' },
   { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                         icon: '📋' },
   {                             label: 'Export',         href: '/admin/export',                            icon: '📤' },
+  {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
   {                             label: 'Impostazioni',   href: '/admin/impostazioni',                      icon: '⚙️' },
 ]
 
