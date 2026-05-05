@@ -48,6 +48,21 @@ export default function ModificaUtentePage() {
     router.push('/admin/utenti')
   }
 
+  async function anonimizza() {
+    if (!confirm(`Anonimizzare ${form.nome} ${form.cognome}?\n\nI dati personali (nome, email) verranno sostituiti con valori anonimi. Lo storico turni verrà mantenuto. Questa operazione è irreversibile.`)) return
+    const res = await fetch(`/api/utenti/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ anonimizza: true }),
+    })
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({})) as { error?: string }
+      alert(json.error ?? 'Impossibile anonimizzare l\'utente.')
+      return
+    }
+    router.push('/admin/utenti')
+  }
+
   return (
     <div className="max-w-md space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Modifica utente</h1>
@@ -66,6 +81,7 @@ export default function ModificaUtentePage() {
             <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
               {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}
             </Button>
+            <Button variant="danger" type="button" onClick={anonimizza}>Anonimizza (GDPR)</Button>
             <Button variant="danger" type="button" onClick={elimina}>Elimina</Button>
           </div>
           <div className="flex gap-2">

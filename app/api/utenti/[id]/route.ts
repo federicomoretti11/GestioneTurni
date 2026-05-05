@@ -16,8 +16,24 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const supabase = createClient()
   const body = await request.json()
+
+  if (body.anonimizza) {
+    const adminClient = createAdminClient()
+    await adminClient.auth.admin.updateUserById(params.id, {
+      email: `deleted-${params.id}@deleted.local`,
+    })
+    const { data, error } = await adminClient
+      .from('profiles')
+      .update({ nome: 'Utente', cognome: 'Eliminato', attivo: false })
+      .eq('id', params.id)
+      .select()
+      .single()
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(data)
+  }
+
+  const supabase = createClient()
   const { data, error } = await supabase
     .from('profiles')
     .update({ attivo: body.attivo })
