@@ -56,15 +56,21 @@ Entrambe le tabelle: solo il ruolo `admin` del proprio tenant può leggere e scr
 ```sql
 -- categorie_documenti
 CREATE POLICY "admin_categorie_documenti" ON categorie_documenti FOR ALL
-  USING (tenant_id = get_my_tenant_id() AND EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
-  ));
+  USING (
+    tenant_id = get_my_tenant_id()
+    AND (get_is_super_admin() OR EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
+    ))
+  );
 
 -- documenti
 CREATE POLICY "admin_documenti" ON documenti FOR ALL
-  USING (tenant_id = get_my_tenant_id() AND EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
-  ));
+  USING (
+    tenant_id = get_my_tenant_id()
+    AND (get_is_super_admin() OR EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
+    ))
+  );
 ```
 
 Storage bucket policy: lettura consentita solo a utenti autenticati il cui `tenant_id` corrisponde al prefisso del path. In pratica il bucket è privato e l'accesso avviene esclusivamente tramite signed URL generati server-side.
@@ -89,7 +95,7 @@ Storage bucket policy: lettura consentita solo a utenti autenticati il cui `tena
 | GET | `/api/admin/documenti?categoria_id=` | Lista documenti di una categoria |
 | POST | `/api/admin/documenti` | Upload file (multipart/form-data: file + categoria_id) |
 | DELETE | `/api/admin/documenti/[id]` | Elimina record DB + file da Storage |
-| GET | `/api/admin/documenti/[id]/url` | Restituisce signed URL (preview + download, scadenza 1h) |
+| GET | `/api/admin/documenti/[id]/url` | Restituisce `{ preview_url, download_url }` — due signed URL con scadenza 1h: preview con `Content-Disposition: inline`, download con `Content-Disposition: attachment` |
 
 ---
 
