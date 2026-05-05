@@ -137,13 +137,58 @@ export default function DocumentiPage() {
     if (url) window.open(url, '_blank')
   }
 
+  const nomeCategAttiva = categorie.find(c => c.id === categoriaAttiva)?.nome
+
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">Archivio documenti</h1>
-      <div className="flex gap-6 min-h-[500px]">
 
-        {/* Sidebar categorie */}
-        <div className="w-52 shrink-0 space-y-1">
+      {/* ── MOBILE: tab strip orizzontale ── */}
+      <div className="md:hidden space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 flex-1 min-w-0 scrollbar-hide">
+            {categorie.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setCategoriaAttiva(cat.id)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  categoriaAttiva === cat.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+              >
+                {cat.nome}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setAddingCategoria(v => !v)}
+            className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-lg font-medium"
+          >
+            +
+          </button>
+        </div>
+
+        {addingCategoria && (
+          <form onSubmit={creaCategoria} className="flex gap-2">
+            <input
+              autoFocus
+              value={nuovaCategoria}
+              onChange={e => setNuovaCategoria(e.target.value)}
+              placeholder="Nome categoria"
+              className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+            />
+            <Button type="submit" size="sm">Crea</Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => setAddingCategoria(false)}>✕</Button>
+          </form>
+        )}
+      </div>
+
+      {/* ── LAYOUT PRINCIPALE ── */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 md:min-h-[500px]">
+
+        {/* Sidebar categorie — solo desktop */}
+        <div className="hidden md:block w-52 shrink-0 space-y-1">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">Categorie</p>
           {categorie.map(cat => (
             <div
@@ -188,81 +233,59 @@ export default function DocumentiPage() {
         </div>
 
         {/* Area documenti */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 p-4 md:p-5">
           {!categoriaAttiva ? (
             <p className="text-sm text-gray-400 text-center pt-12">Seleziona una categoria</p>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-700">
-                  {categorie.find(c => c.id === categoriaAttiva)?.nome}
-                </p>
-                <div>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="*/*"
-                    className="hidden"
-                    onChange={uploadFile}
-                  />
-                  <Button
-                    size="sm"
-                    disabled={uploading}
-                    onClick={() => fileRef.current?.click()}
-                  >
-                    {uploading ? 'Caricamento…' : '+ Carica documento'}
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-gray-700 truncate">{nomeCategAttiva}</p>
+                <div className="shrink-0">
+                  <input ref={fileRef} type="file" accept="*/*" className="hidden" onChange={uploadFile} />
+                  <Button size="sm" disabled={uploading} onClick={() => fileRef.current?.click()}>
+                    {uploading ? 'Caricamento…' : '+ Carica'}
                   </Button>
                 </div>
               </div>
 
-              {erroreUpload && (
-                <p className="text-sm text-red-600">{erroreUpload}</p>
-              )}
+              {erroreUpload && <p className="text-sm text-red-600">{erroreUpload}</p>}
 
               {documenti.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center pt-8">Nessun documento in questa categoria</p>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {documenti.map(doc => (
-                    <div key={doc.id} className="flex items-center gap-3 py-3">
-                      <span className="text-xl">{iconaFile(doc.mime_type)}</span>
-                      <div className="flex-1 min-w-0">
-                        {rinominando === doc.id ? (
-                          <input
-                            autoFocus
-                            value={nuovoNome}
-                            onChange={e => setNuovoNome(e.target.value)}
-                            onBlur={() => rinominaDocumento(doc)}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') rinominaDocumento(doc)
-                              if (e.key === 'Escape') setRinominando(null)
-                            }}
-                            className="w-full border border-blue-300 rounded px-2 py-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                          />
-                        ) : (
-                          <p className="text-sm font-medium text-gray-900 truncate">{doc.nome}</p>
-                        )}
-                        <p className="text-xs text-gray-400">
-                          {formatBytes(doc.dimensione_bytes)} · {new Date(doc.created_at).toLocaleDateString('it-IT')}
-                        </p>
+                    <div key={doc.id} className="py-3 space-y-2">
+                      {/* Riga principale: icona + nome + meta */}
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl shrink-0">{iconaFile(doc.mime_type)}</span>
+                        <div className="flex-1 min-w-0">
+                          {rinominando === doc.id ? (
+                            <input
+                              autoFocus
+                              value={nuovoNome}
+                              onChange={e => setNuovoNome(e.target.value)}
+                              onBlur={() => rinominaDocumento(doc)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') rinominaDocumento(doc)
+                                if (e.key === 'Escape') setRinominando(null)
+                              }}
+                              className="w-full border border-blue-300 rounded px-2 py-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                            />
+                          ) : (
+                            <p className="text-sm font-medium text-gray-900 truncate">{doc.nome}</p>
+                          )}
+                          <p className="text-xs text-gray-400">
+                            {formatBytes(doc.dimensione_bytes)} · {new Date(doc.created_at).toLocaleDateString('it-IT')}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex gap-2 shrink-0">
-                        <button
-                          onClick={() => apriUrl(doc.id, 'preview')}
-                          className="text-xs text-blue-600 hover:underline"
-                        >Anteprima</button>
-                        <button
-                          onClick={() => apriUrl(doc.id, 'download')}
-                          className="text-xs text-blue-600 hover:underline"
-                        >Scarica</button>
-                        <button
-                          onClick={() => { setRinominando(doc.id); setNuovoNome(doc.nome) }}
-                          className="text-xs text-gray-500 hover:underline"
-                        >Rinomina</button>
-                        <button
-                          onClick={() => eliminaDocumento(doc)}
-                          className="text-xs text-red-500 hover:underline"
-                        >Elimina</button>
+                      {/* Azioni — su mobile vanno a capo sotto il nome */}
+                      <div className="flex gap-3 pl-8 md:pl-0 md:justify-end">
+                        <button onClick={() => apriUrl(doc.id, 'preview')} className="text-xs text-blue-600 hover:underline">Anteprima</button>
+                        <button onClick={() => apriUrl(doc.id, 'download')} className="text-xs text-blue-600 hover:underline">Scarica</button>
+                        <button onClick={() => { setRinominando(doc.id); setNuovoNome(doc.nome) }} className="text-xs text-gray-500 hover:underline">Rinomina</button>
+                        <button onClick={() => eliminaDocumento(doc)} className="text-xs text-red-500 hover:underline">Elimina</button>
                       </div>
                     </div>
                   ))}
