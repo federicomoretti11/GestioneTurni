@@ -7,6 +7,7 @@ import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 import { createClient } from '@/lib/supabase/client'
 
 const BASE_ITEMS = [
+  { label: 'Home',             href: '/home',                                    icon: '🏠' },
   { label: 'Dashboard',        href: '/admin/dashboard',                         icon: '📊' },
   { section: 'Calendario',     label: 'Per dipendente', href: '/admin/calendario',                        icon: '📅' },
   {                             label: 'Per posto',      href: '/admin/calendario-posti',                  icon: '📍' },

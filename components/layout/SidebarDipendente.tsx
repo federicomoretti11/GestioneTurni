@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 
 const BASE_ITEMS = [
+  { label: 'Home',         href: '/home',                icon: '🏠' },
   { label: 'I miei turni', href: '/dipendente/turni', icon: '📅' },
   { label: 'Richieste',    href: '/dipendente/richieste', icon: '📋' },
   { label: 'Profilo',      href: '/dipendente/profilo', icon: '👤' },

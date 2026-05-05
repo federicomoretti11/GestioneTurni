@@ -90,9 +90,7 @@ export async function middleware(request: NextRequest) {
     const isSuperAdmin = profile?.is_super_admin === true
 
     if (path === '/' || path === '/login') {
-      if (isSuperAdmin || ruolo === 'admin') return NextResponse.redirect(new URL('/admin/dashboard', request.url))
-      if (ruolo === 'manager') return NextResponse.redirect(new URL('/manager/calendario', request.url))
-      if (ruolo === 'dipendente') return NextResponse.redirect(new URL('/dipendente/turni', request.url))
+      return NextResponse.redirect(new URL('/home', request.url))
     }
 
     if (path.startsWith('/super-admin') && !isSuperAdmin) {

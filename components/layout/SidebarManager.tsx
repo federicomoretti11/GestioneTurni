@@ -5,6 +5,7 @@ import { Sidebar } from './Sidebar'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 
 const BASE_ITEMS = [
+  { label: 'Home',             href: '/home',                                                              icon: '🏠' },
   { section: 'Calendario',     label: 'Per dipendente', href: '/manager/calendario',                       icon: '📅' },
   {                             label: 'Per posto',       href: '/manager/calendario-posti',                icon: '📍' },
   { section: 'Programmazione', label: 'Per dipendente', href: '/manager/calendario-programmazione',       icon: '📝' },
