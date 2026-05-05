@@ -15,6 +15,7 @@ export default function TenantsPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [errore, setErrore] = useState('')
+  const [eliminando, setEliminando] = useState<string | null>(null)
   const [form, setForm] = useState({
     nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '',
   })
@@ -50,6 +51,14 @@ export default function TenantsPage() {
       setErrore(d.error ?? 'Errore')
     }
     setSaving(false)
+  }
+
+  async function elimina(tenant: Tenant) {
+    if (!confirm(`Eliminare "${tenant.nome}"?\n\nQuesta azione è irreversibile: verranno cancellati tutti i dati e gli utenti del tenant.`)) return
+    setEliminando(tenant.id)
+    await fetch(`/api/super-admin/tenants?id=${tenant.id}`, { method: 'DELETE' })
+    setEliminando(null)
+    carica()
   }
 
   async function toggleAttivo(tenant: Tenant) {
@@ -164,12 +173,19 @@ export default function TenantsPage() {
                       {t.attivo ? 'Attivo' : 'Disattivo'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
                     <button
                       onClick={() => toggleAttivo(t)}
                       className="text-xs text-gray-500 hover:text-gray-800 underline"
                     >
                       {t.attivo ? 'Disattiva' : 'Attiva'}
+                    </button>
+                    <button
+                      onClick={() => elimina(t)}
+                      disabled={eliminando === t.id}
+                      className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40"
+                    >
+                      {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
                     </button>
                   </td>
                 </tr>

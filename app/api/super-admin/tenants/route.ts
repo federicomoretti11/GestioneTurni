@@ -78,6 +78,32 @@ export async function POST(request: Request) {
   return NextResponse.json(tenant, { status: 201 })
 }
 
+export async function DELETE(request: Request) {
+  const user = await checkSuperAdmin()
+  if (!user) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+
+  const { searchParams } = new URL(request.url)
+  const id = searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'id obbligatorio' }, { status: 400 })
+
+  const admin = createAdminClient()
+
+  // Elimina tutti gli utenti auth del tenant
+  const { data: profilesList } = await admin
+    .from('profiles')
+    .select('id')
+    .eq('tenant_id', id)
+  for (const p of profilesList ?? []) {
+    await admin.auth.admin.deleteUser(p.id)
+  }
+
+  // Elimina il tenant (CASCADE elimina tutti i dati correlati)
+  const { error } = await admin.from('tenants').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return new NextResponse(null, { status: 204 })
+}
+
 export async function PATCH(request: Request) {
   const user = await checkSuperAdmin()
   if (!user) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
