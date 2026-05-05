@@ -111,20 +111,21 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header gradient */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-8 pb-16">
-        {/* Top bar: logo + logout */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Logo size={40} variant="white" />
-            <span className="text-white font-bold text-base tracking-tight">Opero Hub</span>
-          </div>
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-8 pb-16 relative">
+        {/* Logout in alto a destra */}
+        <div className="absolute top-4 right-5">
           <HomeLogout />
         </div>
-        <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
-        <h1 className="text-2xl font-bold text-white mt-1">
+        {/* Logo centrato */}
+        <div className="flex flex-col items-center gap-2 mb-6">
+          <Logo size={64} variant="white" />
+          <span className="text-white font-bold text-2xl tracking-tight">Opero Hub</span>
+        </div>
+        <p className="text-white/60 text-[13px] capitalize text-center">{oggi}</p>
+        <h1 className="text-xl font-bold text-white mt-1 text-center">
           {saluto()}, {profile.nome} 👋
         </h1>
-        <p className="text-white/50 text-sm mt-1 capitalize">
+        <p className="text-white/50 text-sm mt-1 capitalize text-center">
           {isSuperAdmin ? 'Super Admin' : ruolo}
         </p>
       </div>
