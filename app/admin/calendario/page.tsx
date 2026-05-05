@@ -173,13 +173,13 @@ export default function CalendarioPage() {
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
 
-      <div className="flex flex-wrap gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-600 whitespace-nowrap">Dipendente</label>
+          <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">Dipendente</label>
           <select
             value={filtroDipendente}
             onChange={e => setFiltroDipendente(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Tutti</option>
             {dipendenti.map(d => (
@@ -188,11 +188,11 @@ export default function CalendarioPage() {
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-600 whitespace-nowrap">Posto di servizio</label>
+          <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">Posto di servizio</label>
           <select
             value={filtroPosto}
             onChange={e => setFiltroPosto(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Tutti</option>
             {postiDisponibili.map(p => (
