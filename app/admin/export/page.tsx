@@ -163,7 +163,7 @@ export default function ExportPage() {
                 r.tipo, r.data_inizio, r.data_fine, r.stato, r.note ?? '', (r.created_at as string).slice(0, 10),
               ]
         )
-        contenuto = [intestazioni, ...righe].map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+        contenuto = [intestazioni, ...righe].map(r => r.map((v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
         mimeType = 'text/csv'
         estensione = 'csv'
       }
