@@ -25,7 +25,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
         />
       )}
       {altroAperto && (
-        <div className="md:hidden fixed bottom-16 right-2 z-50 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="md:hidden fixed bottom-16 left-2 right-2 z-50 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden max-h-[50vh] overflow-y-auto">
           {nascosti.map(item => (
             <Link
               key={item.href}

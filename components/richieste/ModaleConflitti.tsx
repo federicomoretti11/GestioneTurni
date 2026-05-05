@@ -19,8 +19,9 @@ interface Props {
 export function ModaleConflitti({ nomeDipendente, conflitti, onConferma, onAnnulla }: Props) {
   const [scelta, setScelta] = useState<'sovrascrivi' | 'mantieni'>('mantieni')
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-4">
+    <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
+      <div className="bg-white rounded-t-2xl md:rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div className="md:hidden w-10 h-1 bg-gray-300 rounded-full mx-auto -mt-1 mb-2" />
         <div className="flex items-start gap-2">
           <span className="text-xl">⚠️</span>
           <div>

@@ -157,7 +157,7 @@ export function Notifiche({ userId, ruolo }: Props) {
               )}
             </div>
           </div>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[min(24rem,calc(100vh-8rem))] overflow-y-auto">
             {loading && notifiche.length === 0 ? (
               <div className="px-4 py-6 text-center text-sm text-gray-400">Caricamento…</div>
             ) : notifiche.length === 0 ? (
