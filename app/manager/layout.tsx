@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { SidebarManager } from '@/components/layout/SidebarManager'
-import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 
-const BOTTOM_NAV_ITEMS = [
+const NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'Calendario', href: '/manager/calendario', icon: '📅' },
   { label: 'Per posto', href: '/manager/calendario-posti', icon: '📍' },
@@ -22,10 +21,9 @@ export default async function ManagerLayout({ children }: { children: React.Reac
     <div className="flex h-screen bg-gray-50">
       <SidebarManager />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} />
-        <main className="flex-1 overflow-auto p-4 pb-20 md:pb-4">{children}</main>
+        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} navItems={NAV_ITEMS} />
+        <main className="flex-1 overflow-auto p-4">{children}</main>
       </div>
-      <BottomNav items={BOTTOM_NAV_ITEMS} />
     </div>
   )
 }
