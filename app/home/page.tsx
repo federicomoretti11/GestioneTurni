@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { HomeLogout } from '@/components/layout/HomeLogout'
+import { Logo } from '@/components/ui/Logo'
 
 function saluto() {
   const h = new Date().getHours()
@@ -114,7 +115,7 @@ export default async function HomePage() {
         {/* Top bar: logo + logout */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <img src="/logo-white.svg" alt="Opero Hub" className="h-10 w-10" />
+            <Logo size={40} variant="white" />
             <span className="text-white font-bold text-base tracking-tight">Opero Hub</span>
           </div>
           <HomeLogout />

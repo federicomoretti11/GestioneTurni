@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Logo } from '@/components/ui/Logo'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number }
 
@@ -46,7 +47,7 @@ export function MobileMenu({ items, nomeUtente, onLogout }: Props) {
       >
         {/* Header drawer */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-white/5 shrink-0">
-          <img src="/logo-white.svg" alt="Opero Hub" className="h-7 w-7" />
+          <Logo size={28} variant="white" />
           <button
             onClick={() => setOpen(false)}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"

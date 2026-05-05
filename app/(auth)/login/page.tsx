@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Logo } from '@/components/ui/Logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -36,7 +37,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
         <div className="flex flex-col items-center mb-8 gap-3">
-          <img src="/logo.svg" alt="Opero Hub" className="h-20 w-20" />
+          <Logo size={80} variant="dark" />
           <span className="text-xl font-bold text-gray-900 tracking-tight">Opero Hub</span>
         </div>
         {!vistaReset ? (

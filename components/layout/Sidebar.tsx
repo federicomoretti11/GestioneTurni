@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Logo } from '@/components/ui/Logo'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string }
 
@@ -13,7 +14,7 @@ export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
       <div className="px-4 py-4 border-b border-white/5">
         {logoSrc ? (
           <div className="flex items-center gap-2.5">
-            <img src={logoSrc} alt={title} className="h-7 w-7 shrink-0" />
+            <Logo size={28} variant="white" />
             <div>
               <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
               {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
