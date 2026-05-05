@@ -136,48 +136,6 @@ export default function ExportPage() {
     if (tipo === 'csv') await exportCsv(turni, filename, festivi)
   }
 
-  async function scaricaDati(tipo: 'dipendenti' | 'richieste', formato: 'csv' | 'json') {
-    const res = await fetch(`/api/admin/export-dati?tipo=${tipo}`)
-    if (!res.ok) return
-    const dati = await res.json()
-
-    let contenuto: string
-    let mimeType: string
-    let estensione: string
-
-    if (formato === 'json') {
-      contenuto = JSON.stringify(dati, null, 2)
-      mimeType = 'application/json'
-      estensione = 'json'
-    } else {
-      if (dati.length === 0) { contenuto = ''; mimeType = 'text/csv'; estensione = 'csv' }
-      else {
-        const intestazioni = tipo === 'dipendenti'
-          ? ['Nome', 'Cognome', 'Ruolo', 'Attivo', 'Data creazione']
-          : ['Dipendente', 'Tipo', 'Data inizio', 'Data fine', 'Stato', 'Note', 'Data richiesta']
-        const righe = dati.map((r: Record<string, unknown>) =>
-          tipo === 'dipendenti'
-            ? [r.nome, r.cognome, r.ruolo, r.attivo ? 'Sì' : 'No', (r.created_at as string).slice(0, 10)]
-            : [
-                `${(r.profile as {nome:string;cognome:string})?.cognome} ${(r.profile as {nome:string;cognome:string})?.nome}`,
-                r.tipo, r.data_inizio, r.data_fine, r.stato, r.note ?? '', (r.created_at as string).slice(0, 10),
-              ]
-        )
-        contenuto = [intestazioni, ...righe].map(r => r.map((v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
-        mimeType = 'text/csv'
-        estensione = 'csv'
-      }
-    }
-
-    const blob = new Blob([contenuto], { type: mimeType })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${tipo}_${new Date().toISOString().slice(0, 10)}.${estensione}`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   return (
     <div className="space-y-6 max-w-md">
       <h1 className="text-xl font-bold text-gray-900">Export Turni</h1>
@@ -298,34 +256,6 @@ export default function ExportPage() {
           </div>
         </div>
       )}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <div>
-          <h2 className="font-semibold text-gray-800">Esporta dati aziendali</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Portabilità dei dati ai sensi del GDPR art. 20</p>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-700">Dipendenti</p>
-              <p className="text-xs text-gray-400">Nome, ruolo, stato, data creazione</p>
-            </div>
-            <div className="flex gap-2">
-              <Button size="sm" variant="secondary" onClick={() => scaricaDati('dipendenti', 'csv')}>CSV</Button>
-              <Button size="sm" variant="secondary" onClick={() => scaricaDati('dipendenti', 'json')}>JSON</Button>
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-700">Richieste</p>
-              <p className="text-xs text-gray-400">Ferie, permessi, malattie con stati</p>
-            </div>
-            <div className="flex gap-2">
-              <Button size="sm" variant="secondary" onClick={() => scaricaDati('richieste', 'csv')}>CSV</Button>
-              <Button size="sm" variant="secondary" onClick={() => scaricaDati('richieste', 'json')}>JSON</Button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

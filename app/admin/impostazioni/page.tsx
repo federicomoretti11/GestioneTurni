@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Button } from '@/components/ui/Button'
 
 interface Impostazioni {
   gps_checkin_abilitato: boolean
@@ -66,6 +67,48 @@ export default function ImpostazioniPage() {
   const [imp, setImp] = useState<Impostazioni | null>(null)
   const [loadingGps, setLoadingGps] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
+
+  async function scaricaDati(tipo: 'dipendenti' | 'richieste', formato: 'csv' | 'json') {
+    const res = await fetch(`/api/admin/export-dati?tipo=${tipo}`)
+    if (!res.ok) return
+    const dati = await res.json()
+
+    let contenuto: string
+    let mimeType: string
+    let estensione: string
+
+    if (formato === 'json') {
+      contenuto = JSON.stringify(dati, null, 2)
+      mimeType = 'application/json'
+      estensione = 'json'
+    } else {
+      if (dati.length === 0) { contenuto = ''; mimeType = 'text/csv'; estensione = 'csv' }
+      else {
+        const intestazioni = tipo === 'dipendenti'
+          ? ['Nome', 'Cognome', 'Ruolo', 'Attivo', 'Data creazione']
+          : ['Dipendente', 'Tipo', 'Data inizio', 'Data fine', 'Stato', 'Note', 'Data richiesta']
+        const righe = dati.map((r: Record<string, unknown>) =>
+          tipo === 'dipendenti'
+            ? [r.nome, r.cognome, r.ruolo, r.attivo ? 'Sì' : 'No', (r.created_at as string).slice(0, 10)]
+            : [
+                `${(r.profile as {nome:string;cognome:string})?.cognome} ${(r.profile as {nome:string;cognome:string})?.nome}`,
+                r.tipo, r.data_inizio, r.data_fine, r.stato, r.note ?? '', (r.created_at as string).slice(0, 10),
+              ]
+        )
+        contenuto = [intestazioni, ...righe].map(r => r.map((v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+        mimeType = 'text/csv'
+        estensione = 'csv'
+      }
+    }
+
+    const blob = new Blob([contenuto], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${tipo}_${new Date().toISOString().slice(0, 10)}.${estensione}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   async function carica() {
     const res = await fetch('/api/impostazioni')
@@ -161,6 +204,39 @@ export default function ImpostazioniPage() {
             descrizione="Template riutilizzabili per la pianificazione"
             href="/admin/template"
           />
+        </div>
+      </section>
+
+      {/* Privacy e GDPR */}
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Privacy e GDPR</h2>
+        <div className="bg-white rounded-xl border border-gray-200 px-5 py-4 space-y-3">
+          <div>
+            <p className="text-sm font-medium text-gray-800">Esporta dati aziendali</p>
+            <p className="text-xs text-gray-500 mt-0.5">Portabilità dei dati ai sensi del GDPR art. 20</p>
+          </div>
+          <div className="divide-y divide-gray-100">
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-medium text-gray-700">Dipendenti</p>
+                <p className="text-xs text-gray-400">Nome, ruolo, stato, data creazione</p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={() => scaricaDati('dipendenti', 'csv')}>CSV</Button>
+                <Button size="sm" variant="secondary" onClick={() => scaricaDati('dipendenti', 'json')}>JSON</Button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-medium text-gray-700">Richieste</p>
+                <p className="text-xs text-gray-400">Ferie, permessi, malattie con stati</p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={() => scaricaDati('richieste', 'csv')}>CSV</Button>
+                <Button size="sm" variant="secondary" onClick={() => scaricaDati('richieste', 'json')}>JSON</Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
