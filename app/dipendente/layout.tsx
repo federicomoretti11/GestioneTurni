@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 
 const BOTTOM_NAV_ITEMS = [
+  { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'I miei turni', href: '/dipendente/turni', icon: '📅' },
   { label: 'Richieste',    href: '/dipendente/richieste', icon: '📋' },
   { label: 'Profilo',      href: '/dipendente/profilo', icon: '👤' },

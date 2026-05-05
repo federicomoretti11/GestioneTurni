@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { Header } from '@/components/layout/Header'
 
 const BOTTOM_NAV_ITEMS = [
+  { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
   { label: 'Calendario', href: '/admin/calendario', icon: '📅' },
   { label: 'Per posto', href: '/admin/calendario-posti', icon: '📍' },
