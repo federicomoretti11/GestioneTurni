@@ -35,8 +35,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
-        <div className="flex justify-center mb-8">
-          <img src="/logo.svg" alt="Opero Hub" className="h-16 w-16" />
+        <div className="flex flex-col items-center mb-8 gap-3">
+          <img src="/logo.svg" alt="Opero Hub" className="h-20 w-20" />
+          <span className="text-xl font-bold text-gray-900 tracking-tight">Opero Hub</span>
         </div>
         {!vistaReset ? (
           <>

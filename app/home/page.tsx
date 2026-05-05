@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { HomeLogout } from '@/components/layout/HomeLogout'
 
 function saluto() {
   const h = new Date().getHours()
@@ -109,7 +110,15 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header gradient */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-10 pb-16">
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-8 pb-16">
+        {/* Top bar: logo + logout */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <img src="/logo-white.svg" alt="Opero Hub" className="h-10 w-10" />
+            <span className="text-white font-bold text-base tracking-tight">Opero Hub</span>
+          </div>
+          <HomeLogout />
+        </div>
         <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
         <h1 className="text-2xl font-bold text-white mt-1">
           {saluto()}, {profile.nome} 👋
