@@ -77,16 +77,22 @@ export default function ModificaUtentePage() {
           <option value="admin">Admin</option>
         </Select>
         <div className="flex justify-between items-center pt-2">
-          <div className="flex gap-2">
-            <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
-              {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}
-            </Button>
-            <Button variant="danger" type="button" onClick={anonimizza}>Anonimizza (GDPR)</Button>
-            <Button variant="danger" type="button" onClick={elimina}>Elimina</Button>
-          </div>
+          <Button variant={form.attivo ? 'danger' : 'secondary'} type="button" onClick={toggleAttivo}>
+            {form.attivo ? 'Disattiva utente' : 'Riattiva utente'}
+          </Button>
           <div className="flex gap-2">
             <Button variant="secondary" type="button" onClick={() => router.back()}>Annulla</Button>
             <Button type="submit">Salva</Button>
+          </div>
+        </div>
+        <div className="border-t pt-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-gray-700">Azioni irreversibili</p>
+            <p className="text-xs text-gray-400">Anonimizza mantiene lo storico turni; Elimina cancella tutto.</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" type="button" onClick={anonimizza}>Anonimizza (GDPR)</Button>
+            <Button variant="danger" size="sm" type="button" onClick={elimina}>Elimina</Button>
           </div>
         </div>
       </form>
