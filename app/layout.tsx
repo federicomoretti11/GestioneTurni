@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GestioneTurni",
-  description: "Gestione turni dipendenti",
+  title: "Opero Hub",
+  description: "Opero Hub — gestione turni e operatività aziendale",
 };
 
 export default function RootLayout({

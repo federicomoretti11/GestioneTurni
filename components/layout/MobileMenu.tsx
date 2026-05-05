@@ -46,7 +46,7 @@ export function MobileMenu({ items, nomeUtente, onLogout }: Props) {
       >
         {/* Header drawer */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-white/5 shrink-0">
-          <span className="text-[13px] font-bold tracking-tight text-white">GestioneTurni</span>
+          <span className="text-[13px] font-bold tracking-tight text-white">Opero Hub</span>
           <button
             onClick={() => setOpen(false)}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
