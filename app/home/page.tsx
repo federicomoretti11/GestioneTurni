@@ -116,16 +116,17 @@ export default async function HomePage() {
         <div className="absolute top-4 right-5">
           <HomeLogout />
         </div>
-        {/* Logo centrato */}
-        <div className="flex flex-col items-center gap-2 mb-6">
-          <Logo size={64} variant="white" />
+        {/* Logo centrato e protagonista */}
+        <div className="flex flex-col items-center gap-3 mb-8">
+          <Logo size={80} variant="white" />
           <span className="text-white font-bold text-2xl tracking-tight">Opero Hub</span>
         </div>
-        <p className="text-white/60 text-[13px] capitalize text-center">{oggi}</p>
-        <h1 className="text-xl font-bold text-white mt-1 text-center">
+        {/* Saluto a sinistra */}
+        <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
+        <h1 className="text-2xl font-bold text-white mt-1">
           {saluto()}, {profile.nome} 👋
         </h1>
-        <p className="text-white/50 text-sm mt-1 capitalize text-center">
+        <p className="text-white/50 text-sm mt-1 capitalize">
           {isSuperAdmin ? 'Super Admin' : ruolo}
         </p>
       </div>
