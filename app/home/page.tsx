@@ -19,14 +19,14 @@ function ModuloCard({
   return (
     <Link
       href={href}
-      className="relative flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+      className="relative flex flex-col items-center text-center gap-4 rounded-2xl border border-gray-200 bg-white p-7 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
     >
-      <div className={`w-11 h-11 rounded-xl ${colore} flex items-center justify-center text-xl`}>
+      <div className={`w-14 h-14 rounded-xl ${colore} flex items-center justify-center text-2xl`}>
         {icon}
       </div>
       <div>
-        <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{titolo}</p>
-        <p className="text-sm text-gray-500 mt-0.5 leading-snug">{descrizione}</p>
+        <p className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{titolo}</p>
+        <p className="text-sm text-gray-500 mt-1 leading-snug">{descrizione}</p>
       </div>
       {!!badge && (
         <span className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1.5">
@@ -111,24 +111,28 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header gradient */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-8 pb-16 relative">
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-5 pt-20 pb-24 relative flex items-center">
+        {/* Greeting a sinistra, verticalmente centrato */}
+        <div>
+          <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
+          <h1 className="text-2xl font-bold text-white mt-0.5">
+            {saluto()}, {profile.nome} 👋
+          </h1>
+          <p className="text-white/50 text-sm mt-0.5 capitalize">
+            {isSuperAdmin ? 'Super Admin' : ruolo}
+          </p>
+        </div>
+
+        {/* Logo centrato in assoluto nel mezzo dell'header */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <Logo size={100} variant="white" />
+          <span className="text-white font-bold text-2xl tracking-tight">Opero Hub</span>
+        </div>
+
         {/* Logout in alto a destra */}
         <div className="absolute top-4 right-5">
           <HomeLogout />
         </div>
-        {/* Logo centrato e protagonista */}
-        <div className="flex flex-col items-center gap-3 mb-8">
-          <Logo size={120} variant="white" />
-          <span className="text-white font-bold text-3xl tracking-tight">Opero Hub</span>
-        </div>
-        {/* Saluto a sinistra */}
-        <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
-        <h1 className="text-2xl font-bold text-white mt-1">
-          {saluto()}, {profile.nome} 👋
-        </h1>
-        <p className="text-white/50 text-sm mt-1 capitalize">
-          {isSuperAdmin ? 'Super Admin' : ruolo}
-        </p>
       </div>
 
       {/* Content */}
