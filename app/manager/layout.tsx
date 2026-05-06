@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Programmazione', href: '/manager/calendario-programmazione', icon: '📝' },
   { label: 'Programmazione per posto', href: '/manager/calendario-programmazione-posti', icon: '📝' },
   { label: 'Turni', href: '/manager/template', icon: '🏷️' },
+  { label: 'Task', href: '/manager/task', icon: '✅' },
   { label: 'Export', href: '/manager/export', icon: '📤' },
 ]
 

@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝' },
   { label: 'Programmazione per posto', href: '/admin/calendario-programmazione-posti', icon: '📝' },
   { label: 'Turni', href: '/admin/template', icon: '🏷️' },
+  { label: 'Task', href: '/admin/task', icon: '✅' },
   { label: 'Export', href: '/admin/export', icon: '📤' },
   { label: 'Utenti', href: '/admin/utenti', icon: '👥' },
   { label: 'Posti', href: '/admin/posti', icon: '📍' },

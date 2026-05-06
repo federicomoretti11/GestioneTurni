@@ -191,7 +191,13 @@ export default function ImpostazioniPage() {
       {/* Sistema */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Sistema</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <CardLink
+            icon="📤"
+            titolo="Export turni"
+            descrizione="Esporta presenze e ore in PDF, Excel o CSV"
+            href="/admin/export"
+          />
           <CardLink
             icon="📋"
             titolo="Audit log"

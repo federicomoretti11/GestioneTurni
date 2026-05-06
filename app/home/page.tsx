@@ -51,6 +51,11 @@ const IUser = (p: React.SVGProps<SVGSVGElement>) => (
     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
   </svg>
 )
+const ITask = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+  </svg>
+)
 
 // ── Accents ──────────────────────────────────────────────────
 const A = {
@@ -188,6 +193,44 @@ export default async function HomePage() {
     if (data) attivita = data as unknown as AttivitaItem[]
   }
 
+  // Conteggio task
+  let taskDaFare = 0
+  let taskInCorso = 0
+  let taskMiei = 0
+  if (isAdmin || isManager) {
+    const { data: tCounts } = await supabase
+      .from('tasks')
+      .select('stato')
+    if (tCounts) {
+      taskDaFare = tCounts.filter(t => t.stato === 'da_fare').length
+      taskInCorso = tCounts.filter(t => t.stato === 'in_corso').length
+    }
+  }
+  if (isDipendente) {
+    const { count } = await supabase
+      .from('task_assegnazioni')
+      .select('*', { count: 'exact', head: true })
+      .eq('dipendente_id', user.id)
+    taskMiei = count ?? 0
+  }
+
+  // Dati operativi giornalieri (solo admin — sostituisce dashboard)
+  type TurnoOggiType = {
+    id: string; ora_inizio: string; ora_fine: string
+    profile: { nome: string; cognome: string }
+    template: { colore?: string; nome?: string } | null
+    posto: { nome: string } | null
+  }
+  let turniOggi: TurnoOggiType[] = []
+  if (isAdmin) {
+    const todayISO = new Date().toISOString().slice(0, 10)
+    const { data: tOggi } = await supabase
+      .from('turni')
+      .select('id, ora_inizio, ora_fine, profile:profiles!turni_dipendente_id_fkey(nome, cognome), template:turni_template(colore, nome), posto:posti_di_servizio(nome)')
+      .eq('stato', 'confermato').eq('data', todayISO).order('ora_inizio')
+    turniOggi = (tOggi ?? []) as unknown as TurnoOggiType[]
+  }
+
   const oggi = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })
 
   // Area cards per ruolo
@@ -197,11 +240,16 @@ export default async function HomePage() {
     accent: AccentKey; badge?: number
   }
 
+  const taskDescAdmin = taskInCorso > 0 || taskDaFare > 0
+    ? `${taskInCorso} in corso · ${taskDaFare} da fare`
+    : 'Nessun task aperto al momento.'
+
   const aree: AreaDef[] = isAdmin
     ? [
         { titolo: 'Turni',          descrizione: 'Visualizza e gestisci i turni.',       href: '/admin/calendario',                 IconComp: ICalendar, accent: 'blue' },
         { titolo: 'Pianificazione', descrizione: 'Programma i turni settimanali.',      href: '/admin/calendario-programmazione',  IconComp: IDoc,      accent: 'violet' },
         { titolo: 'Richieste',      descrizione: 'Approva ferie, permessi, cambi.',     href: '/admin/richieste',                  IconComp: IInbox,    accent: 'amber', badge: richiesteInAttesa || undefined },
+        { titolo: 'Task',           descrizione: taskDescAdmin,                          href: '/admin/task',                       IconComp: ITask,     accent: 'teal',  badge: taskInCorso || undefined },
         { titolo: 'Documenti',      descrizione: 'Carica e distribuisci documenti.',    href: '/admin/documenti',                  IconComp: IDoc,      accent: 'slate' },
         { titolo: 'Impostazioni',   descrizione: 'Persone, ruoli, sedi, integrazioni.', href: '/admin/impostazioni',               IconComp: ISettings, accent: 'slate' },
       ]
@@ -209,13 +257,15 @@ export default async function HomePage() {
     ? [
         { titolo: 'Calendario',     descrizione: 'Visualizza e modifica i turni.',    href: '/manager/calendario',                  IconComp: ICalendar, accent: 'blue' },
         { titolo: 'Richieste',      descrizione: 'Approva ferie e cambi turno.',      href: '/manager/richieste',                   IconComp: IInbox,    accent: 'amber', badge: richiesteInAttesa || undefined },
+        { titolo: 'Task',           descrizione: taskDescAdmin,                        href: '/manager/task',                        IconComp: ITask,     accent: 'teal',  badge: taskInCorso || undefined },
         { titolo: 'Programmazione', descrizione: 'Pianifica i turni settimanali.',    href: '/manager/calendario-programmazione',   IconComp: IDoc,      accent: 'slate' },
         { titolo: 'Export',         descrizione: 'Report turni in PDF, Excel, CSV.',  href: '/manager/export',                      IconComp: IExport,   accent: 'teal' },
       ]
     : [
-        { titolo: 'I miei turni', descrizione: 'Il tuo calendario turni.',            href: '/dipendente/turni',     IconComp: ICalendar, accent: 'blue' },
-        { titolo: 'Richieste',    descrizione: 'Ferie, permessi e cambi turno.',      href: '/dipendente/richieste', IconComp: ISend,     accent: 'amber' },
-        { titolo: 'Profilo',      descrizione: 'I tuoi dati personali.',              href: '/dipendente/profilo',   IconComp: IUser,     accent: 'violet' },
+        { titolo: 'I miei turni', descrizione: 'Il tuo calendario turni.',                                  href: '/dipendente/turni',     IconComp: ICalendar, accent: 'blue' },
+        { titolo: 'Richieste',    descrizione: 'Ferie, permessi e cambi turno.',                            href: '/dipendente/richieste', IconComp: ISend,     accent: 'amber' },
+        { titolo: 'Task',         descrizione: taskMiei > 0 ? `${taskMiei} task assegnati a te` : 'Nessun task assegnato.', href: '/dipendente/task', IconComp: ITask, accent: 'teal', badge: taskMiei || undefined },
+        { titolo: 'Profilo',      descrizione: 'I tuoi dati personali.',                                    href: '/dipendente/profilo',   IconComp: IUser,     accent: 'violet' },
       ]
 
   function timeAgo(iso: string) {
@@ -320,43 +370,77 @@ export default async function HomePage() {
           {/* ── Colonna destra (1/3) ── */}
           <div className="lg:col-span-1 space-y-4">
 
-            {/* Attività recente */}
-            <div className="rounded-xl bg-white border border-slate-200/80 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[12px] uppercase tracking-[0.14em] font-semibold text-slate-400">Attività recente</h3>
-                {(isAdmin || isManager) && (
-                  <Link href={isAdmin ? '/admin/richieste' : '/manager/richieste'} className="text-[12px] text-slate-500 hover:text-slate-800">Tutto</Link>
+            {/* Turni di oggi — solo admin */}
+            {isAdmin && (
+              <div className="rounded-xl bg-white border border-slate-200/80 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                  <h3 className="text-[12px] uppercase tracking-[0.14em] font-semibold text-slate-400">Turni di oggi</h3>
+                  <span className="text-[12px] font-mono text-slate-400">{turniOggi.length}</span>
+                </div>
+                {turniOggi.length === 0 ? (
+                  <p className="text-[13px] text-slate-400 px-4 py-4">Nessun turno confermato oggi.</p>
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {turniOggi.slice(0, 6).map(t => (
+                      <li key={t.id} className="px-4 py-2.5 flex items-center gap-2.5">
+                        <Avatar nome={t.profile.nome} cognome={t.profile.cognome} size={26} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-medium text-slate-800 truncate">{t.profile.cognome} {t.profile.nome}</p>
+                          <p className="text-[11px] text-slate-400">{t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)}{t.posto?.nome ? ` · ${t.posto.nome}` : ''}</p>
+                        </div>
+                        {t.template?.colore && (
+                          <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: t.template.colore }} />
+                        )}
+                      </li>
+                    ))}
+                    {turniOggi.length > 6 && (
+                      <li className="px-4 py-2.5">
+                        <Link href="/admin/calendario" className="text-[12px] text-slate-500 hover:text-slate-800">
+                          +{turniOggi.length - 6} altri →
+                        </Link>
+                      </li>
+                    )}
+                  </ul>
                 )}
               </div>
+            )}
 
-              {attivita.length > 0 ? (
-                <ul className="space-y-1">
-                  {attivita.map((a, i) => (
-                    <li key={a.id} className="py-2.5 border-t border-slate-100 first:border-t-0">
-                      <div className="flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: A[accentAttivita[i % 5]].icon }} />
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[13px] text-slate-800 font-medium">
-                            {a.profiles?.nome} {a.profiles?.cognome}
-                          </span>
-                          <span className="text-[13px] text-slate-500"> {tipoLabel(a.tipo)}</span>
-                          <div className="text-[11px] text-slate-400 mt-0.5 font-mono">{timeAgo(a.created_at)}</div>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : isDipendente ? (
-                <div className="space-y-3">
-                  <p className="text-[13px] text-slate-500">Le tue ultime azioni appariranno qui.</p>
-                  <Link href="/dipendente/richieste" className="text-[12.5px] font-medium inline-flex items-center gap-1" style={{ color: A.blue.text }}>
-                    Vai alle richieste <IArrow className="w-3.5 h-3.5" />
-                  </Link>
+            {/* Attività recente — solo manager e dipendente */}
+            {!isAdmin && (
+              <div className="rounded-xl bg-white border border-slate-200/80 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[12px] uppercase tracking-[0.14em] font-semibold text-slate-400">Attività recente</h3>
+                  {isManager && (
+                    <Link href="/manager/richieste" className="text-[12px] text-slate-500 hover:text-slate-800">Tutto</Link>
+                  )}
                 </div>
-              ) : (
-                <p className="text-[13px] text-slate-400">Nessuna attività recente.</p>
-              )}
-            </div>
+                {attivita.length > 0 ? (
+                  <ul className="space-y-1">
+                    {attivita.map((a, i) => (
+                      <li key={a.id} className="py-2.5 border-t border-slate-100 first:border-t-0">
+                        <div className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: A[accentAttivita[i % 5]].icon }} />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[13px] text-slate-800 font-medium">{a.profiles?.nome} {a.profiles?.cognome}</span>
+                            <span className="text-[13px] text-slate-500"> {tipoLabel(a.tipo)}</span>
+                            <div className="text-[11px] text-slate-400 mt-0.5 font-mono">{timeAgo(a.created_at)}</div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : isDipendente ? (
+                  <div className="space-y-3">
+                    <p className="text-[13px] text-slate-500">Le tue ultime azioni appariranno qui.</p>
+                    <Link href="/dipendente/richieste" className="text-[12.5px] font-medium inline-flex items-center gap-1" style={{ color: A.blue.text }}>
+                      Vai alle richieste <IArrow className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="text-[13px] text-slate-400">Nessuna attività recente.</p>
+                )}
+              </div>
+            )}
 
             {/* Da approvare */}
             {(isAdmin || isManager) && (

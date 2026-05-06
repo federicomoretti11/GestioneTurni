@@ -8,13 +8,12 @@ import { createClient } from '@/lib/supabase/client'
 
 const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                    icon: '🏠' },
-  { label: 'Dashboard',        href: '/admin/dashboard',                         icon: '📊' },
   { section: 'Calendario',     label: 'Per dipendente', href: '/admin/calendario',                        icon: '📅' },
   {                             label: 'Per posto',      href: '/admin/calendario-posti',                  icon: '📍' },
   { section: 'Programmazione', label: 'Per dipendente', href: '/admin/calendario-programmazione',         icon: '📝' },
   {                             label: 'Per posto',      href: '/admin/calendario-programmazione-posti',   icon: '🗂️' },
   { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                         icon: '📋' },
-  {                             label: 'Export',         href: '/admin/export',                            icon: '📤' },
+  {                             label: 'Task',           href: '/admin/task',                              icon: '✅' },
   {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
   {                             label: 'Impostazioni',   href: '/admin/impostazioni',                      icon: '⚙️' },
 ]

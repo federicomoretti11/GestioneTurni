@@ -121,6 +121,33 @@ export async function sendEmailTurniPubblicati(params: {
   }
 }
 
+export async function sendEmailAttivazioneAccount(params: {
+  toEmail: string
+  nome: string
+  cognome: string
+  linkAttivazione: string
+}) {
+  try {
+    await getResend().emails.send({
+      from: FROM,
+      to: params.toEmail,
+      subject: 'Attiva il tuo account Opero Hub',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#1e40af">Benvenuto in Opero Hub 👋</h2>
+          <p>Ciao <strong>${params.nome} ${params.cognome}</strong>,</p>
+          <p>Il tuo account è stato creato. Clicca sul pulsante qui sotto per attivarlo e impostare la tua password.</p>
+          <a href="${params.linkAttivazione}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#1e40af;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Attiva account</a>
+          <p style="color:#6b7280;font-size:13px;margin-top:24px">Se non riesci a cliccare il pulsante, copia questo link nel browser:</p>
+          <p style="color:#6b7280;font-size:12px;word-break:break-all">${params.linkAttivazione}</p>
+          <p style="color:#9ca3af;font-size:12px;margin-top:24px">Il link scade dopo 24 ore.</p>
+        </div>`,
+    })
+  } catch (e) {
+    console.error('[email] sendEmailAttivazioneAccount fallita', e)
+  }
+}
+
 export async function sendEmailSbloccoApprovato(params: {
   toEmail: string
   dataTurno: string

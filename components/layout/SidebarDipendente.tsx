@@ -8,7 +8,8 @@ const BASE_ITEMS = [
   { label: 'Home',         href: '/home',                icon: '🏠' },
   { label: 'I miei turni', href: '/dipendente/turni', icon: '📅' },
   { label: 'Richieste',    href: '/dipendente/richieste', icon: '📋' },
-  { label: 'Profilo',      href: '/dipendente/profilo', icon: '👤' },
+  { label: 'Task',         href: '/dipendente/task',      icon: '✅' },
+  { label: 'Profilo',      href: '/dipendente/profilo',   icon: '👤' },
 ]
 
 export function SidebarDipendente() {

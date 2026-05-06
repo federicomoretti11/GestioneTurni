@@ -34,7 +34,7 @@ export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
           return (
             <div key={`${item.section ?? ''}-${item.href}`}>
               {showSection && (
-                <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                <div className={`px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 ${i > 0 ? 'mt-3 pt-3 border-t border-white/10' : 'pt-2'}`}>
                   {item.section}
                 </div>
               )}

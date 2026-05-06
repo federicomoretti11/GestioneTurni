@@ -11,8 +11,9 @@ const BASE_ITEMS = [
   { section: 'Programmazione', label: 'Per dipendente', href: '/manager/calendario-programmazione',       icon: '📝' },
   {                             label: 'Per posto',       href: '/manager/calendario-programmazione-posti', icon: '🗂️' },
   { section: 'Gestione',       label: 'Richieste',       href: '/manager/richieste',                       icon: '📋' },
+  {                             label: 'Task',            href: '/manager/task',                            icon: '✅' },
   {                             label: 'Modelli turno',   href: '/manager/template',                        icon: '🏷️' },
-  {                             label: 'Export',          href: '/manager/export',                          icon: '📤' },
+  {                             label: 'Impostazioni',    href: '/manager/impostazioni',                    icon: '⚙️' },
 ]
 
 export function SidebarManager() {
