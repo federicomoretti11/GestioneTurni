@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const pubbliche = ['/login', '/reset-password']
+  const pubbliche = ['/login', '/reset-password', '/auth/callback']
 
   if (!user && !pubbliche.includes(path)) {
     return NextResponse.redirect(new URL('/login', request.url))

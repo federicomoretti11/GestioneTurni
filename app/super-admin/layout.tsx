@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Logo } from '@/components/ui/Logo'
+import { Footer } from '@/components/layout/Footer'
 
 export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -16,7 +17,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
   if (!profile?.is_super_admin) redirect('/admin/dashboard')
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-slate-900 text-white px-6 py-3 flex items-center gap-4">
         <Logo size={28} variant="white" />
         <span className="font-bold text-sm tracking-tight">Opero Hub</span>
@@ -26,7 +27,8 @@ export default async function SuperAdminLayout({ children }: { children: React.R
         </a>
         <span className="text-xs text-slate-400">{profile.nome} {profile.cognome}</span>
       </header>
-      <main className="max-w-5xl mx-auto p-6">{children}</main>
+      <main className="flex-1 max-w-5xl mx-auto w-full p-6">{children}</main>
+      <Footer />
     </div>
   )
 }

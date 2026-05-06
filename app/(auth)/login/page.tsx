@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Logo } from '@/components/ui/Logo'
+import { Footer } from '@/components/layout/Footer'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,7 +27,7 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     })
     setLoading(false)
     if (error) { setError('Errore nell\'invio. Controlla l\'email e riprova.'); return }
@@ -34,7 +35,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="flex-1 flex items-center justify-center">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
         <div className="flex flex-col items-center mb-8 gap-3">
           <Logo size={80} variant="dark" />
@@ -102,6 +104,8 @@ export default function LoginPage() {
           </>
         )}
       </div>
+      </div>
+      <Footer />
     </div>
   )
 }

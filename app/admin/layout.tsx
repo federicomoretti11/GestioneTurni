@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { SidebarAdmin } from '@/components/layout/SidebarAdmin'
 import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
@@ -26,7 +27,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <SidebarAdmin />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="admin" userId={user!.id} navItems={NAV_ITEMS} />
-        <main className="flex-1 overflow-auto p-4">{children}</main>
+        <main className="flex-1 overflow-auto">
+          <div className="min-h-full flex flex-col p-4">
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
+        </main>
       </div>
     </div>
   )
