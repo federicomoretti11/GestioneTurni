@@ -7,6 +7,7 @@ import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { isTurnoBloccato } from '@/lib/utils/turni'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 
 export default function CalendarioPostiPage() {
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
@@ -82,8 +83,9 @@ export default function CalendarioPostiPage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="posto" hrefDipendente="/admin/calendario" hrefPosto="/admin/calendario-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Calendario per Posto</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Calendario per Posto</h1>
         <SwitcherVista
           vista={vista}
           onChange={setVista}

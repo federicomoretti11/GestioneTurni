@@ -12,6 +12,9 @@ const NAV_ITEMS = [
   { label: 'Turni', href: '/manager/template', icon: '🏷️' },
   { label: 'Task', href: '/manager/task', icon: '✅' },
   { label: 'Export', href: '/manager/export', icon: '📤' },
+  { label: 'Utenti', href: '/manager/utenti', icon: '👥' },
+  { label: 'Posti', href: '/manager/posti', icon: '📍' },
+  { label: 'Documenti', href: '/manager/documenti', icon: '🗄️' },
 ]
 
 export default async function ManagerLayout({ children }: { children: React.ReactNode }) {

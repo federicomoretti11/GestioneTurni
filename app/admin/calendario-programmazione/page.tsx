@@ -15,6 +15,7 @@ import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { useToast } from '@/components/ui/ToastProvider'
 import { useBozzaCount } from '@/components/layout/BozzaCounter'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 
 export default function CalendarioProgrammazionePage() {
   const { mostra } = useToast()
@@ -190,8 +191,9 @@ export default function CalendarioProgrammazionePage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="dipendente" hrefDipendente="/admin/calendario-programmazione" hrefPosto="/admin/calendario-programmazione-posti" />
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Programmazione</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Programmazione</h1>
       </div>
 
       <HeaderProgrammazione
@@ -220,13 +222,14 @@ export default function CalendarioProgrammazionePage() {
         </div>
       ) : (
         <>
-          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="hidden md:block bg-white rounded-xl border border-slate-200/80 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
             <GrigliaCalendario
               giorni={giorni}
               dipendenti={dipendenti}
               turni={turni}
               onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
               onEditTurno={turno => setModale({ open: true, turno })}
+              compact
             />
           </div>
           <div className="md:hidden">

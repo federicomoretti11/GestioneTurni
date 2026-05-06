@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/ui/Logo'
 
-interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string }
+interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string; altHrefs?: string[] }
 
 interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string }
 
@@ -30,7 +30,7 @@ export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
       <nav className="flex-1 p-2">
         {items.map((item, i) => {
           const showSection = item.section && item.section !== items[i - 1]?.section
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || (item.altHrefs?.includes(pathname) ?? false)
           return (
             <div key={`${item.section ?? ''}-${item.href}`}>
               {showSection && (

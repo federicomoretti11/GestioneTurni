@@ -60,34 +60,34 @@ export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddT
       <table className="border-collapse text-sm w-full" style={{ minWidth: 720 }}>
         <thead>
           <tr>
-            <th className="sticky left-0 z-10 border border-gray-200 bg-gray-50 px-3 py-2 text-left font-medium text-gray-600 min-w-[160px]">
+            <th className="sticky left-0 z-10 border border-slate-200 bg-slate-50 px-3 py-2 text-left font-medium text-slate-600 min-w-[160px]">
               Posto di servizio
             </th>
             {giorni.map(g => {
               const isOggi = toDateString(g) === oggi
               return (
-                <th ref={isOggi ? todayRef : undefined} key={g.toISOString()} className={`border border-gray-200 px-2 py-2 text-center font-medium min-w-[100px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-600'}`}>
+                <th ref={isOggi ? todayRef : undefined} key={g.toISOString()} className={`border border-slate-200 px-2 py-2 text-center font-medium min-w-[100px] ${isOggi ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-600'}`}>
                   {formatDayLabel(g)}
                   {isOggi && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mx-auto mt-0.5" />}
                 </th>
               )
             })}
-            <th className="border border-gray-200 bg-blue-50 px-3 py-2 text-center font-medium text-blue-700 min-w-[70px]">
+            <th className="border border-slate-200 bg-blue-50 px-3 py-2 text-center font-medium text-blue-700 min-w-[70px]">
               Totale
             </th>
           </tr>
         </thead>
         <tbody>
           {posti.map(posto => (
-            <tr key={posto.id} className="group hover:bg-gray-50">
-              <td className="sticky left-0 z-10 border border-gray-200 bg-white group-hover:bg-gray-50 px-3 py-2 font-medium text-gray-800 whitespace-nowrap">
+            <tr key={posto.id} className="group hover:bg-slate-50/50">
+              <td className="sticky left-0 z-10 border border-slate-200 bg-white group-hover:bg-slate-50 px-3 py-2 font-medium text-slate-800 whitespace-nowrap">
                 {posto.nome}
               </td>
               {giorni.map(g => {
                 const data = toDateString(g)
                 const turniCella = getTurniCella(posto.id, data)
                 return (
-                  <td key={data} className={`border border-gray-200 p-1 align-top min-w-[100px] relative group/cella ${data === oggi ? 'bg-blue-50/40' : ''}`}>
+                  <td key={data} className={`border border-slate-200 p-1 align-top min-w-[100px] relative group/cella ${data === oggi ? 'bg-blue-50/40' : ''}`}>
                     <div className="space-y-0.5">
                       {turniCella.map(t => {
                         const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
@@ -134,25 +134,25 @@ export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddT
                   </td>
                 )
               })}
-              <td className="border border-gray-200 bg-blue-50 px-3 py-2 text-center font-semibold text-blue-700 whitespace-nowrap">
+              <td className="border border-slate-200 bg-blue-50 px-3 py-2 text-center font-semibold text-blue-700 whitespace-nowrap">
                 {oreLabel(orePosto(posto.id))}
               </td>
             </tr>
           ))}
         </tbody>
         <tfoot>
-          <tr className="bg-gray-50">
-            <td className="sticky left-0 z-10 border border-gray-200 bg-gray-50 px-3 py-2 font-semibold text-gray-600">Totale giorno</td>
+          <tr className="bg-slate-50">
+            <td className="sticky left-0 z-10 border border-slate-200 bg-slate-50 px-3 py-2 font-semibold text-slate-600">Totale giorno</td>
             {giorni.map(g => {
               const data = toDateString(g)
               const ore = oreColonna(data)
               return (
-                <td key={data} className="border border-gray-200 px-2 py-2 text-center font-semibold text-gray-600">
+                <td key={data} className="border border-slate-200 px-2 py-2 text-center font-semibold text-slate-600">
                   {oreLabel(ore)}
                 </td>
               )
             })}
-            <td className="border border-gray-200 bg-blue-100 px-3 py-2 text-center font-bold text-blue-800">
+            <td className="border border-slate-200 bg-blue-100 px-3 py-2 text-center font-bold text-blue-800">
               {oreLabel(oreTotale)}
             </td>
           </tr>

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
 import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCalendarioPostiMobile'
 import { HeaderProgrammazione } from '@/components/programmazione/HeaderProgrammazione'
@@ -172,8 +173,9 @@ export default function CalendarioProgrammazionePostiPage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="posto" hrefDipendente="/admin/calendario-programmazione" hrefPosto="/admin/calendario-programmazione-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Programmazione per Posto</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Programmazione per Posto</h1>
       </div>
 
       <HeaderProgrammazione
@@ -208,7 +210,7 @@ export default function CalendarioProgrammazionePostiPage() {
         </div>
       )}
 
-      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="hidden md:block bg-white rounded-xl border border-slate-200/80 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <GrigliaCalendarioPosti
           giorni={giorni}
           turni={turniFiltrati}

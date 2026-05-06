@@ -9,12 +9,13 @@ interface CellaProps {
   onReadonlyClick?: (turno: TurnoConDettagli) => void
   isOggi?: boolean
   isPassato?: boolean
+  compact?: boolean
 }
 
-export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false }: CellaProps) {
-  const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-gray-50' : '')
+export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact }: CellaProps) {
+  const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-slate-50' : '')
   return (
-    <td className={`border border-gray-200 p-1 align-top min-w-[80px] h-14 group relative ${sfondo}`}>
+    <td className={`border border-slate-200 p-1 align-top min-w-[72px] min-h-[48px] group relative ${sfondo}`}>
       <div className="space-y-0.5">
         {turni.map(t => (
           <BadgeTurno
@@ -27,17 +28,20 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onRead
             onClick={readonly ? (onReadonlyClick ? () => onReadonlyClick(t) : undefined) : () => onEdit(t)}
             oraIngressoEffettiva={t.ora_ingresso_effettiva}
             oraUscitaEffettiva={t.ora_uscita_effettiva}
+            statoBozza={t.stato === 'bozza'}
+            compact={compact}
           />
         ))}
       </div>
       {!readonly && turni.length === 0 && (
         <button
           onClick={onAdd}
-          className="absolute inset-0 flex items-center justify-center text-gray-300 hover:text-blue-500 hover:bg-blue-50 text-xl font-light transition-colors"
+          className="absolute inset-0 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 text-xl font-light transition-colors"
         >
           +
         </button>
       )}
+      {turni.length === 0 && <div className="min-h-[36px]" />}
     </td>
   )
 }

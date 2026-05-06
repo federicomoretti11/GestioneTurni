@@ -8,7 +8,7 @@ async function checkAdmin() {
   if (!user) return null
   const { data } = await supabase
     .from('profiles').select('ruolo').eq('id', user.id).single()
-  if (data?.ruolo !== 'admin') return null
+  if (data?.ruolo !== 'admin' && data?.ruolo !== 'manager') return null
   return { user, supabase }
 }
 

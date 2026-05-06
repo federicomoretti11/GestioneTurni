@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
 import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCalendarioPostiMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
@@ -47,8 +48,9 @@ export default function CalendarioPostiPage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="posto" hrefDipendente="/manager/calendario" hrefPosto="/manager/calendario-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Calendario per Posto</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Calendario per Posto</h1>
         <SwitcherVista
           vista={vista}
           onChange={setVista}

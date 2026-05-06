@@ -13,6 +13,7 @@ import { AlertErrore } from '@/components/ui/AlertErrore'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
 import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
 import { useToast } from '@/components/ui/ToastProvider'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 
 function parseDataParam(s: string | null): Date | null {
   if (!s) return null
@@ -149,8 +150,9 @@ export default function CalendarioPage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="dipendente" hrefDipendente="/admin/calendario" hrefPosto="/admin/calendario-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Calendario Turni</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Calendario Turni</h1>
         <div className="flex items-center gap-2">
           {vista === 'settimana' && (
             <button

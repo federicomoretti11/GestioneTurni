@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
@@ -149,8 +150,9 @@ export default function CalendarioPage() {
 
   return (
     <div className="space-y-4">
+      <ViewSwitcher attiva="dipendente" hrefDipendente="/manager/calendario" hrefPosto="/manager/calendario-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Calendario Turni</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Calendario Turni</h1>
         <div className="flex items-center gap-2">
           {vista === 'settimana' && (
             <button

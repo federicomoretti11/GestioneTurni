@@ -8,10 +8,8 @@ import { createClient } from '@/lib/supabase/client'
 
 const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                    icon: '🏠' },
-  { section: 'Calendario',     label: 'Per dipendente', href: '/admin/calendario',                        icon: '📅' },
-  {                             label: 'Per posto',      href: '/admin/calendario-posti',                  icon: '📍' },
-  { section: 'Programmazione', label: 'Per dipendente', href: '/admin/calendario-programmazione',         icon: '📝' },
-  {                             label: 'Per posto',      href: '/admin/calendario-programmazione-posti',   icon: '🗂️' },
+  { section: 'Calendario',     label: 'Calendario',     href: '/admin/calendario',               icon: '📅', altHrefs: ['/admin/calendario-posti'] },
+  { section: 'Programmazione', label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝', altHrefs: ['/admin/calendario-programmazione-posti'] },
   { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                         icon: '📋' },
   {                             label: 'Task',           href: '/admin/task',                              icon: '✅' },
   {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
@@ -43,7 +41,7 @@ export function SidebarAdmin() {
     ...(isSuperAdmin ? SUPER_ADMIN_ITEMS : []),
   ].map(it => {
     if (it.href === '/admin/calendario-programmazione' && mounted) {
-      const badge = pathname === '/admin/calendario-programmazione' ? 0 : bozza
+      const badge = (pathname === '/admin/calendario-programmazione' || pathname === '/admin/calendario-programmazione-posti') ? 0 : bozza
       return { ...it, badge }
     }
     if (it.href === '/admin/richieste' && mounted) {
