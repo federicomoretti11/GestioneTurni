@@ -100,10 +100,10 @@ export default function PostiPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="text-xl font-bold text-gray-900">Posti di servizio</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Posti di servizio</h1>
 
-      <form onSubmit={handleSalva} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-800">{editing ? 'Modifica posto' : 'Nuovo posto'}</h2>
+      <form onSubmit={handleSalva} className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <h2 className="font-semibold text-slate-800">{editing ? 'Modifica posto' : 'Nuovo posto'}</h2>
         <Input
           label="Nome *"
           value={form.nome}
@@ -118,11 +118,11 @@ export default function PostiPage() {
           placeholder="..."
         />
 
-        <details className="border border-gray-200 rounded-lg">
-          <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-gray-700 select-none">
+        <details className="border border-slate-200 rounded-lg">
+          <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-slate-700 select-none">
             Geolocalizzazione GPS
           </summary>
-          <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-100">
+          <div className="px-4 pb-4 pt-2 space-y-3 border-t border-slate-100">
             <div className="grid grid-cols-2 gap-3">
               <Input
                 label="Latitudine"
@@ -154,9 +154,9 @@ export default function PostiPage() {
                 type="checkbox"
                 checked={form.geo_check_abilitato}
                 onChange={e => setForm(f => ({ ...f, geo_check_abilitato: e.target.checked }))}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Abilita controllo GPS al check-in</span>
+              <span className="text-sm text-slate-700">Abilita controllo GPS al check-in</span>
             </label>
             {latOk && lngOk && (
               <a
@@ -177,27 +177,27 @@ export default function PostiPage() {
         </div>
       </form>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y">
+      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {posti.map(p => (
-          <div key={p.id} className="flex items-center justify-between px-4 py-3">
+          <div key={p.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div>
               <div className="flex items-center gap-2">
-                <p className={`font-medium ${p.attivo ? 'text-gray-800' : 'text-gray-400'}`}>{p.nome}</p>
+                <p className={`font-medium ${p.attivo ? 'text-slate-800' : 'text-slate-400'}`}>{p.nome}</p>
                 {p.geo_check_abilitato && (
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700">GPS</span>
                 )}
               </div>
-              {p.descrizione && <p className="text-sm text-gray-500">{p.descrizione}</p>}
+              {p.descrizione && <p className="text-sm text-slate-500">{p.descrizione}</p>}
             </div>
             <div className="flex items-center gap-3">
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.attivo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.attivo ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
                 {p.attivo ? 'Attivo' : 'Disattivo'}
               </span>
-              <button onClick={() => apriModifica(p)} className="text-sm text-blue-600 hover:underline">Modifica</button>
-              <button onClick={() => toggleAttivo(p)} className="text-sm text-gray-500 hover:underline">
+              <button onClick={() => apriModifica(p)} className="text-sm text-blue-600 hover:text-blue-800 font-medium">Modifica</button>
+              <button onClick={() => toggleAttivo(p)} className="text-sm text-slate-500 hover:text-slate-700">
                 {p.attivo ? 'Disattiva' : 'Riattiva'}
               </button>
-              <button onClick={() => elimina(p)} className="text-sm text-red-600 hover:underline">Elimina</button>
+              <button onClick={() => elimina(p)} className="text-sm text-red-600 hover:text-red-800">Elimina</button>
             </div>
           </div>
         ))}

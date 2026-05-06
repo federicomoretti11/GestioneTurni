@@ -65,15 +65,15 @@ export default function AuditPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-lg font-bold text-gray-900">Audit log</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Audit log</h1>
         <div className="flex items-center gap-2">
           <button
             onClick={handleTestEmail}
-            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors"
+            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 hover:bg-slate-50 transition-colors text-slate-600"
           >
             Test email
           </button>
-          {emailMsg && <span className="text-xs text-gray-600">{emailMsg}</span>}
+          {emailMsg && <span className="text-xs text-slate-600">{emailMsg}</span>}
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export default function AuditPage() {
         <select
           value={filtroTabella}
           onChange={e => setFiltroTabella(e.target.value)}
-          className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700"
         >
           <option value="">Tutto</option>
           <option value="turni">Turni</option>
@@ -89,33 +89,33 @@ export default function AuditPage() {
         </select>
       </div>
 
-      {loading && <p className="text-sm text-gray-500">Caricamento…</p>}
+      {loading && <p className="text-sm text-slate-400">Caricamento…</p>}
 
-      <div className="bg-white rounded-xl border border-gray-200 divide-y">
+      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {voci.map(v => {
-          const cfg = AZIONE_CONFIG[v.azione] ?? { label: v.azione, color: 'bg-gray-100 text-gray-600' }
+          const cfg = AZIONE_CONFIG[v.azione] ?? { label: v.azione, color: 'bg-slate-100 text-slate-600' }
           const attore = v.utente ? `${v.utente.nome} ${v.utente.cognome}` : 'Sistema'
           return (
-            <div key={v.id} className="px-4 py-3 flex items-start gap-3">
+            <div key={v.id} className="px-4 py-3 flex items-start gap-3 hover:bg-slate-50/50">
               <div className="flex-1 min-w-0 space-y-0.5">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${cfg.color}`}>
                     {cfg.label}
                   </span>
-                  <span className="text-xs font-medium text-gray-700 capitalize">{v.tabella.slice(0, -1)}</span>
-                  <span className="text-xs text-gray-400 font-mono">{v.record_id.slice(0, 8)}</span>
-                  <span className="text-xs text-gray-600">— {attore}</span>
+                  <span className="text-xs font-medium text-slate-700 capitalize">{v.tabella.slice(0, -1)}</span>
+                  <span className="text-xs text-slate-400 font-mono">{v.record_id.slice(0, 8)}</span>
+                  <span className="text-xs text-slate-600">— {attore}</span>
                 </div>
                 <DettagliChip dettagli={v.dettagli} />
               </div>
-              <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
+              <span className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
                 {formatDateTime(v.created_at)}
               </span>
             </div>
           )
         })}
         {!loading && voci.length === 0 && (
-          <p className="px-4 py-6 text-sm text-gray-400 text-center">Nessuna voce registrata</p>
+          <p className="px-4 py-6 text-sm text-slate-400 text-center">Nessuna voce registrata</p>
         )}
       </div>
     </div>

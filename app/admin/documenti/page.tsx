@@ -141,7 +141,7 @@ export default function DocumentiPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold text-gray-900">Archivio documenti</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Archivio documenti</h1>
 
       {/* ── MOBILE: tab strip orizzontale ── */}
       <div className="md:hidden space-y-2">
@@ -154,7 +154,7 @@ export default function DocumentiPage() {
                 className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   categoriaAttiva === cat.id
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-slate-100 text-slate-600'
                 }`}
               >
                 {cat.nome}
@@ -163,7 +163,7 @@ export default function DocumentiPage() {
           </div>
           <button
             onClick={() => setAddingCategoria(v => !v)}
-            className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-lg font-medium"
+            className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-lg font-medium"
           >
             +
           </button>
@@ -176,7 +176,7 @@ export default function DocumentiPage() {
               value={nuovaCategoria}
               onChange={e => setNuovaCategoria(e.target.value)}
               placeholder="Nome categoria"
-              className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm"
+              className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-sm"
             />
             <Button type="submit" size="sm">Crea</Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => setAddingCategoria(false)}>✕</Button>
@@ -189,21 +189,21 @@ export default function DocumentiPage() {
 
         {/* Sidebar categorie — solo desktop */}
         <div className="hidden md:block w-52 shrink-0 space-y-1">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">Categorie</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Categorie</p>
           {categorie.map(cat => (
             <div
               key={cat.id}
               className={`group flex items-center justify-between rounded-lg px-3 py-2 cursor-pointer text-sm transition-colors ${
                 categoriaAttiva === cat.id
                   ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-slate-700 hover:bg-slate-100'
               }`}
               onClick={() => setCategoriaAttiva(cat.id)}
             >
               <span className="truncate">{cat.nome}</span>
               <button
                 onClick={ev => { ev.stopPropagation(); eliminaCategoria(cat) }}
-                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 text-xs ml-1"
+                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 text-xs ml-1"
               >✕</button>
             </div>
           ))}
@@ -215,7 +215,7 @@ export default function DocumentiPage() {
                 value={nuovaCategoria}
                 onChange={e => setNuovaCategoria(e.target.value)}
                 placeholder="Nome categoria"
-                className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm mb-1"
+                className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mb-1"
               />
               <div className="flex gap-1">
                 <Button type="submit" size="sm">Crea</Button>
@@ -225,7 +225,7 @@ export default function DocumentiPage() {
           ) : (
             <button
               onClick={() => setAddingCategoria(true)}
-              className="w-full text-left text-sm text-gray-400 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              className="w-full text-left text-sm text-slate-400 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
             >
               + Nuova categoria
             </button>
@@ -233,13 +233,13 @@ export default function DocumentiPage() {
         </div>
 
         {/* Area documenti */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 p-4 md:p-5">
+        <div className="flex-1 bg-white rounded-xl border border-slate-200/80 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
           {!categoriaAttiva ? (
-            <p className="text-sm text-gray-400 text-center pt-12">Seleziona una categoria</p>
+            <p className="text-sm text-slate-400 text-center pt-12">Seleziona una categoria</p>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-gray-700 truncate">{nomeCategAttiva}</p>
+                <p className="text-sm font-medium text-slate-700 truncate">{nomeCategAttiva}</p>
                 <div className="shrink-0">
                   <input ref={fileRef} type="file" accept="*/*" className="hidden" onChange={uploadFile} />
                   <Button size="sm" disabled={uploading} onClick={() => fileRef.current?.click()}>
@@ -251,9 +251,9 @@ export default function DocumentiPage() {
               {erroreUpload && <p className="text-sm text-red-600">{erroreUpload}</p>}
 
               {documenti.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center pt-8">Nessun documento in questa categoria</p>
+                <p className="text-sm text-slate-400 text-center pt-8">Nessun documento in questa categoria</p>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-slate-100">
                   {documenti.map(doc => (
                     <div key={doc.id} className="py-3 space-y-2">
                       {/* Riga principale: icona + nome + meta */}
@@ -270,12 +270,12 @@ export default function DocumentiPage() {
                                 if (e.key === 'Enter') rinominaDocumento(doc)
                                 if (e.key === 'Escape') setRinominando(null)
                               }}
-                              className="w-full border border-blue-300 rounded px-2 py-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                              className="w-full border border-blue-300 rounded px-2 py-0.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-400"
                             />
                           ) : (
-                            <p className="text-sm font-medium text-gray-900 truncate">{doc.nome}</p>
+                            <p className="text-sm font-medium text-slate-800 truncate">{doc.nome}</p>
                           )}
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-slate-400">
                             {formatBytes(doc.dimensione_bytes)} · {new Date(doc.created_at).toLocaleDateString('it-IT')}
                           </p>
                         </div>
@@ -284,7 +284,7 @@ export default function DocumentiPage() {
                       <div className="flex gap-3 pl-8 md:pl-0 md:justify-end">
                         <button onClick={() => apriUrl(doc.id, 'preview')} className="text-xs text-blue-600 hover:underline">Anteprima</button>
                         <button onClick={() => apriUrl(doc.id, 'download')} className="text-xs text-blue-600 hover:underline">Scarica</button>
-                        <button onClick={() => { setRinominando(doc.id); setNuovoNome(doc.nome) }} className="text-xs text-gray-500 hover:underline">Rinomina</button>
+                        <button onClick={() => { setRinominando(doc.id); setNuovoNome(doc.nome) }} className="text-xs text-slate-500 hover:underline">Rinomina</button>
                         <button onClick={() => eliminaDocumento(doc)} className="text-xs text-red-500 hover:underline">Elimina</button>
                       </div>
                     </div>

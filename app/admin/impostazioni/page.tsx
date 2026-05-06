@@ -51,7 +51,7 @@ function CardLink({
   return (
     <Link
       href={href}
-      className="flex flex-col gap-2 bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
+      className="flex flex-col gap-2 bg-white rounded-xl border border-slate-200/80 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
     >
       <span className="text-2xl">{icon}</span>
       <div>
@@ -137,7 +137,7 @@ export default function ImpostazioniPage() {
       {/* Impostazioni globali */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Impostazioni globali</h2>
-        <div className="bg-white rounded-xl border border-gray-200 px-5 divide-y divide-gray-100">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-5 divide-y divide-slate-100">
           <ToggleRow
             label="GPS check-in"
             descrizione={
@@ -216,12 +216,12 @@ export default function ImpostazioniPage() {
       {/* Privacy e GDPR */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Privacy e GDPR</h2>
-        <div className="bg-white rounded-xl border border-gray-200 px-5 py-4 space-y-3">
+        <div className="bg-white rounded-xl border border-slate-200/80 px-5 py-4 space-y-3">
           <div>
             <p className="text-sm font-medium text-gray-800">Esporta dati aziendali</p>
             <p className="text-xs text-gray-500 mt-0.5">Portabilità dei dati ai sensi del GDPR art. 20</p>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-slate-100">
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="text-sm font-medium text-gray-700">Dipendenti</p>

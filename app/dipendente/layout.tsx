@@ -17,12 +17,12 @@ export default async function DipendenteLayout({ children }: { children: React.R
   const { data: profile } = await supabase.from('profiles').select('nome, cognome').eq('id', user!.id).single()
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#FAFAF8]">
       <SidebarDipendente />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="dipendente" userId={user!.id} navItems={NAV_ITEMS} />
         <main className="flex-1 overflow-auto">
-          <div className="min-h-full flex flex-col p-4">
+          <div className="min-h-full flex flex-col px-4 sm:px-6 pt-6 pb-8">
             <div className="flex-1">{children}</div>
             <Footer />
           </div>

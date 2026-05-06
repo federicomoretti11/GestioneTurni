@@ -138,24 +138,24 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-6 max-w-md">
-      <h1 className="text-xl font-bold text-gray-900">Export Turni</h1>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Export Turni</h1>
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Data inizio" type="date" value={dataInizio} onChange={e => setDataInizio(e.target.value)} />
           <Input label="Data fine" type="date" value={dataFine} onChange={e => setDataFine(e.target.value)} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Dipendente <span className="text-gray-400 font-normal">(opzionale)</span></label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Dipendente <span className="text-slate-400 font-normal">(opzionale)</span></label>
           <select value={filtroDipendente} onChange={e => setFiltroDipendente(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">Tutti</option>
             {dipendenti.map(d => <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Posto di servizio <span className="text-gray-400 font-normal">(opzionale)</span></label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Posto di servizio <span className="text-slate-400 font-normal">(opzionale)</span></label>
           <select value={filtroPosto} onChange={e => setFiltroPosto(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">Tutti</option>
             {posti.filter(p => p.attivo).map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
           </select>
@@ -169,16 +169,16 @@ export default function ExportPage() {
       </div>
 
       {anteprima && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h2 className="font-semibold text-gray-800">Riepilogo</h2>
+        <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+          <h2 className="font-semibold text-slate-800">Riepilogo</h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg px-4 py-3 text-center">
               <p className="text-2xl font-bold text-blue-700">{oreLabel(anteprima.totaleOre)}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Ore totali</p>
+              <p className="text-xs text-slate-500 mt-0.5">Ore totali</p>
             </div>
-            <div className="bg-gray-50 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-gray-700">{anteprima.totaleTurni}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Turni</p>
+            <div className="bg-slate-50 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-slate-700">{anteprima.totaleTurni}</p>
+              <p className="text-xs text-slate-500 mt-0.5">Turni</p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -197,15 +197,15 @@ export default function ExportPage() {
           </div>
 
           {anteprima.perDipendente.length > 1 && (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-slate-100">
               {anteprima.perDipendente.map(d => (
                 <div key={d.nome} className="py-2 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">{d.nome}</span>
-                    <span className="text-gray-500">{d.turni} turni · <span className="font-medium text-blue-700">{oreLabel(d.ore)}</span></span>
+                    <span className="text-slate-700">{d.nome}</span>
+                    <span className="text-slate-500">{d.turni} turni · <span className="font-medium text-blue-700">{oreLabel(d.ore)}</span></span>
                   </div>
                   {(d.diurne > 0 || d.notturne > 0 || d.festive > 0) && (
-                    <div className="flex gap-3 mt-1 text-[11px] text-gray-500">
+                    <div className="flex gap-3 mt-1 text-[11px] text-slate-500">
                       <span>D: <span className="font-medium text-amber-700">{oreLabel(d.diurne)}</span></span>
                       <span>N: <span className="font-medium text-indigo-700">{oreLabel(d.notturne)}</span></span>
                       {d.festive > 0 && <span>F: <span className="font-medium text-red-700">{oreLabel(d.festive)}</span></span>}
@@ -217,12 +217,12 @@ export default function ExportPage() {
           )}
 
           {anteprima.assenze.length > 0 && (
-            <div className="border-t border-gray-100 pt-4 space-y-2">
-              <h3 className="text-sm font-semibold text-gray-700">Assenze nel periodo</h3>
-              <div className="divide-y divide-gray-100">
+            <div className="border-t border-slate-100 pt-4 space-y-2">
+              <h3 className="text-sm font-semibold text-slate-700">Assenze nel periodo</h3>
+              <div className="divide-y divide-slate-100">
                 {anteprima.assenze.map(a => (
                   <div key={a.nome} className="py-2 text-sm flex justify-between items-center">
-                    <span className="text-gray-700">{a.nome}</span>
+                    <span className="text-slate-700">{a.nome}</span>
                     <div className="flex gap-3 text-xs">
                       {a.ferie > 0 && <span className="text-green-700 font-medium">Ferie: {a.ferie}gg</span>}
                       {a.permesso > 0 && <span className="text-blue-700 font-medium">Permesso: {a.permesso}</span>}

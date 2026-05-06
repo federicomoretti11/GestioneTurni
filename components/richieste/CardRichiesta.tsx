@@ -8,7 +8,7 @@ const STATO_CONFIG = {
   approvata:          { label: 'Approvata',                       color: 'bg-green-100 text-green-800' },
   comunicata:         { label: 'Ricevuta',                        color: 'bg-green-100 text-green-800' },
   rifiutata:          { label: 'Rifiutata',                       color: 'bg-red-100 text-red-800'     },
-  annullata:          { label: 'Annullata',                       color: 'bg-gray-100 text-gray-500'   },
+  annullata:          { label: 'Annullata',                       color: 'bg-slate-100 text-slate-500' },
 }
 
 const TIPO_LABEL = {
@@ -29,11 +29,11 @@ interface Props {
 export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
   const cfg = STATO_CONFIG[richiesta.stato]
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-2">
+    <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex flex-col gap-2" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
       <div className="flex items-start justify-between gap-2">
         <div>
-          <span className="font-semibold text-sm text-gray-900">{TIPO_LABEL[richiesta.tipo]}</span>
-          <span className="ml-2 text-xs text-gray-500">{dateRange(richiesta)}</span>
+          <span className="font-semibold text-sm text-slate-900">{TIPO_LABEL[richiesta.tipo]}</span>
+          <span className="ml-2 text-xs text-slate-500">{dateRange(richiesta)}</span>
         </div>
         <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${cfg.color}`}>
           {cfg.label}
@@ -41,7 +41,7 @@ export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
       </div>
 
       {richiesta.note_dipendente && (
-        <p className="text-xs text-gray-600 italic">&quot;{richiesta.note_dipendente}&quot;</p>
+        <p className="text-xs text-slate-600 italic">&quot;{richiesta.note_dipendente}&quot;</p>
       )}
 
       {richiesta.stato === 'rifiutata' && richiesta.motivazione_decisione && (
@@ -51,7 +51,7 @@ export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
       )}
 
       {richiesta.turno && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-slate-500">
           Turno: {formatDateIT(richiesta.turno.data)} · {richiesta.turno.ora_inizio?.slice(0,5)}–{richiesta.turno.ora_fine?.slice(0,5)}
         </p>
       )}

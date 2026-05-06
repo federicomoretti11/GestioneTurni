@@ -73,32 +73,32 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
       <div className="bg-white rounded-t-2xl md:rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto">
         <div className="md:hidden w-10 h-1 bg-gray-300 rounded-full mx-auto -mt-1 mb-2" />
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-gray-900">{titolo}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+          <h2 className="font-semibold text-slate-900">{titolo}</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">✕</button>
         </div>
 
         {/* Data inizio */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Data inizio</label>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Data inizio</label>
           <input
             type="date"
             min={dataMin()}
             value={dataInizio}
             onChange={e => setDataInizio(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+            className="w-full border border-slate-200 rounded-lg p-2 text-sm"
           />
         </div>
 
         {/* Data fine (solo ferie) */}
         {tipo === 'ferie' && (
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Data fine</label>
+            <label className="block text-xs font-medium text-slate-700 mb-1">Data fine</label>
             <input
               type="date"
               min={dataInizio || dataMin()}
               value={dataFine}
               onChange={e => setDataFine(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+              className="w-full border border-slate-200 rounded-lg p-2 text-sm"
             />
           </div>
         )}
@@ -107,14 +107,14 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
         {tipo === 'malattia' && (
           <>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Data fine prevista</label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Data fine prevista</label>
               <input
                 type="date"
                 min={dataInizio}
                 value={dataFine}
                 disabled={openEnded}
                 onChange={e => setDataFine(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2 text-sm disabled:opacity-40"
+                className="w-full border border-slate-200 rounded-lg p-2 text-sm disabled:opacity-40"
               />
             </div>
             <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
@@ -132,11 +132,11 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
         {tipo === 'permesso' && (
           <>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Tipo permesso</label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Tipo permesso</label>
               <select
                 value={permessoTipo}
                 onChange={e => setPermessoTipo(e.target.value as PermessoTipo)}
-                className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                className="w-full border border-slate-200 rounded-lg p-2 text-sm"
               >
                 <option value="giornata">Giornata intera</option>
                 <option value="mezza_mattina">Mezza giornata mattina</option>
@@ -147,21 +147,21 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
             {permessoTipo === 'ore' && (
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Dalle</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Dalle</label>
                   <input
                     type="time"
                     value={oraInizio}
                     onChange={e => setOraInizio(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-slate-200 rounded-lg p-2 text-sm"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Alle</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Alle</label>
                   <input
                     type="time"
                     value={oraFine}
                     onChange={e => setOraFine(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                    className="w-full border border-slate-200 rounded-lg p-2 text-sm"
                   />
                 </div>
               </div>
@@ -171,12 +171,12 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
 
         {/* Note */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Note (opzionali)</label>
+          <label className="block text-xs font-medium text-slate-700 mb-1">Note (opzionali)</label>
           <textarea
             value={note}
             onChange={e => setNote(e.target.value)}
             rows={2}
-            className="w-full border border-gray-300 rounded-lg p-2 text-sm resize-none"
+            className="w-full border border-slate-200 rounded-lg p-2 text-sm resize-none"
             placeholder="Aggiungi una nota..."
           />
         </div>
@@ -186,7 +186,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
         <div className="flex gap-2 pt-1">
           <button
             onClick={onClose}
-            className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50"
+            className="flex-1 border border-slate-200 text-slate-700 text-sm font-medium py-2 rounded-lg hover:bg-slate-50"
           >
             Annulla
           </button>

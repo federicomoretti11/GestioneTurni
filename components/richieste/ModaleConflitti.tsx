@@ -25,8 +25,8 @@ export function ModaleConflitti({ nomeDipendente, conflitti, onConferma, onAnnul
         <div className="flex items-start gap-2">
           <span className="text-xl">⚠️</span>
           <div>
-            <h2 className="font-bold text-gray-900">Conflitti calendario</h2>
-            <p className="text-sm text-gray-600 mt-0.5">
+            <h2 className="font-semibold text-slate-900">Conflitti calendario</h2>
+            <p className="text-sm text-slate-600 mt-0.5">
               {nomeDipendente} ha già turni assegnati nei giorni:
             </p>
           </div>

@@ -50,16 +50,16 @@ export default function TemplatePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">Turni</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Turni</h1>
         <Button onClick={apriNuovo}>+ Nuovo turno</Button>
       </div>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y">
+      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {templates.map(t => (
-          <div key={t.id} className="flex items-center justify-between px-4 py-3">
+          <div key={t.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: t.colore }} />
-              <span className="font-medium text-gray-800">{t.nome}</span>
-              <span className="text-sm text-gray-500">{t.ora_inizio.slice(0,5)} – {t.ora_fine.slice(0,5)}</span>
+              <span className="font-medium text-slate-800">{t.nome}</span>
+              <span className="text-sm text-slate-500">{t.ora_inizio.slice(0,5)} – {t.ora_fine.slice(0,5)}</span>
               {t.categoria && t.categoria !== 'lavoro' && (
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full capitalize">{t.categoria}</span>
               )}

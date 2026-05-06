@@ -113,8 +113,8 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-6 max-w-md">
-      <h1 className="text-xl font-bold text-gray-900">Export Turni</h1>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Export Turni</h1>
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Data inizio" type="date" value={dataInizio} onChange={e => setDataInizio(e.target.value)} />
           <Input label="Data fine" type="date" value={dataFine} onChange={e => setDataFine(e.target.value)} />
@@ -144,14 +144,14 @@ export default function ExportPage() {
       </div>
 
       {anteprima && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4">
           <h2 className="font-semibold text-gray-800">Riepilogo</h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg px-4 py-3 text-center">
               <p className="text-2xl font-bold text-blue-700">{oreLabel(anteprima.totaleOre)}</p>
               <p className="text-xs text-gray-500 mt-0.5">Ore totali</p>
             </div>
-            <div className="bg-gray-50 rounded-lg px-4 py-3 text-center">
+            <div className="bg-slate-50 rounded-lg px-4 py-3 text-center">
               <p className="text-2xl font-bold text-gray-700">{anteprima.totaleTurni}</p>
               <p className="text-xs text-gray-500 mt-0.5">Turni</p>
             </div>

@@ -79,12 +79,12 @@ export default function RichiesteManagerPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="text-lg font-bold text-gray-900">Richieste dipendenti</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Richieste dipendenti</h1>
 
       {/* Filtri */}
       <div className="flex gap-2 flex-wrap">
         <select value={filtroStato} onChange={e => setFiltroStato(e.target.value)}
-          className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
           <option value="">Tutti gli stati</option>
           <option value="pending">In attesa</option>
           <option value="approvata_manager">Approvate manager</option>
@@ -93,7 +93,7 @@ export default function RichiesteManagerPage() {
           <option value="annullata">Annullate</option>
         </select>
         <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
-          className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
           <option value="">Tutti i tipi</option>
           <option value="ferie">Ferie</option>
           <option value="permesso">Permesso</option>
@@ -103,11 +103,11 @@ export default function RichiesteManagerPage() {
         </select>
       </div>
 
-      {loading && <p className="text-gray-500 text-sm">Caricamento...</p>}
+      {loading && <p className="text-slate-400 text-sm">Caricamento...</p>}
 
       {daDec.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Da decidere</h2>
+          <h2 className="text-[11px] font-semibold text-slate-400 mb-3 uppercase tracking-[0.14em]">Da decidere</h2>
           <div className="space-y-3">
             {daDec.map(r => (
               <CardRichiesta key={r.id} richiesta={r} actions={actions(r)} />
@@ -118,7 +118,7 @@ export default function RichiesteManagerPage() {
 
       {storico.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-gray-500 mb-2 uppercase tracking-wide">Storico</h2>
+          <h2 className="text-[11px] font-semibold text-slate-400 mb-3 uppercase tracking-[0.14em]">Storico</h2>
           <div className="space-y-3">
             {storico.map(r => (
               <CardRichiesta key={r.id} richiesta={r} actions={actions(r)} />
@@ -164,21 +164,21 @@ export default function RichiesteManagerPage() {
       )}
       {richiestaRientro && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4">
-            <h2 className="font-bold text-gray-900">Imposta data rientro</h2>
-            <p className="text-sm text-gray-600">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4" style={{ boxShadow: '0 4px 24px rgba(15,23,42,.12)' }}>
+            <h2 className="font-semibold text-slate-900">Imposta data rientro</h2>
+            <p className="text-sm text-slate-600">
               Malattia di {richiestaRientro.profile?.nome} {richiestaRientro.profile?.cognome}
               {' '}dal {richiestaRientro.data_inizio}
             </p>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Data rientro</label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Data rientro</label>
               <input type="date" min={richiestaRientro.data_inizio} value={dataRientro}
                 onChange={e => setDataRientro(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2 text-sm" />
+                className="w-full border border-slate-200 rounded-lg p-2 text-sm" />
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setRichiestaRientro(null); setDataRientro('') }}
-                className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2 rounded-lg">
+                className="flex-1 border border-slate-200 text-slate-700 text-sm font-medium py-2 rounded-lg">
                 Annulla
               </button>
               <button

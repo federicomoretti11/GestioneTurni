@@ -57,7 +57,7 @@ export default function RichiesteDipendentePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-900">Le mie richieste</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Le mie richieste</h1>
         <div className="relative">
           <button
             onClick={() => setDropdownAperto(v => !v)}
@@ -66,12 +66,12 @@ export default function RichiesteDipendentePage() {
             + Nuova richiesta ▾
           </button>
           {dropdownAperto && (
-            <div className="absolute right-0 mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-200/80 rounded-lg z-10" style={{ boxShadow: '0 4px 16px rgba(15,23,42,.1)' }}>
               {(['ferie', 'permesso', 'malattia'] as const).map(t => (
                 <button
                   key={t}
                   onClick={() => apriForm(t)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 capitalize"
+                  className="block w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700 capitalize"
                 >
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
@@ -82,10 +82,10 @@ export default function RichiesteDipendentePage() {
       </div>
 
       {errore && <p className="text-red-600 text-sm">{errore}</p>}
-      {loading && <p className="text-gray-500 text-sm">Caricamento...</p>}
+      {loading && <p className="text-slate-400 text-sm">Caricamento...</p>}
 
       {!loading && richieste.length === 0 && (
-        <p className="text-gray-500 text-sm text-center py-8">Nessuna richiesta inviata.</p>
+        <p className="text-slate-400 text-sm text-center py-8">Nessuna richiesta inviata.</p>
       )}
 
       {richieste.map(r => (

@@ -102,13 +102,13 @@ export default function FestiviPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-bold text-gray-900">Festivi</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Festivi</h1>
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-600">Anno</label>
+          <label className="text-sm font-medium text-slate-600">Anno</label>
           <select
             value={annoFiltro}
             onChange={e => setAnnoFiltro(Number(e.target.value))}
-            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             {anniDisponibili.map(a => <option key={a} value={a}>{a}</option>)}
           </select>
@@ -127,8 +127,8 @@ export default function FestiviPage() {
         </Button>
       </div>
 
-      <form onSubmit={handleAggiungi} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-800">Aggiungi festivo patronale o custom</h2>
+      <form onSubmit={handleAggiungi} className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <h2 className="font-semibold text-slate-800">Aggiungi festivo patronale o custom</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Input
             label="Data *"
@@ -143,11 +143,11 @@ export default function FestiviPage() {
             placeholder="es. Santo Patrono"
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
             <select
               value={form.tipo}
               onChange={e => setForm(f => ({ ...f, tipo: e.target.value as Festivo['tipo'] }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="patronale">Patronale</option>
               <option value="custom">Custom</option>
@@ -161,16 +161,16 @@ export default function FestiviPage() {
         </div>
       </form>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y">
+      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {festivi.map(f => (
-          <div key={f.data} className="flex items-center justify-between px-4 py-3">
+          <div key={f.data} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-14 flex-shrink-0 text-center">
-                <div className="text-lg font-bold text-gray-800 leading-none">{f.data.slice(8, 10)}</div>
-                <div className="text-[10px] text-gray-500 uppercase mt-0.5">{f.data.slice(5, 7)}/{f.data.slice(0, 4)}</div>
+                <div className="text-lg font-bold text-slate-800 leading-none">{f.data.slice(8, 10)}</div>
+                <div className="text-[10px] text-slate-500 uppercase mt-0.5">{f.data.slice(5, 7)}/{f.data.slice(0, 4)}</div>
               </div>
               <div className="min-w-0">
-                <p className="font-medium text-gray-800 truncate">{f.nome}</p>
+                <p className="font-medium text-slate-800 truncate">{f.nome}</p>
                 <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-semibold mt-0.5 ${coloreTipo(f.tipo)}`}>
                   {labelTipo(f.tipo)}
                 </span>

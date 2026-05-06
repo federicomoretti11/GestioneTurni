@@ -85,8 +85,8 @@ export function ModaleApprovaRifiuta({ richiesta, azione, onClose, onSuccess, on
     <div className="fixed inset-0 bg-black/40 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
       <div className="bg-white rounded-t-2xl md:rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[85vh] overflow-y-auto">
         <div className="md:hidden w-10 h-1 bg-gray-300 rounded-full mx-auto -mt-1 mb-2" />
-        <h2 className="font-bold text-gray-900">{titoli[azione]}</h2>
-        <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
+        <h2 className="font-semibold text-slate-900">{titoli[azione]}</h2>
+        <div className="bg-slate-50 rounded-lg p-3 text-sm space-y-1">
           <p><span className="font-medium">Dipendente:</span> {nomeDipendente}</p>
           <p><span className="font-medium">Tipo:</span> {TIPO_LABEL[richiesta.tipo]}</p>
           <p><span className="font-medium">Date:</span> {dateTesto}</p>

@@ -48,27 +48,27 @@ export default function ProfiloPage() {
 
   return (
     <div className="max-w-md space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">Il mio profilo</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-slate-900">Il mio profilo</h1>
 
       {/* Dati personali */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <h2 className="font-semibold text-gray-800">Dati personali</h2>
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <h2 className="font-semibold text-slate-800">Dati personali</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-gray-500 mb-0.5">Nome</p>
-            <p className="font-medium text-gray-900">{profilo.nome}</p>
+            <p className="text-xs text-slate-500 mb-0.5">Nome</p>
+            <p className="font-medium text-slate-900">{profilo.nome}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-0.5">Cognome</p>
-            <p className="font-medium text-gray-900">{profilo.cognome}</p>
+            <p className="text-xs text-slate-500 mb-0.5">Cognome</p>
+            <p className="font-medium text-slate-900">{profilo.cognome}</p>
           </div>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-0.5">Email</p>
-          <p className="font-medium text-gray-900">{email}</p>
+          <p className="text-xs text-slate-500 mb-0.5">Email</p>
+          <p className="font-medium text-slate-900">{email}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-0.5">Ruolo</p>
+          <p className="text-xs text-slate-500 mb-0.5">Ruolo</p>
           <span className="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full capitalize">
             {profilo.ruolo}
           </span>
@@ -76,8 +76,8 @@ export default function ProfiloPage() {
       </div>
 
       {/* Cambio password */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-800 mb-4">Cambia password</h2>
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <h2 className="font-semibold text-slate-800 mb-4">Cambia password</h2>
         <form onSubmit={handleCambiaPassword} className="space-y-4">
           <Input
             label="Password attuale"
