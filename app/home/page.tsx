@@ -118,8 +118,8 @@ export default async function HomePage() {
         </div>
         {/* Logo centrato e protagonista */}
         <div className="flex flex-col items-center gap-3 mb-8">
-          <Logo size={80} variant="white" />
-          <span className="text-white font-bold text-2xl tracking-tight">Opero Hub</span>
+          <Logo size={120} variant="white" />
+          <span className="text-white font-bold text-3xl tracking-tight">Opero Hub</span>
         </div>
         {/* Saluto a sinistra */}
         <p className="text-white/60 text-[13px] capitalize">{oggi}</p>
