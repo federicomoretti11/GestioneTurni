@@ -4,7 +4,7 @@ import type { TipoRichiesta } from '@/lib/types'
 
 const FROM = process.env.RESEND_FROM ?? 'onboarding@resend.dev'
 
-function getResend() {
+export function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? '')
 }
 

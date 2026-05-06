@@ -67,6 +67,8 @@ export default function ImpostazioniPage() {
   const [imp, setImp] = useState<Impostazioni | null>(null)
   const [loadingGps, setLoadingGps] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
+  const [testEmailStato, setTestEmailStato] = useState<'idle' | 'loading' | 'ok' | 'errore'>('idle')
+  const [testEmailMsg, setTestEmailMsg] = useState('')
 
   async function scaricaDati(tipo: 'dipendenti' | 'richieste', formato: 'csv' | 'json') {
     const res = await fetch(`/api/admin/export-dati?tipo=${tipo}`)
@@ -117,6 +119,21 @@ export default function ImpostazioniPage() {
 
   useEffect(() => { carica() }, [])
 
+  async function inviaTestEmail() {
+    setTestEmailStato('loading')
+    setTestEmailMsg('')
+    const res = await fetch('/api/admin/test-email', { method: 'POST' })
+    const d = await res.json()
+    if (res.ok) {
+      setTestEmailStato('ok')
+      setTestEmailMsg(`Email inviata a ${d.sentTo}`)
+    } else {
+      setTestEmailStato('errore')
+      setTestEmailMsg(d.error ?? 'Errore sconosciuto')
+    }
+    setTimeout(() => setTestEmailStato('idle'), 5000)
+  }
+
   async function toggle(campo: keyof Impostazioni, setLoading: (v: boolean) => void) {
     if (!imp) return
     setLoading(true)
@@ -160,6 +177,23 @@ export default function ImpostazioniPage() {
             loading={loadingEmail || !imp}
             onChange={() => toggle('email_notifiche_abilitato', setLoadingEmail)}
           />
+          <div className="flex items-center justify-between gap-4 py-4">
+            <div>
+              <p className="text-sm font-medium text-gray-800">Email di test</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {testEmailStato === 'ok' && <span className="text-green-600">{testEmailMsg}</span>}
+                {testEmailStato === 'errore' && <span className="text-red-600">{testEmailMsg}</span>}
+                {testEmailStato !== 'ok' && testEmailStato !== 'errore' && 'Invia un\'email di prova al tuo indirizzo per verificare la configurazione'}
+              </p>
+            </div>
+            <button
+              onClick={inviaTestEmail}
+              disabled={testEmailStato === 'loading'}
+              className="shrink-0 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
+            >
+              {testEmailStato === 'loading' ? 'Invio…' : 'Invia test'}
+            </button>
+          </div>
         </div>
       </section>
 
