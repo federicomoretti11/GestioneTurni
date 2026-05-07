@@ -5,7 +5,6 @@ import { Footer } from '@/components/layout/Footer'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
-  { label: 'Dashboard', href: '/admin/dashboard', icon: '📊' },
   { label: 'Calendario', href: '/admin/calendario', icon: '📅' },
   { label: 'Per sito', href: '/admin/calendario-posti', icon: '📍' },
   { label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝' },

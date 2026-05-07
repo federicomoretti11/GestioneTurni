@@ -14,7 +14,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
     .eq('id', user.id)
     .single()
 
-  if (!profile?.is_super_admin) redirect('/admin/dashboard')
+  if (!profile?.is_super_admin) redirect('/home')
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -22,8 +22,8 @@ export default async function SuperAdminLayout({ children }: { children: React.R
         <Logo size={28} variant="white" />
         <span className="font-bold text-sm tracking-tight">Opero Hub</span>
         <span className="text-xs text-slate-400 bg-slate-700 px-2 py-0.5 rounded">Super Admin</span>
-        <a href="/admin/dashboard" className="ml-auto text-xs text-slate-400 hover:text-white flex items-center gap-1">
-          ← Dashboard
+        <a href="/home" className="ml-auto text-xs text-slate-400 hover:text-white flex items-center gap-1">
+          ← Home
         </a>
         <span className="text-xs text-slate-400">{profile.nome} {profile.cognome}</span>
       </header>
