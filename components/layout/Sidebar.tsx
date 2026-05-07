@@ -6,7 +6,7 @@ interface NavItem { label: string; href: string; icon: string; badge?: number; s
 
 interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string; tenantName?: string }
 
-export function Sidebar({ items, title, ruolo, tenantName }: SidebarProps) {
+export function Sidebar({ items }: SidebarProps) {
   const pathname = usePathname()
   return (
     <aside className="hidden md:flex flex-col w-56 bg-slate-900 text-white flex-shrink-0">
