@@ -4,9 +4,13 @@ import { requireTenantId } from '@/lib/tenant'
 
 export async function GET() {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const tenantId = requireTenantId()
   const { data, error } = await supabase
     .from('posti_di_servizio')
     .select('*')
+    .eq('tenant_id', tenantId)
     .order('nome')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
@@ -14,6 +18,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const { data: profilo } = await supabase.from('profiles').select('ruolo').eq('id', user.id).single()
+  if (profilo?.ruolo !== 'admin' && profilo?.ruolo !== 'manager') {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  }
   const tenantId = requireTenantId()
   const body = await request.json()
   const { data, error } = await supabase

@@ -43,8 +43,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'file e categoria_id obbligatori' }, { status: 400 })
   }
 
+  const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
   const docId = crypto.randomUUID()
-  const storagePath = `${tenantId}/${docId}/${file.name}`
+  const storagePath = `${tenantId}/${docId}/${safeFilename}`
   const bytes = await file.arrayBuffer()
 
   const adminClient = createAdminClient()
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
       id: docId,
       tenant_id: tenantId,
       categoria_id: categoriaId,
-      nome: file.name,
+      nome: safeFilename,
       storage_path: storagePath,
       mime_type: file.type || 'application/octet-stream',
       dimensione_bytes: file.size,

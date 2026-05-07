@@ -5,6 +5,8 @@ const GIORNI_RETENTION_LETTE = 10
 
 export async function GET(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
   const { searchParams } = new URL(request.url)
   const soloNonLette = searchParams.get('non_lette') === '1'
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '50', 10) || 50, 200)
