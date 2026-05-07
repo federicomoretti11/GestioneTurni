@@ -311,7 +311,7 @@ export default async function HomePage() {
       </div>
 
       {/* ── Contenuto ── */}
-      <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 md:pt-10 pb-8">
+      <div className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 pt-6 md:pt-10 pb-8">
 
         {/* Greeting */}
         <div className="mb-6 md:mb-8">
