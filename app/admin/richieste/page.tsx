@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Richiesta } from '@/lib/types'
@@ -85,7 +85,7 @@ export default function RichiesteAdminPage() {
       {/* Filtri */}
       <div className="flex gap-2 flex-wrap">
         <select value={filtroStato} onChange={e => setFiltroStato(e.target.value)}
-          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
+          className="border border-slate-900/20 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
           <option value="">Tutti gli stati</option>
           <option value="pending">In attesa</option>
           <option value="approvata_manager">Da convalidare</option>
@@ -94,7 +94,7 @@ export default function RichiesteAdminPage() {
           <option value="annullata">Annullate</option>
         </select>
         <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
-          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
+          className="border border-slate-900/20 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700">
           <option value="">Tutti i tipi</option>
           <option value="ferie">Ferie</option>
           <option value="permesso">Permesso</option>
@@ -175,11 +175,11 @@ export default function RichiesteAdminPage() {
               <label className="block text-xs font-medium text-slate-700 mb-1">Data rientro</label>
               <input type="date" min={richiestaRientro.data_inizio} value={dataRientro}
                 onChange={e => setDataRientro(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg p-2 text-sm" />
+                className="w-full border border-slate-900/20 rounded-lg p-2 text-sm" />
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setRichiestaRientro(null); setDataRientro('') }}
-                className="flex-1 border border-slate-200 text-slate-700 text-sm font-medium py-2 rounded-lg">
+                className="flex-1 border border-slate-900/20 text-slate-700 text-sm font-medium py-2 rounded-lg">
                 Annulla
               </button>
               <button

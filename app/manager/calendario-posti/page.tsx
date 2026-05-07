@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
@@ -46,6 +46,10 @@ export default function CalendarioPostiPage() {
     return turni.filter(t => t.posto_id === filtroPosto)
   }, [turni, filtroPosto])
 
+  const postiFiltrati = useMemo(() =>
+    filtroPosto ? postiDisponibili.filter(p => p.id === filtroPosto) : postiDisponibili
+  , [postiDisponibili, filtroPosto])
+
   return (
     <div className="space-y-4">
       <ViewSwitcher attiva="posto" hrefDipendente="/manager/calendario" hrefPosto="/manager/calendario-posti" />
@@ -62,7 +66,7 @@ export default function CalendarioPostiPage() {
       </div>
 
       {postiDisponibili.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-slate-900/20 px-4 py-3">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">Posto di servizio</label>
             <select
@@ -84,8 +88,8 @@ export default function CalendarioPostiPage() {
         </div>
       )}
 
-      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiDisponibili} />
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
+        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiFiltrati} />
       </div>
       <div className="md:hidden">
         <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />

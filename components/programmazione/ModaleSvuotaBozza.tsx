@@ -23,7 +23,7 @@ export function ModaleSvuotaBozza({ open, periodo, bozze, onConferma, onAnnulla,
           L&apos;operazione è irreversibile. I turni ufficiali non vengono toccati.
         </p>
         <div className="flex justify-end gap-2 mt-5">
-          <button onClick={onAnnulla} disabled={loading} className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50">
+          <button onClick={onAnnulla} disabled={loading} className="px-4 py-2 text-sm rounded-lg border border-slate-200/60 hover:bg-gray-50">
             Annulla
           </button>
           <button onClick={onConferma} disabled={loading}

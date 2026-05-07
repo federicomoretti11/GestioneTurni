@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -102,7 +102,7 @@ export default function PostiPage() {
     <div className="space-y-6 max-w-2xl">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Posti di servizio</h1>
 
-      <form onSubmit={handleSalva} className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <form onSubmit={handleSalva} className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <h2 className="font-semibold text-slate-800">{editing ? 'Modifica posto' : 'Nuovo posto'}</h2>
         <Input
           label="Nome *"
@@ -118,7 +118,7 @@ export default function PostiPage() {
           placeholder="..."
         />
 
-        <details className="border border-slate-200 rounded-lg">
+        <details className="border border-slate-900/20 rounded-lg">
           <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-slate-700 select-none">
             Geolocalizzazione GPS
           </summary>
@@ -177,7 +177,7 @@ export default function PostiPage() {
         </div>
       </form>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {posti.map(p => (
           <div key={p.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div>

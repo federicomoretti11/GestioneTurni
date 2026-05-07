@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
@@ -16,7 +16,7 @@ export default async function UtentiPage() {
         <h1 className="text-xl font-semibold tracking-tight text-slate-900">Utenti</h1>
         <Link href="/manager/utenti/nuovo"><Button>+ Nuovo utente</Button></Link>
       </div>
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-100">

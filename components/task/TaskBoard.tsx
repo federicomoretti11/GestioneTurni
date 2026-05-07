@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState, useRef } from 'react'
 
 // ── Types ────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ function TaskCard({ task, draggable, onDragStart, onClick }: {
       draggable={draggable}
       onDragStart={onDragStart}
       onClick={onClick}
-      className="group relative w-full text-left bg-white border border-slate-200 rounded-md p-3 hover:border-slate-300 hover:shadow-[0_1px_0_rgba(15,23,42,.04),0_4px_12px_-6px_rgba(15,23,42,.18)] transition cursor-pointer select-none"
+      className="group relative w-full text-left bg-white border border-slate-900/20 rounded-md p-3 hover:border-slate-300 hover:shadow-[0_1px_0_rgba(15,23,42,.04),0_4px_12px_-6px_rgba(15,23,42,.18)] transition cursor-pointer select-none"
     >
       <span className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-l-md ${P[task.priorita].bar}`} />
       <div className="flex items-center justify-between mb-1.5 ml-1.5">
@@ -192,7 +192,7 @@ function BoardView({ tasks, canManage, onCardClick, onStatusChange, onAddClick }
 function ListView({ tasks, onCardClick }: { tasks: Task[]; onCardClick: (t: Task) => void }) {
   return (
     <div className="px-5 py-5 flex-1 overflow-auto">
-      <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="rounded-lg border border-slate-900/20 bg-white overflow-hidden">
         <table className="w-full text-[13px]">
           <thead className="bg-slate-50/60 border-b border-slate-200">
             <tr>
@@ -322,7 +322,7 @@ function DetailPanel({ task, canManage, utenti, onClose, onEdit, onDelete, onSta
             <div className="flex items-center gap-2">
               <select value={localStato}
                 onChange={e => setLocalStato(e.target.value as Stato)}
-                className="text-[12px] border border-slate-200 rounded-md px-2 py-0.5 bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                className="text-[12px] border border-slate-900/20 rounded-md px-2 py-0.5 bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                 {COLUMNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
               {statoChanged && (
@@ -462,7 +462,7 @@ function MentionTextarea({ value, onChange, onEnter, users, placeholder }: {
   return (
     <div className="relative flex-1">
       {filtered.length > 0 && (
-        <div className="absolute bottom-full mb-1 left-0 w-60 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden z-20">
+        <div className="absolute bottom-full mb-1 left-0 w-60 bg-white border border-slate-900/20 rounded-lg shadow-xl overflow-hidden z-20">
           {filtered.map(u => (
             <button key={u.id} type="button" onMouseDown={e => { e.preventDefault(); pick(u) }}
               className="w-full flex items-center gap-2 px-3 py-2 hover:bg-indigo-50 transition text-left">
@@ -479,7 +479,7 @@ function MentionTextarea({ value, onChange, onEnter, users, placeholder }: {
           if (e.key === 'Escape') { setMentionStart(null); setMentionQuery('') }
         }}
         placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-md border border-slate-200 text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none"
+        className="w-full px-3 py-2 rounded-md border border-slate-900/20 text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none"
       />
     </div>
   )
@@ -524,20 +524,20 @@ function TaskForm({ task, utenti, onClose, onSaved }: {
           <div>
             <label className="block text-[12px] font-medium text-slate-600 mb-1">Titolo *</label>
             <input type="text" value={titolo} onChange={e => setTitolo(e.target.value)}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               placeholder="Descrivi il task…"/>
           </div>
           <div>
             <label className="block text-[12px] font-medium text-slate-600 mb-1">Descrizione</label>
             <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none"
+              className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none"
               placeholder="Dettagli aggiuntivi…"/>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[12px] font-medium text-slate-600 mb-1">Priorità</label>
               <select value={priorita} onChange={e => setPriorita(e.target.value as typeof priorita)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
                 <option value="bassa">Bassa</option>
                 <option value="media">Media</option>
                 <option value="alta">Alta</option>
@@ -546,12 +546,12 @@ function TaskForm({ task, utenti, onClose, onSaved }: {
             <div>
               <label className="block text-[12px] font-medium text-slate-600 mb-1">Scadenza</label>
               <input type="date" value={scadenza} onChange={e => setScadenza(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"/>
+                className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"/>
             </div>
           </div>
           <div>
             <label className="block text-[12px] font-medium text-slate-600 mb-2">Assegna a</label>
-            <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-lg divide-y divide-slate-100">
+            <div className="max-h-40 overflow-y-auto border border-slate-900/20 rounded-lg divide-y divide-slate-100">
               {utenti.map(u => (
                 <label key={u.id} className="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer">
                   <input type="checkbox" checked={assegnati.includes(u.id)} onChange={() => toggle(u.id)}
@@ -634,19 +634,19 @@ export function TaskBoard({ canManage }: { canManage: boolean }) {
             </span>
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Cerca task…"
-              className="h-8 pl-8 pr-3 w-52 rounded-md border border-slate-200 bg-white text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"/>
+              className="h-8 pl-8 pr-3 w-52 rounded-md border border-slate-900/20 bg-white text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"/>
           </div>
           {/* View toggle */}
-          <div className="inline-flex items-center h-8 p-0.5 rounded-md border border-slate-200 bg-slate-50">
+          <div className="inline-flex items-center h-8 p-0.5 rounded-md border border-slate-900/20 bg-slate-50">
             <button onClick={() => setView('board')}
-              className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded text-[12px] transition ${view==='board' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800'}`}>
+              className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded text-[12px] transition ${view==='board' ? 'bg-white text-slate-900 shadow-sm border border-slate-900/20' : 'text-slate-500 hover:text-slate-800'}`}>
               <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="5" height="14" rx="1"/><rect x="10" y="4" width="5" height="9" rx="1"/><rect x="17" y="4" width="4" height="6" rx="1"/>
               </svg>
               Board
             </button>
             <button onClick={() => setView('list')}
-              className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded text-[12px] transition ${view==='list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800'}`}>
+              className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded text-[12px] transition ${view==='list' ? 'bg-white text-slate-900 shadow-sm border border-slate-900/20' : 'text-slate-500 hover:text-slate-800'}`}>
               <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>
               </svg>

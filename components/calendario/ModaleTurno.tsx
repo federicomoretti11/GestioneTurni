@@ -179,7 +179,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         </div>
 
         {(timbroIngresso || timbroUscita || turno.sblocco_usato_at) && (
-          <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+          <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200/60 px-4 py-3">
             <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature effettive</p>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
               <span className="inline-flex items-center gap-2 text-slate-700">
@@ -204,7 +204,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         )}
 
         {mostraMaggiorazioni && (
-          <div className="mt-3 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+          <div className="mt-3 rounded-xl bg-slate-50 border border-slate-200/60 px-4 py-3">
             <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Ore e maggiorazioni</p>
             <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
               <span className="inline-flex items-center gap-2 text-slate-700">
@@ -268,7 +268,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         </div>
       )}
       {mostraMaggiorazioni && (
-        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200/60 px-4 py-3">
           <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Ore e maggiorazioni</p>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <span className="inline-flex items-center gap-2 text-slate-700">
@@ -297,7 +297,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         </div>
       )}
       {mostraTimbri && (
-        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
+        <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200/60 px-4 py-3">
           <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature</p>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <span className="inline-flex items-center gap-2 text-slate-700">
@@ -338,7 +338,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
             <select
               value={templateId}
               onChange={e => handleTemplateChange(e.target.value)}
-              className="flex-1 h-10 border border-gray-200 rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+              className="flex-1 h-10 border border-slate-200/60 rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
             >
               <option value="">— Personalizzato —</option>
               {templates.map(t => (

@@ -36,13 +36,13 @@ export function HeaderProgrammazione({
         📝 <strong>Modalità bozza</strong> — i turni non sono visibili ai dipendenti finché non li confermi.
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+      <div className="bg-white border border-slate-200/60 rounded-xl p-4 space-y-3">
         <div className="flex flex-wrap gap-2">
           {PRESETS.map(p => (
             <button
               key={p.id}
               onClick={() => applicaPreset(p.id)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+              className="text-xs px-3 py-1.5 rounded-lg border border-slate-200/60 hover:bg-gray-50"
             >
               {p.label}
             </button>
@@ -95,13 +95,13 @@ export function HeaderProgrammazione({
           </div>
           {!readOnly && (
             <div className="flex gap-2">
-              <button onClick={onCopiaDaPeriodo} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50">
+              <button onClick={onCopiaDaPeriodo} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200/60 hover:bg-gray-50">
                 Copia da ufficiale
               </button>
               <button
                 onClick={onSvuotaBozza}
                 disabled={bozzeNelPeriodo === 0}
-                className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-xs px-3 py-1.5 rounded-lg border border-slate-200/60 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Svuota bozza
               </button>

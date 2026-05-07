@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import type { Richiesta } from '@/lib/types'
 import { formatDateIT } from '@/lib/utils/date'
 
@@ -29,7 +29,7 @@ interface Props {
 export function CardRichiesta({ richiesta, onCancella, actions }: Props) {
   const cfg = STATO_CONFIG[richiesta.stato]
   return (
-    <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex flex-col gap-2" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+    <div className="bg-white rounded-xl border border-slate-900/20 p-4 flex flex-col gap-2" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <span className="font-semibold text-sm text-slate-900">{TIPO_LABEL[richiesta.tipo]}</span>

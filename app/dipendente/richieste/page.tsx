@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Richiesta } from '@/lib/types'
@@ -66,7 +66,7 @@ export default function RichiesteDipendentePage() {
             + Nuova richiesta ▾
           </button>
           {dropdownAperto && (
-            <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-200/80 rounded-lg z-10" style={{ boxShadow: '0 4px 16px rgba(15,23,42,.1)' }}>
+            <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-900/20 rounded-lg z-10" style={{ boxShadow: '0 4px 16px rgba(15,23,42,.1)' }}>
               {(['ferie', 'permesso', 'malattia'] as const).map(t => (
                 <button
                   key={t}

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback } from 'react'
 
 interface VoceAudit {
@@ -69,7 +69,7 @@ export default function AuditPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleTestEmail}
-            className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 hover:bg-slate-50 transition-colors text-slate-600"
+            className="text-sm border border-slate-900/20 rounded-lg px-3 py-1.5 hover:bg-slate-50 transition-colors text-slate-600"
           >
             Test email
           </button>
@@ -81,7 +81,7 @@ export default function AuditPage() {
         <select
           value={filtroTabella}
           onChange={e => setFiltroTabella(e.target.value)}
-          className="border border-slate-200 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700"
+          className="border border-slate-900/20 rounded-lg px-2 py-1.5 text-sm bg-white text-slate-700"
         >
           <option value="">Tutto</option>
           <option value="turni">Turni</option>
@@ -91,7 +91,7 @@ export default function AuditPage() {
 
       {loading && <p className="text-sm text-slate-400">Caricamento…</p>}
 
-      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {voci.map(v => {
           const cfg = AZIONE_CONFIG[v.azione] ?? { label: v.azione, color: 'bg-slate-100 text-slate-600' }
           const attore = v.utente ? `${v.utente.nome} ${v.utente.cognome}` : 'Sistema'

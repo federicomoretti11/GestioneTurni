@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 function CardLink({ icon, titolo, descrizione, href }: {
   icon: string; titolo: string; descrizione: string; href: string
@@ -6,7 +6,7 @@ function CardLink({ icon, titolo, descrizione, href }: {
   return (
     <Link
       href={href}
-      className="flex flex-col gap-2 bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
+      className="flex flex-col gap-2 bg-white rounded-xl border border-slate-900/20 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
     >
       <span className="text-2xl">{icon}</span>
       <div>

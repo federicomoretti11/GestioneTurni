@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -141,7 +141,7 @@ export function Notifiche({ userId, ruolo }: Props) {
       </button>
 
       {aperto && (
-        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
+        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-lg border border-slate-900/20 overflow-hidden z-50">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 gap-2">
             <span className="font-semibold text-sm text-gray-900">Notifiche</span>
             <div className="flex items-center gap-3">

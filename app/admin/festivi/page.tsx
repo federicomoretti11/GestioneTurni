@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -108,7 +108,7 @@ export default function FestiviPage() {
           <select
             value={annoFiltro}
             onChange={e => setAnnoFiltro(Number(e.target.value))}
-            className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="border border-slate-900/20 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             {anniDisponibili.map(a => <option key={a} value={a}>{a}</option>)}
           </select>
@@ -127,7 +127,7 @@ export default function FestiviPage() {
         </Button>
       </div>
 
-      <form onSubmit={handleAggiungi} className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <form onSubmit={handleAggiungi} className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <h2 className="font-semibold text-slate-800">Aggiungi festivo patronale o custom</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Input
@@ -147,7 +147,7 @@ export default function FestiviPage() {
             <select
               value={form.tipo}
               onChange={e => setForm(f => ({ ...f, tipo: e.target.value as Festivo['tipo'] }))}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full border border-slate-900/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="patronale">Patronale</option>
               <option value="custom">Custom</option>
@@ -161,7 +161,7 @@ export default function FestiviPage() {
         </div>
       </form>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {festivi.map(f => (
           <div key={f.data} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div className="flex items-center gap-3 min-w-0">

@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <SidebarAdmin />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="admin" userId={user!.id} navItems={NAV_ITEMS} tenantName={tenantName} />
-        <main className="flex-1 overflow-auto flex flex-col">
+        <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
           <div className="flex-1 flex flex-col px-4 sm:px-6 pt-6 pb-8">
             <div className="flex-1">{children}</div>
             <Footer />

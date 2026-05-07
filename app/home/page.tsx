@@ -78,7 +78,7 @@ function AreaCard({ titolo, descrizione, href, IconComp, accent, badge }: {
   return (
     <Link
       href={href}
-      className="group block rounded-xl bg-white border border-slate-200/80 p-4 sm:p-5 hover:border-slate-300 transition-colors relative"
+      className="group block rounded-xl bg-white border border-slate-900/20 p-4 sm:p-5 hover:border-slate-300 transition-colors relative"
       style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}
     >
       <div className="flex items-start justify-between mb-5">
@@ -110,7 +110,7 @@ function NudgeCard({ accent, eyebrow, big, meta, ctaLabel, ctaHref, footer }: {
 }) {
   const a = A[accent]
   return (
-    <div className="rounded-xl bg-white border border-slate-200/80 p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+    <div className="rounded-xl bg-white border border-slate-900/20 p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5 mb-2">
@@ -288,7 +288,7 @@ export default async function HomePage() {
   const accentAttivita: AccentKey[] = ['amber', 'blue', 'green', 'slate', 'violet']
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
 
       {/* ── TopBar ── */}
       <div className="h-20 bg-white/80 backdrop-blur border-b border-slate-200/70 flex items-center px-4 md:px-6 sticky top-0 z-30">
@@ -372,7 +372,7 @@ export default async function HomePage() {
 
             {/* Turni di oggi — solo admin */}
             {isAdmin && (
-              <div className="rounded-xl bg-white border border-slate-200/80 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+              <div className="rounded-xl bg-white border border-slate-900/20 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                   <h3 className="text-[12px] uppercase tracking-[0.14em] font-semibold text-slate-400">Turni di oggi</h3>
                   <span className="text-[12px] font-mono text-slate-400">{turniOggi.length}</span>
@@ -407,7 +407,7 @@ export default async function HomePage() {
 
             {/* Attività recente — solo manager e dipendente */}
             {!isAdmin && (
-              <div className="rounded-xl bg-white border border-slate-200/80 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+              <div className="rounded-xl bg-white border border-slate-900/20 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[12px] uppercase tracking-[0.14em] font-semibold text-slate-400">Attività recente</h3>
                   {isManager && (

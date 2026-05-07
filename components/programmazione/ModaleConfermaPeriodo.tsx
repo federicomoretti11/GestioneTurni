@@ -23,7 +23,7 @@ export function ModaleConfermaPeriodo({ open, periodo, bozze, onConferma, onAnnu
           I dipendenti riceveranno una notifica aggregata e vedranno i turni sul calendario.
         </p>
         <div className="flex justify-end gap-2 mt-5">
-          <button onClick={onAnnulla} disabled={loading} className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50">
+          <button onClick={onAnnulla} disabled={loading} className="px-4 py-2 text-sm rounded-lg border border-slate-200/60 hover:bg-gray-50">
             Annulla
           </button>
           <button onClick={onConferma} disabled={loading} className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-semibold disabled:opacity-50">

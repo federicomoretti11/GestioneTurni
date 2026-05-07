@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { TurnoTemplate } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
@@ -53,7 +53,7 @@ export default function TemplatePage() {
         <h1 className="text-xl font-semibold tracking-tight text-slate-900">Turni</h1>
         <Button onClick={apriNuovo}>+ Nuovo turno</Button>
       </div>
-      <div className="bg-white rounded-xl border border-slate-200/80 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 divide-y divide-slate-100" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         {templates.map(t => (
           <div key={t.id} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/50">
             <div className="flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function TemplatePage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Categoria</label>
             <select value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white">
+              className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm bg-white">
               <option value="lavoro">Lavoro (normale)</option>
               <option value="ferie">Ferie</option>
               <option value="permesso">Permesso</option>

@@ -10,10 +10,10 @@ const I = (p: React.SVGProps<SVGSVGElement> & { size?: number }) => (
     stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...p} />
 )
 const IconCalendar = (p: { size?: number }) => <I {...p}><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18" /><path d="M8 3v4M16 3v4" /></I>
-const IconPin      = (p: { size?: number }) => <I {...p}><path d="M12 22s7-7.5 7-13a7 7 0 1 0-14 0c0 5.5 7 13 7 13z" /><circle cx="12" cy="9" r="2.5" /></I>
+const IconPin      = (p: { size?: number }) => <I {...p}><rect x="7" y="3" width="10" height="9" rx="1.5" /><rect x="5" y="12" width="14" height="3" rx="1" /><path d="M4 21h16" /></I>
 const IconCheck    = (p: { size?: number }) => <I {...p}><circle cx="12" cy="12" r="9" /><path d="M8.5 12.5l2.5 2.5L16 9.5" /></I>
 const IconDoc      = (p: { size?: number }) => <I {...p}><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" /><path d="M14 3v5h5" /></I>
-const IconChat     = (p: { size?: number }) => <I {...p}><path d="M21 12a8 8 0 1 1-3.2-6.4L21 4l-1 4.4A7.9 7.9 0 0 1 21 12z" /></I>
+const IconChat     = (p: { size?: number }) => <I {...p}><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 12l2 2 4-4" /><path d="M9 17h4" /></I>
 const IconArrow    = (p: { size?: number; strokeWidth?: number }) => <I {...p}><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></I>
 const IconEye      = (p: { size?: number }) => <I {...p}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></I>
 const IconEyeOff   = (p: { size?: number }) => <I {...p}><path d="M3 3l18 18" /><path d="M10.6 6.1A10 10 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.1 3.9" /><path d="M6.4 7.5A17 17 0 0 0 2 12s3.5 6 10 6c1.6 0 3-.3 4.2-.8" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></I>
@@ -21,7 +21,7 @@ const IconBack     = (p: { size?: number }) => <I {...p}><path d="M15 6l-6 6 6 6
 
 const BULLETS = [
   { icon: IconCalendar, label: 'Pianificazione turni' },
-  { icon: IconPin,      label: 'Check-in GPS' },
+  { icon: IconPin,      label: 'Sistema di timbratura' },
   { icon: IconCheck,    label: 'Gestione richieste' },
   { icon: IconDoc,      label: 'Documenti aziendali' },
   { icon: IconChat,     label: 'Task e comunicazioni interne' },
@@ -108,7 +108,8 @@ export default function LoginPage() {
       </aside>
 
       {/* ── Colonna destra: form ── */}
-      <section className="flex flex-col flex-1 bg-[#FAFAF8] min-h-screen">
+      <section className="flex flex-col flex-1 bg-[#FAFAF8] min-h-screen"
+        style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
         {/* Header mobile */}
         <header className="lg:hidden flex items-center gap-2 px-5 py-5 border-b border-slate-200">
           <Logo size={28} variant="dark" />

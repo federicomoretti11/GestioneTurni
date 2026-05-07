@@ -1,4 +1,4 @@
-import { TurnoConDettagli } from '@/lib/types'
+﻿import { TurnoConDettagli } from '@/lib/types'
 import { BadgeTurno } from '@/components/ui/Badge'
 
 interface CellaProps {
@@ -15,7 +15,7 @@ interface CellaProps {
 export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact }: CellaProps) {
   const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-slate-50' : '')
   return (
-    <td className={`border border-slate-200 p-1 align-top min-w-[72px] min-h-[48px] group relative ${sfondo}`}>
+    <td className={`border border-slate-200/60 p-1 align-top min-w-[72px] min-h-[48px] group relative ${sfondo}`}>
       <div className="space-y-0.5">
         {turni.map(t => (
           <BadgeTurno

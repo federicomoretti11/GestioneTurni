@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import type { TipoRichiesta, PermessoTipo } from '@/lib/types'
 
@@ -85,7 +85,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
             min={dataMin()}
             value={dataInizio}
             onChange={e => setDataInizio(e.target.value)}
-            className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+            className="w-full border border-slate-900/20 rounded-lg p-2 text-sm"
           />
         </div>
 
@@ -98,7 +98,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
               min={dataInizio || dataMin()}
               value={dataFine}
               onChange={e => setDataFine(e.target.value)}
-              className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+              className="w-full border border-slate-900/20 rounded-lg p-2 text-sm"
             />
           </div>
         )}
@@ -114,7 +114,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
                 value={dataFine}
                 disabled={openEnded}
                 onChange={e => setDataFine(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg p-2 text-sm disabled:opacity-40"
+                className="w-full border border-slate-900/20 rounded-lg p-2 text-sm disabled:opacity-40"
               />
             </div>
             <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
@@ -136,7 +136,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
               <select
                 value={permessoTipo}
                 onChange={e => setPermessoTipo(e.target.value as PermessoTipo)}
-                className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+                className="w-full border border-slate-900/20 rounded-lg p-2 text-sm"
               >
                 <option value="giornata">Giornata intera</option>
                 <option value="mezza_mattina">Mezza giornata mattina</option>
@@ -152,7 +152,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
                     type="time"
                     value={oraInizio}
                     onChange={e => setOraInizio(e.target.value)}
-                    className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+                    className="w-full border border-slate-900/20 rounded-lg p-2 text-sm"
                   />
                 </div>
                 <div className="flex-1">
@@ -161,7 +161,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
                     type="time"
                     value={oraFine}
                     onChange={e => setOraFine(e.target.value)}
-                    className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+                    className="w-full border border-slate-900/20 rounded-lg p-2 text-sm"
                   />
                 </div>
               </div>
@@ -176,7 +176,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
             value={note}
             onChange={e => setNote(e.target.value)}
             rows={2}
-            className="w-full border border-slate-200 rounded-lg p-2 text-sm resize-none"
+            className="w-full border border-slate-900/20 rounded-lg p-2 text-sm resize-none"
             placeholder="Aggiungi una nota..."
           />
         </div>
@@ -186,7 +186,7 @@ export function FormNuovaRichiesta({ tipo, onClose, onSuccess }: Props) {
         <div className="flex gap-2 pt-1">
           <button
             onClick={onClose}
-            className="flex-1 border border-slate-200 text-slate-700 text-sm font-medium py-2 rounded-lg hover:bg-slate-50"
+            className="flex-1 border border-slate-900/20 text-slate-700 text-sm font-medium py-2 rounded-lg hover:bg-slate-50"
           >
             Annulla
           </button>

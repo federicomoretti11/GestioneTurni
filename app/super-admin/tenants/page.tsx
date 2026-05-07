@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState } from 'react'
 
 interface Tenant {
@@ -103,7 +103,7 @@ export default function TenantsPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-5 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-900/20 p-5 mb-6 space-y-4">
           <h2 className="font-semibold text-gray-900">Nuovo tenant</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -167,7 +167,7 @@ export default function TenantsPage() {
       {loading ? (
         <p className="text-sm text-gray-500">Caricamento…</p>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-900/20 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>

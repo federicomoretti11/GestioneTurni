@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { TurnoConDettagli } from '@/lib/types'
 import { formatTimeShort } from '@/lib/utils/date'
@@ -122,7 +122,7 @@ export function BannerTurnoOggi({ turno, onRefresh }: Props) {
 
   if (!turno) {
     return (
-      <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 p-5">
+      <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-900/20 p-5">
         <p className="text-xs uppercase tracking-wider font-semibold text-slate-500">Oggi · {salutoOggi()}</p>
         <p className="mt-2 text-sm text-slate-600">Nessun turno in programma oggi.</p>
       </div>

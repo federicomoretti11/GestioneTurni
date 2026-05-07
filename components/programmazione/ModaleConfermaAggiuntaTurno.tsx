@@ -34,7 +34,7 @@ export function ModaleConfermaAggiuntaTurno({ open, data, dipendenteNome, turniE
         <div className="flex justify-end gap-2 mt-5">
           <button
             onClick={onAnnulla}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-200 hover:bg-gray-50"
+            className="px-4 py-2 text-sm rounded-lg border border-slate-200/60 hover:bg-gray-50"
           >
             Annulla
           </button>

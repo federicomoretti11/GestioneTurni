@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -114,7 +114,7 @@ export default function ExportPage() {
   return (
     <div className="space-y-6 max-w-md">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Export Turni</h1>
-      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Data inizio" type="date" value={dataInizio} onChange={e => setDataInizio(e.target.value)} />
           <Input label="Data fine" type="date" value={dataFine} onChange={e => setDataFine(e.target.value)} />
@@ -144,7 +144,7 @@ export default function ExportPage() {
       </div>
 
       {anteprima && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4">
+        <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4">
           <h2 className="font-semibold text-gray-800">Riepilogo</h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg px-4 py-3 text-center">

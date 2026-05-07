@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { Footer } from '@/components/layout/Footer'
 
 export default function PrivacyPage() {
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900 mb-2">Privacy Policy</h1>
         <p className="text-[13px] text-slate-400 mb-10">Ultimo aggiornamento: maggio 2025</p>
 
-        <div className="rounded-xl bg-white border border-slate-200/80 p-8 text-[14px] text-slate-600 space-y-8"
+        <div className="rounded-xl bg-white border border-slate-900/20 p-8 text-[14px] text-slate-600 space-y-8"
           style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
 
           <section className="space-y-3">

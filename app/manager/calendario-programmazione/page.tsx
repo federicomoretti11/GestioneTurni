@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
@@ -58,12 +58,12 @@ export default function ManagerProgrammazionePage() {
       {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
 
       {loading ? (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-4">
+        <div className="bg-white rounded-xl border border-slate-900/20 p-4">
           <SkeletonCalendario righe={dipendenti.length || 4} colonne={giorni.length} />
         </div>
       ) : (
         <>
-          <div className="hidden md:block bg-white rounded-xl border border-slate-200/80 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+          <div className="hidden md:block bg-white rounded-xl border border-slate-900/20 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
             <GrigliaCalendario
               giorni={giorni}
               dipendenti={dipendenti}

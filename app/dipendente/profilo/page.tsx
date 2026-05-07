@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/Input'
@@ -51,7 +51,7 @@ export default function ProfiloPage() {
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Il mio profilo</h1>
 
       {/* Dati personali */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <h2 className="font-semibold text-slate-800">Dati personali</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -76,7 +76,7 @@ export default function ProfiloPage() {
       </div>
 
       {/* Cambio password */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-6" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 p-6" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <h2 className="font-semibold text-slate-800 mb-4">Cambia password</h2>
         <form onSubmit={handleCambiaPassword} className="space-y-4">
           <Input

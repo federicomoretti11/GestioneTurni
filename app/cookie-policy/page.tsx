@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { Footer } from '@/components/layout/Footer'
 
 export default function CookiePolicyPage() {
@@ -11,7 +11,7 @@ export default function CookiePolicyPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900 mb-2">Cookie Policy</h1>
         <p className="text-[13px] text-slate-400 mb-10">Ultimo aggiornamento: maggio 2025</p>
 
-        <div className="rounded-xl bg-white border border-slate-200/80 p-8 text-[14px] text-slate-600 space-y-8"
+        <div className="rounded-xl bg-white border border-slate-900/20 p-8 text-[14px] text-slate-600 space-y-8"
           style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
 
           <section className="space-y-3">
@@ -31,24 +31,24 @@ export default function CookiePolicyPage() {
               <table className="w-full text-[13px] border-collapse">
                 <thead>
                   <tr className="bg-slate-50">
-                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-200">Nome</th>
-                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-200">Tipologia</th>
-                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-200">Finalità</th>
-                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-200">Durata</th>
+                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-900/20">Nome</th>
+                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-900/20">Tipologia</th>
+                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-900/20">Finalità</th>
+                    <th className="text-left p-3 font-semibold text-slate-700 border border-slate-900/20">Durata</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="p-3 border border-slate-200 text-slate-500"><code className="text-xs bg-slate-100 px-1 rounded">sb-*</code></td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Tecnico</td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Gestione sessione di autenticazione (Supabase Auth)</td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Sessione / 1 settimana</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500"><code className="text-xs bg-slate-100 px-1 rounded">sb-*</code></td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Tecnico</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Gestione sessione di autenticazione (Supabase Auth)</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Sessione / 1 settimana</td>
                   </tr>
                   <tr className="bg-slate-50/50">
-                    <td className="p-3 border border-slate-200 text-slate-500"><code className="text-xs bg-slate-100 px-1 rounded">__Secure-*</code></td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Tecnico</td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Sicurezza della sessione HTTPS</td>
-                    <td className="p-3 border border-slate-200 text-slate-500">Sessione</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500"><code className="text-xs bg-slate-100 px-1 rounded">__Secure-*</code></td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Tecnico</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Sicurezza della sessione HTTPS</td>
+                    <td className="p-3 border border-slate-900/20 text-slate-500">Sessione</td>
                   </tr>
                 </tbody>
               </table>

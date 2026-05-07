@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
@@ -217,12 +217,12 @@ export default function CalendarioProgrammazionePage() {
       )}
 
       {loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
           <SkeletonCalendario righe={dipendenti.length || 4} colonne={giorni.length} />
         </div>
       ) : (
         <>
-          <div className="hidden md:block bg-white rounded-xl border border-slate-200/80 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+          <div className="hidden md:block bg-white rounded-xl border border-slate-900/20 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
             <GrigliaCalendario
               giorni={giorni}
               dipendenti={dipendenti}

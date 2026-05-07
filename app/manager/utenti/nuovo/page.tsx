@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/Input'
@@ -25,7 +25,7 @@ export default function NuovoUtentePage() {
   return (
     <div className="max-w-md space-y-4">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Nuovo utente</h1>
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Nome" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} required />
           <Input label="Cognome" value={form.cognome} onChange={e => setForm(f => ({ ...f, cognome: e.target.value }))} required />

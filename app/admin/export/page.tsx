@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -139,7 +139,7 @@ export default function ExportPage() {
   return (
     <div className="space-y-6 max-w-md">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Export Turni</h1>
-      <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">
           <Input label="Data inizio" type="date" value={dataInizio} onChange={e => setDataInizio(e.target.value)} />
           <Input label="Data fine" type="date" value={dataFine} onChange={e => setDataFine(e.target.value)} />
@@ -147,7 +147,7 @@ export default function ExportPage() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Dipendente <span className="text-slate-400 font-normal">(opzionale)</span></label>
           <select value={filtroDipendente} onChange={e => setFiltroDipendente(e.target.value)}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">Tutti</option>
             {dipendenti.map(d => <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>)}
           </select>
@@ -155,7 +155,7 @@ export default function ExportPage() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Posto di servizio <span className="text-slate-400 font-normal">(opzionale)</span></label>
           <select value={filtroPosto} onChange={e => setFiltroPosto(e.target.value)}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            className="w-full border border-slate-900/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
             <option value="">Tutti</option>
             {posti.filter(p => p.attivo).map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
           </select>
@@ -169,7 +169,7 @@ export default function ExportPage() {
       </div>
 
       {anteprima && (
-        <div className="bg-white rounded-xl border border-slate-200/80 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
           <h2 className="font-semibold text-slate-800">Riepilogo</h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg px-4 py-3 text-center">
@@ -234,7 +234,7 @@ export default function ExportPage() {
             </div>
           )}
 
-          <label className="flex items-center gap-2 text-sm text-gray-700 bg-slate-50 rounded-lg px-3 py-2 border border-slate-200 cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-sm text-gray-700 bg-slate-50 rounded-lg px-3 py-2 border border-slate-900/20 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={soloRiepilogo}

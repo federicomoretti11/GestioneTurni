@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendarioPosti'
@@ -56,6 +56,10 @@ export default function CalendarioProgrammazionePostiPage() {
     if (!filtroPosto) return turni
     return turni.filter(t => t.posto_id === filtroPosto)
   }, [turni, filtroPosto])
+
+  const postiFiltrati = useMemo(() =>
+    filtroPosto ? postiDisponibili.filter(p => p.id === filtroPosto) : postiDisponibili
+  , [postiDisponibili, filtroPosto])
 
   async function handleConferma() {
     setLoadingAzione(true)
@@ -188,7 +192,7 @@ export default function CalendarioProgrammazionePostiPage() {
       />
 
       {postiDisponibili.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-slate-900/20 px-4 py-3">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">Posto di servizio</label>
             <select
@@ -210,11 +214,11 @@ export default function CalendarioProgrammazionePostiPage() {
         </div>
       )}
 
-      <div className="hidden md:block bg-white rounded-xl border border-slate-200/80 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+      <div className="hidden md:block bg-white rounded-xl border border-slate-900/20 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <GrigliaCalendarioPosti
           giorni={giorni}
           turni={turniFiltrati}
-          posti={postiDisponibili}
+          posti={postiFiltrati}
           onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
           onEditTurno={turno => setModale({ open: true, turno })}
         />

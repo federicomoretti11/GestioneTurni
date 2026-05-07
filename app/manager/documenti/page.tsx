@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
 
@@ -176,7 +176,7 @@ export default function DocumentiPage() {
               value={nuovaCategoria}
               onChange={e => setNuovaCategoria(e.target.value)}
               placeholder="Nome categoria"
-              className="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-sm"
+              className="flex-1 border border-slate-900/20 rounded-lg px-2 py-1.5 text-sm"
             />
             <Button type="submit" size="sm">Crea</Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => setAddingCategoria(false)}>✕</Button>
@@ -215,7 +215,7 @@ export default function DocumentiPage() {
                 value={nuovaCategoria}
                 onChange={e => setNuovaCategoria(e.target.value)}
                 placeholder="Nome categoria"
-                className="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm mb-1"
+                className="w-full border border-slate-900/20 rounded-lg px-2 py-1.5 text-sm mb-1"
               />
               <div className="flex gap-1">
                 <Button type="submit" size="sm">Crea</Button>
@@ -233,7 +233,7 @@ export default function DocumentiPage() {
         </div>
 
         {/* Area documenti */}
-        <div className="flex-1 bg-white rounded-xl border border-slate-200/80 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+        <div className="flex-1 bg-white rounded-xl border border-slate-900/20 p-4 md:p-5" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
           {!categoriaAttiva ? (
             <p className="text-sm text-slate-400 text-center pt-12">Seleziona una categoria</p>
           ) : (

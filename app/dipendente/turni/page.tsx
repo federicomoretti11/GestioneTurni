@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
@@ -184,21 +184,21 @@ export default function MieiTurniPage() {
 
       {/* Riepilogo periodo */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 text-center">
+        <div className="bg-white rounded-xl border border-slate-900/20 px-4 py-3 text-center">
           <p className="text-2xl font-bold text-blue-700">{oreLabel(oreTotali)}</p>
           <p className="text-xs text-gray-500 mt-0.5">Ore totali</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 text-center">
+        <div className="bg-white rounded-xl border border-slate-900/20 px-4 py-3 text-center">
           <p className="text-2xl font-bold text-gray-800">{turniLavorativi.length}</p>
           <p className="text-xs text-gray-500 mt-0.5">Turni lavorativi</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 text-center">
+        <div className="bg-white rounded-xl border border-slate-900/20 px-4 py-3 text-center">
           <p className="text-2xl font-bold text-gray-400">{turniRiposo.length}</p>
           <p className="text-xs text-gray-500 mt-0.5">Riposi</p>
         </div>
       </div>
 
-      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
         {loading ? <SkeletonCalendario righe={1} colonne={giorni.length} /> : <GrigliaCalendario
           giorni={giorni}
           dipendenti={[profilo]}
@@ -245,7 +245,7 @@ export default function MieiTurniPage() {
               return (
                 <>
                   {!isRiposo && (
-                    <div className="rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 space-y-2">
+                    <div className="rounded-xl bg-gray-50 border border-slate-900/20 px-4 py-3 space-y-2">
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Timbratura</p>
                       <div className="flex gap-6 text-sm">
                         <span className="flex items-center gap-1.5 text-gray-700">

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 import { Avatar } from '@/components/ui/Avatar'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -96,7 +96,7 @@ export default async function AdminDashboard() {
         {kpis.map(k => (
           <div
             key={k.label}
-            className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3 md:p-5 flex items-center justify-between md:block"
+            className="bg-white rounded-xl border border-slate-900/20 shadow-sm px-4 py-3 md:p-5 flex items-center justify-between md:block"
           >
             <div className="md:order-2">
               <div className="text-[11px] md:text-xs font-medium text-gray-500 md:mt-1">{k.label}</div>
@@ -124,7 +124,7 @@ export default async function AdminDashboard() {
       {/* Sezioni */}
       <div className="px-4 md:px-6 mt-6 mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Turni di oggi */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-900/20">
           <div className="px-4 py-3 border-b border-gray-100">
             <h2 className="font-semibold text-sm text-gray-800">Turni di oggi</h2>
           </div>
@@ -164,7 +164,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Ore settimana */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-900/20">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-sm text-gray-800">Ore questa settimana</h2>
             <span className="text-[11px] text-gray-400">{inizio.slice(5).replace('-', '/')} — {fine.slice(5).replace('-', '/')}</span>

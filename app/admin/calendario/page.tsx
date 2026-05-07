@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
@@ -175,7 +175,7 @@ export default function CalendarioPage() {
 
       {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
 
-      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-gray-200 px-4 py-3">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-3 bg-white rounded-xl border border-slate-900/20 px-4 py-3">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">Dipendente</label>
           <select
@@ -214,7 +214,7 @@ export default function CalendarioPage() {
 
       {loading ? (
         <>
-          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
             <SkeletonCalendario righe={dipendentiFiltrati.length || 4} colonne={giorni.length} />
           </div>
           <div className="md:hidden">
@@ -223,7 +223,7 @@ export default function CalendarioPage() {
         </>
       ) : (
         <>
-          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
             <GrigliaCalendario
               giorni={giorni}
               dipendenti={dipendentiFiltrati}

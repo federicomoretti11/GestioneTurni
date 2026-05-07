@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#3b9eca" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#3b9eca" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g stroke="#045dcc" stroke-width="1" fill="none" opacity="0.12">
+    <polyline points="0,180 120,180 120,120 280,120 280,180 460,180"/>
+    <polyline points="460,180 460,120 600,120 600,80 760,80 760,120 900,120 900,180 1050,180 1050,120 1200,120"/>
+    <polyline points="0,480 150,480 150,420 320,420 320,480 520,480 520,540 700,540 700,480 880,480 880,420 1050,420 1050,480 1200,480"/>
+    <polyline points="0,720 100,720 100,760 260,760 260,720 440,720 440,780 620,780 620,720 800,720 800,760 980,760 980,720 1200,720"/>
+    <polyline points="280,0 280,120"/>
+    <polyline points="600,0 600,80"/>
+    <polyline points="900,0 900,120"/>
+    <polyline points="150,480 150,580 220,580 220,900"/>
+    <polyline points="700,540 700,640 780,640 780,900"/>
+    <polyline points="520,480 520,380 440,380 440,180"/>
+    <polyline points="880,480 880,580 960,580 960,900"/>
+    <polyline points="260,720 260,900"/>
+    <polyline points="620,720 620,900"/>
+    <polyline points="0,580 80,580 80,480"/>
+    <polyline points="1120,480 1120,580 1200,580"/>
+  </g>
+
+  <g fill="#045dcc" opacity="0.18">
+    <circle cx="120" cy="180" r="3.5"/>
+    <circle cx="120" cy="120" r="3.5"/>
+    <circle cx="280" cy="120" r="3.5"/>
+    <circle cx="280" cy="180" r="3.5"/>
+    <circle cx="460" cy="180" r="3.5"/>
+    <circle cx="460" cy="120" r="3.5"/>
+    <circle cx="600" cy="120" r="3.5"/>
+    <circle cx="600" cy="80" r="3.5"/>
+    <circle cx="760" cy="80" r="3.5"/>
+    <circle cx="760" cy="120" r="3.5"/>
+    <circle cx="900" cy="120" r="3.5"/>
+    <circle cx="900" cy="180" r="3.5"/>
+    <circle cx="1050" cy="180" r="3.5"/>
+    <circle cx="1050" cy="120" r="3.5"/>
+    <circle cx="150" cy="480" r="3.5"/>
+    <circle cx="150" cy="420" r="3.5"/>
+    <circle cx="320" cy="420" r="3.5"/>
+    <circle cx="320" cy="480" r="3.5"/>
+    <circle cx="520" cy="480" r="3.5"/>
+    <circle cx="520" cy="540" r="3.5"/>
+    <circle cx="700" cy="540" r="3.5"/>
+    <circle cx="700" cy="480" r="3.5"/>
+    <circle cx="880" cy="480" r="3.5"/>
+    <circle cx="880" cy="420" r="3.5"/>
+    <circle cx="1050" cy="420" r="3.5"/>
+    <circle cx="1050" cy="480" r="3.5"/>
+    <circle cx="100" cy="720" r="3.5"/>
+    <circle cx="100" cy="760" r="3.5"/>
+    <circle cx="260" cy="760" r="3.5"/>
+    <circle cx="260" cy="720" r="3.5"/>
+    <circle cx="440" cy="720" r="3.5"/>
+    <circle cx="440" cy="780" r="3.5"/>
+    <circle cx="620" cy="780" r="3.5"/>
+    <circle cx="620" cy="720" r="3.5"/>
+    <circle cx="800" cy="720" r="3.5"/>
+    <circle cx="800" cy="760" r="3.5"/>
+    <circle cx="980" cy="760" r="3.5"/>
+    <circle cx="980" cy="720" r="3.5"/>
+    <circle cx="150" cy="580" r="3.5"/>
+    <circle cx="220" cy="580" r="3.5"/>
+    <circle cx="700" cy="640" r="3.5"/>
+    <circle cx="780" cy="640" r="3.5"/>
+    <circle cx="520" cy="380" r="3.5"/>
+    <circle cx="440" cy="380" r="3.5"/>
+    <circle cx="880" cy="580" r="3.5"/>
+    <circle cx="960" cy="580" r="3.5"/>
+    <circle cx="80" cy="580" r="3.5"/>
+    <circle cx="80" cy="480" r="3.5"/>
+    <circle cx="1120" cy="480" r="3.5"/>
+    <circle cx="1120" cy="580" r="3.5"/>
+  </g>
+
+  <!-- anelli terminali -->
+  <g stroke="#045dcc" stroke-width="0.8" fill="none" opacity="0.15">
+    <circle cx="600" cy="80" r="6"/>
+    <circle cx="520" cy="480" r="6"/>
+    <circle cx="260" cy="760" r="6"/>
+    <circle cx="880" cy="420" r="6"/>
+  </g>
+
+  <!-- punti sparsi -->
+  <g fill="#045dcc" opacity="0.1">
+    <circle cx="380" cy="300" r="2"/>
+    <circle cx="820" cy="320" r="2"/>
+    <circle cx="180" cy="650" r="2"/>
+    <circle cx="1000" cy="600" r="2"/>
+    <circle cx="550" cy="860" r="2"/>
+    <circle cx="70" cy="350" r="2"/>
+    <circle cx="1150" cy="300" r="2"/>
+    <circle cx="400" cy="60" r="2"/>
+    <circle cx="1000" cy="50" r="2"/>
+  </g>
+
+  <rect width="1200" height="900" fill="url(#glow)"/>
+</svg>
