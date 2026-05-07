@@ -1,9 +1,10 @@
 import Link from 'next/link'
+import { Footer } from '@/components/layout/Footer'
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
-      <div className="max-w-3xl mx-auto px-6 py-16">
+    <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
+      <div className="flex-1 max-w-3xl mx-auto w-full px-6 py-16">
         <div className="mb-8">
           <Link href="/" className="text-[12px] text-slate-400 hover:text-slate-600 transition-colors">← Torna alla home</Link>
         </div>
@@ -93,6 +94,7 @@ export default function PrivacyPage() {
 
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
