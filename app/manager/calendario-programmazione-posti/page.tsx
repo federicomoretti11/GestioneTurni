@@ -44,7 +44,7 @@ export default function ManagerProgrammazionePostiPage() {
     <div className="space-y-4">
       <ViewSwitcher attiva="posto" hrefDipendente="/manager/calendario-programmazione" hrefPosto="/manager/calendario-programmazione-posti" />
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Programmazione per Posto</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-slate-900">Programmazione per Sito</h1>
       </div>
 
       <HeaderProgrammazione

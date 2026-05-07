@@ -6,9 +6,9 @@ import { Footer } from '@/components/layout/Footer'
 const NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'Calendario', href: '/manager/calendario', icon: '📅' },
-  { label: 'Per posto', href: '/manager/calendario-posti', icon: '📍' },
+  { label: 'Per sito', href: '/manager/calendario-posti', icon: '📍' },
   { label: 'Programmazione', href: '/manager/calendario-programmazione', icon: '📝' },
-  { label: 'Programmazione per posto', href: '/manager/calendario-programmazione-posti', icon: '📝' },
+  { label: 'Programmazione per sito', href: '/manager/calendario-programmazione-posti', icon: '📝' },
   { label: 'Turni', href: '/manager/template', icon: '🏷️' },
   { label: 'Task', href: '/manager/task', icon: '✅' },
   { label: 'Export', href: '/manager/export', icon: '📤' },
