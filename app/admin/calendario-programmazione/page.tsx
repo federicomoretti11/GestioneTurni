@@ -50,7 +50,7 @@ export default function CalendarioProgrammazionePage() {
         fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
       ])
-      setDipendenti(u.filter((x: Profile) => x.ruolo === 'dipendente' && x.attivo))
+      setDipendenti(u.filter((x: Profile) => x.includi_in_turni && x.attivo))
       setTemplates(tp)
       setTurni(tr)
       setPosti(po)

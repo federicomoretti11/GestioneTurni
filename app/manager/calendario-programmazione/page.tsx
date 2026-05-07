@@ -27,7 +27,7 @@ export default function ManagerProgrammazionePage() {
         fetch('/api/utenti').then(r => r.json()),
         fetch(`/api/turni?stato=bozza&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
       ])
-      setDipendenti(u.filter((x: Profile) => x.ruolo === 'dipendente' && x.attivo))
+      setDipendenti(u.filter((x: Profile) => x.includi_in_turni && x.attivo))
       setTurni(tr)
     } catch {
       setErrore('Errore nel caricamento dei dati.')

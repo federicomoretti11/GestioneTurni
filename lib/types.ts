@@ -6,6 +6,7 @@ export interface Profile {
   cognome: string
   ruolo: RuoloUtente
   attivo: boolean
+  includi_in_turni: boolean
   created_at: string
 }
 

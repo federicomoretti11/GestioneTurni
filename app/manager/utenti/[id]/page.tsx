@@ -6,7 +6,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import type { Profile } from '@/lib/types'
 
-export default function ModificaUtentePage() {
+export default function ModificaUtenteManagerPage() {
   const router = useRouter()
   const { id } = useParams<{ id: string }>()
   const [form, setForm] = useState({ nome: '', cognome: '', ruolo: 'dipendente', attivo: true, includi_in_turni: true })
@@ -25,7 +25,7 @@ export default function ModificaUtentePage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     })
-    router.push('/admin/utenti')
+    router.push('/manager/utenti')
   }
 
   async function toggleAttivo() {
@@ -35,32 +35,6 @@ export default function ModificaUtentePage() {
       body: JSON.stringify({ attivo: !form.attivo }),
     })
     setForm(f => ({ ...f, attivo: !f.attivo }))
-  }
-
-  async function elimina() {
-    if (!confirm(`Eliminare definitivamente l'utente ${form.nome} ${form.cognome}?\n\nVerranno cancellati tutti i turni e le richieste associate. Questa operazione è irreversibile.`)) return
-    const res = await fetch(`/api/utenti/${id}`, { method: 'DELETE' })
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({})) as { error?: string }
-      alert(json.error ?? 'Impossibile eliminare l\'utente.')
-      return
-    }
-    router.push('/admin/utenti')
-  }
-
-  async function anonimizza() {
-    if (!confirm(`Anonimizzare ${form.nome} ${form.cognome}?\n\nI dati personali (nome, email) verranno sostituiti con valori anonimi. Lo storico turni verrà mantenuto. Questa operazione è irreversibile.`)) return
-    const res = await fetch(`/api/utenti/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ anonimizza: true }),
-    })
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({})) as { error?: string }
-      alert(json.error ?? 'Impossibile anonimizzare l\'utente.')
-      return
-    }
-    router.push('/admin/utenti')
   }
 
   return (
@@ -97,16 +71,6 @@ export default function ModificaUtentePage() {
           <div className="flex gap-2">
             <Button variant="secondary" type="button" onClick={() => router.back()}>Annulla</Button>
             <Button type="submit">Salva</Button>
-          </div>
-        </div>
-        <div className="border-t pt-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium text-gray-700">Azioni irreversibili</p>
-            <p className="text-xs text-gray-400">Anonimizza mantiene lo storico turni; Elimina cancella tutto.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" type="button" onClick={anonimizza}>Anonimizza (GDPR)</Button>
-            <Button variant="danger" size="sm" type="button" onClick={elimina}>Elimina</Button>
           </div>
         </div>
       </form>

@@ -43,7 +43,7 @@ export default function CalendarioProgrammazionePostiPage() {
     setTurni(Array.isArray(trn) ? trn : [])
     setPosti(Array.isArray(pst) ? pst : [])
     setTemplates(Array.isArray(tp) ? tp : [])
-    setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.ruolo === 'dipendente' && u.attivo) : [])
+    setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.includi_in_turni && u.attivo) : [])
   }, [periodo])
 
   useEffect(() => { caricaDati() }, [caricaDati])

@@ -64,7 +64,7 @@ export default function CalendarioPage() {
       fetch('/api/posti'),
     ])
     const [utenti, tmpl, trn, pst] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json()])
-    setDipendenti(utenti.filter((u: Profile) => u.ruolo === 'dipendente' && u.attivo))
+    setDipendenti(utenti.filter((u: Profile) => u.includi_in_turni && u.attivo))
     setTemplates(tmpl)
     setTurni(trn)
     setPosti(pst)
