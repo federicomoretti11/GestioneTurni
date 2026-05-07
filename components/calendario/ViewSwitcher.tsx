@@ -26,7 +26,7 @@ export function ViewSwitcher({ attiva, hrefDipendente, hrefPosto }: {
             : 'text-slate-500 hover:text-slate-700'
         }`}
       >
-        Per posto
+        Per sito
       </Link>
     </div>
   )
