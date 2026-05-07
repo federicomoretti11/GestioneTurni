@@ -69,7 +69,7 @@ export default function LoginPage() {
       <aside className="hidden lg:flex relative bg-slate-900 text-white flex-col p-8 xl:p-10">
         <div className="relative z-10 flex flex-col h-full max-w-sm">
           <div className="flex justify-center">
-            <Logo size={40} variant="light" />
+            <Logo size={40} variant="white" />
           </div>
 
           <div className="flex-1 flex flex-col justify-center py-12">
