@@ -44,7 +44,7 @@ export default function LoginPage() {
     setError(null)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError('Email o password non validi'); setLoading(false); return }
-    window.location.href = '/'
+    window.location.href = '/home'
   }
 
   async function handleReset(e: FormEvent) {
