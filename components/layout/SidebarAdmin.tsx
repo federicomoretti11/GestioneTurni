@@ -14,6 +14,7 @@ const BASE_ITEMS = [
   {                             label: 'Task',           href: '/admin/task',                              icon: '✅' },
   {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
   {                             label: 'Impostazioni',   href: '/admin/impostazioni',                      icon: '⚙️' },
+  { section: 'Account',         label: 'Profilo',        href: '/admin/profilo',                           icon: '👤' },
 ]
 
 const SUPER_ADMIN_ITEMS = [

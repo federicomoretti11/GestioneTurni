@@ -16,6 +16,7 @@ const BASE_ITEMS = [
   {                             label: 'Documenti',      href: '/manager/documenti',                 icon: '🗄️' },
   {                             label: 'Modelli turno',  href: '/manager/template',                  icon: '🏷️' },
   {                             label: 'Impostazioni',   href: '/manager/impostazioni',              icon: '⚙️' },
+  { section: 'Account',         label: 'Profilo',        href: '/manager/profilo',                   icon: '👤' },
 ]
 
 export function SidebarManager() {
