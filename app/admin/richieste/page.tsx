@@ -7,12 +7,14 @@ interface Conflitto { data: string; turno_id: string; ora_inizio: string; ora_fi
 import { CardRichiesta } from '@/components/richieste/CardRichiesta'
 import { ModaleApprovaRifiuta } from '@/components/richieste/ModaleApprovaRifiuta'
 import { ModaleConflitti } from '@/components/richieste/ModaleConflitti'
+import { AlertErrore } from '@/components/ui/AlertErrore'
 
 const STATI_ATTIVI = ['pending', 'approvata_manager']
 
 export default function RichiesteAdminPage() {
   const [richieste, setRichieste] = useState<Richiesta[]>([])
   const [loading, setLoading] = useState(true)
+  const [errore, setErrore] = useState('')
   const [filtroStato, setFiltroStato] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [modale, setModale] = useState<{ richiesta: Richiesta; azione: 'approva' | 'rifiuta' | 'convalida' } | null>(null)
@@ -24,11 +26,13 @@ export default function RichiesteAdminPage() {
   const supabase = createClient()
 
   const carica = useCallback(async () => {
+    setErrore('')
     const params = new URLSearchParams()
     if (filtroStato) params.set('stato', filtroStato)
     if (filtroTipo) params.set('tipo', filtroTipo)
     const res = await fetch(`/api/richieste?${params}`)
     if (res.ok) setRichieste(await res.json())
+    else setErrore('Errore nel caricamento delle richieste.')
     setLoading(false)
   }, [filtroStato, filtroTipo])
 
@@ -41,6 +45,7 @@ export default function RichiesteAdminPage() {
     return () => { supabase.removeChannel(channel) }
   }, [carica])
 
+  const [storicoLimit, setStoricoLimit] = useState(10)
   const daDec = richieste.filter(r => STATI_ATTIVI.includes(r.stato))
   const storico = richieste.filter(r => !STATI_ATTIVI.includes(r.stato))
 
@@ -104,7 +109,22 @@ export default function RichiesteAdminPage() {
         </select>
       </div>
 
-      {loading && <p className="text-slate-400 text-sm">Caricamento...</p>}
+      {errore && <AlertErrore messaggio={errore} onRetry={carica} />}
+
+      {loading && (
+        <div className="space-y-3">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-white rounded-xl border border-slate-900/20 p-4 animate-pulse space-y-3">
+              <div className="flex justify-between">
+                <div className="h-4 bg-gray-200 rounded w-1/4" />
+                <div className="h-5 bg-gray-200 rounded-full w-20" />
+              </div>
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
+              <div className="h-3 bg-gray-200 rounded w-1/3" />
+            </div>
+          ))}
+        </div>
+      )}
 
       {daDec.length > 0 && (
         <section>
@@ -121,10 +141,16 @@ export default function RichiesteAdminPage() {
         <section>
           <h2 className="text-[11px] font-semibold text-slate-400 mb-3 uppercase tracking-[0.14em]">Storico</h2>
           <div className="space-y-3">
-            {storico.map(r => (
+            {storico.slice(0, storicoLimit).map(r => (
               <CardRichiesta key={r.id} richiesta={r} actions={actions(r)} />
             ))}
           </div>
+          {storico.length > storicoLimit && (
+            <button onClick={() => setStoricoLimit(l => l + 10)}
+              className="mt-3 w-full py-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 transition">
+              Carica altri ({storico.length - storicoLimit} rimanenti)
+            </button>
+          )}
         </section>
       )}
 

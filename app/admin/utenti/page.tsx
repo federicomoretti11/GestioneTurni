@@ -1,14 +1,23 @@
-﻿import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 
-export default async function UtentiPage() {
+const PAGE_SIZE = 20
+
+export default async function UtentiPage({ searchParams }: { searchParams: { page?: string } }) {
+  const page = Math.max(1, Number(searchParams.page) || 1)
+  const from = (page - 1) * PAGE_SIZE
+  const to = from + PAGE_SIZE - 1
+
   const supabase = createClient()
-  const { data: utenti } = await supabase
+  const { data: utenti, count } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('cognome')
+    .range(from, to)
+
+  const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
   return (
     <div className="space-y-4">
@@ -48,6 +57,28 @@ export default async function UtentiPage() {
             ))}
           </tbody>
         </table>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+            <p className="text-[12px] text-slate-400">
+              {from + 1}–{Math.min(to + 1, count ?? 0)} di {count} utenti
+            </p>
+            <div className="flex items-center gap-1">
+              {page > 1 && (
+                <Link href={`?page=${page - 1}`}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+                  ← Precedente
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link href={`?page=${page + 1}`}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+                  Successiva →
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

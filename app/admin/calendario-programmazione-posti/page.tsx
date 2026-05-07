@@ -14,6 +14,9 @@ import { getDaysBetween } from '@/lib/utils/date'
 import { isTurnoBloccato } from '@/lib/utils/turni'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { useToast } from '@/components/ui/ToastProvider'
+import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
+import { AlertErrore } from '@/components/ui/AlertErrore'
 
 export default function CalendarioProgrammazionePostiPage() {
   const { mostra } = useToast()
@@ -29,21 +32,31 @@ export default function CalendarioProgrammazionePostiPage() {
   const [modaleSvuota, setModaleSvuota] = useState(false)
   const [modaleAggiunta, setModaleAggiunta] = useState<{ payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }; conflitti: { dipendente: string; orario: string }[]; data: string; dipendenteNome: string } | null>(null)
   const [loadingAzione, setLoadingAzione] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [errore, setErrore] = useState('')
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
   const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
 
   const caricaDati = useCallback(async () => {
-    const [trn, pst, tp, utenti] = await Promise.all([
-      fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
-      fetch('/api/posti').then(r => r.json()),
-      fetch('/api/template').then(r => r.json()),
-      fetch('/api/utenti').then(r => r.json()),
-    ])
-    setTurni(Array.isArray(trn) ? trn : [])
-    setPosti(Array.isArray(pst) ? pst : [])
-    setTemplates(Array.isArray(tp) ? tp : [])
-    setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.includi_in_turni && u.attivo) : [])
+    setLoading(true)
+    setErrore('')
+    try {
+      const [trn, pst, tp, utenti] = await Promise.all([
+        fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
+        fetch('/api/posti').then(r => r.json()),
+        fetch('/api/template').then(r => r.json()),
+        fetch('/api/utenti').then(r => r.json()),
+      ])
+      setTurni(Array.isArray(trn) ? trn : [])
+      setPosti(Array.isArray(pst) ? pst : [])
+      setTemplates(Array.isArray(tp) ? tp : [])
+      setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.includi_in_turni && u.attivo) : [])
+    } catch {
+      setErrore('Errore nel caricamento dei dati.')
+    } finally {
+      setLoading(false)
+    }
   }, [periodo])
 
   useEffect(() => { caricaDati() }, [caricaDati])
@@ -214,22 +227,28 @@ export default function CalendarioProgrammazionePostiPage() {
         </div>
       )}
 
+      {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
+
       <div className="hidden md:block bg-white rounded-xl border border-slate-900/20 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
-        <GrigliaCalendarioPosti
-          giorni={giorni}
-          turni={turniFiltrati}
-          posti={postiFiltrati}
-          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
-          onEditTurno={turno => setModale({ open: true, turno })}
-        />
+        {loading ? <SkeletonCalendario righe={3} colonne={giorni.length} /> : (
+          <GrigliaCalendarioPosti
+            giorni={giorni}
+            turni={turniFiltrati}
+            posti={postiFiltrati}
+            onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+            onEditTurno={turno => setModale({ open: true, turno })}
+          />
+        )}
       </div>
       <div className="md:hidden">
-        <GrigliaCalendarioPostiMobile
-          giorni={giorni}
-          turni={turniFiltrati}
-          onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
-          onEditTurno={turno => setModale({ open: true, turno })}
-        />
+        {loading ? <SkeletonCalendarioMobile /> : (
+          <GrigliaCalendarioPostiMobile
+            giorni={giorni}
+            turni={turniFiltrati}
+            onAddTurno={(postoId, data) => setModale({ open: true, postoId, data })}
+            onEditTurno={turno => setModale({ open: true, turno })}
+          />
+        )}
       </div>
 
       <ModaleTurno

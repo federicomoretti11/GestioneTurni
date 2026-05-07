@@ -6,6 +6,9 @@ import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCal
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
+import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
+import { AlertErrore } from '@/components/ui/AlertErrore'
 
 export default function CalendarioPostiPage() {
   const [vista, setVista] = useState<'settimana' | 'mese'>('settimana')
@@ -13,19 +16,29 @@ export default function CalendarioPostiPage() {
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [errore, setErrore] = useState('')
 
   const giorni = vista === 'settimana'
     ? getWeekDays(dataCorrente)
     : getMonthDays(dataCorrente.getFullYear(), dataCorrente.getMonth())
 
   const caricaDati = useCallback(async () => {
-    const [turniRes, postiRes] = await Promise.all([
-      fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
-      fetch('/api/posti'),
-    ])
-    const [trn, pst] = await Promise.all([turniRes.json(), postiRes.json()])
-    setTurni(Array.isArray(trn) ? trn : [])
-    setPosti(Array.isArray(pst) ? pst : [])
+    setLoading(true)
+    setErrore('')
+    try {
+      const [turniRes, postiRes] = await Promise.all([
+        fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
+        fetch('/api/posti'),
+      ])
+      const [trn, pst] = await Promise.all([turniRes.json(), postiRes.json()])
+      setTurni(Array.isArray(trn) ? trn : [])
+      setPosti(Array.isArray(pst) ? pst : [])
+    } catch {
+      setErrore('Errore nel caricamento dei dati.')
+    } finally {
+      setLoading(false)
+    }
   }, [dataCorrente, vista])
 
   useEffect(() => { caricaDati() }, [caricaDati])
@@ -88,11 +101,17 @@ export default function CalendarioPostiPage() {
         </div>
       )}
 
+      {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
+
       <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-900/20 p-4">
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiFiltrati} />
+        {loading ? <SkeletonCalendario righe={3} colonne={giorni.length} /> : (
+          <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiFiltrati} />
+        )}
       </div>
       <div className="md:hidden">
-        <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        {loading ? <SkeletonCalendarioMobile /> : (
+          <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        )}
       </div>
     </div>
   )

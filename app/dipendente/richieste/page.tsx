@@ -4,10 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import type { Richiesta } from '@/lib/types'
 import { CardRichiesta } from '@/components/richieste/CardRichiesta'
 import { FormNuovaRichiesta } from '@/components/richieste/FormNuovaRichiesta'
+import { AlertErrore } from '@/components/ui/AlertErrore'
 
 export default function RichiesteDipendentePage() {
   const [richieste, setRichieste] = useState<Richiesta[]>([])
   const [loading, setLoading] = useState(true)
+  const [limite, setLimite] = useState(15)
   const [errore, setErrore] = useState('')
   const [formAperto, setFormAperto] = useState(false)
   const [tipoForm, setTipoForm] = useState<'ferie' | 'permesso' | 'malattia' | null>(null)
@@ -81,16 +83,35 @@ export default function RichiesteDipendentePage() {
         </div>
       </div>
 
-      {errore && <p className="text-red-600 text-sm">{errore}</p>}
-      {loading && <p className="text-slate-400 text-sm">Caricamento...</p>}
+      {errore && <AlertErrore messaggio={errore} onRetry={carica} />}
+      {loading && (
+        <div className="space-y-3">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-white rounded-xl border border-slate-900/20 p-4 animate-pulse space-y-3">
+              <div className="flex justify-between">
+                <div className="h-4 bg-gray-200 rounded w-1/4" />
+                <div className="h-5 bg-gray-200 rounded-full w-20" />
+              </div>
+              <div className="h-3 bg-gray-200 rounded w-1/2" />
+              <div className="h-3 bg-gray-200 rounded w-1/3" />
+            </div>
+          ))}
+        </div>
+      )}
 
       {!loading && richieste.length === 0 && (
         <p className="text-slate-400 text-sm text-center py-8">Nessuna richiesta inviata.</p>
       )}
 
-      {richieste.map(r => (
+      {richieste.slice(0, limite).map(r => (
         <CardRichiesta key={r.id} richiesta={r} onCancella={cancella} />
       ))}
+      {richieste.length > limite && (
+        <button onClick={() => setLimite(l => l + 15)}
+          className="w-full py-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 transition">
+          Carica altri ({richieste.length - limite} rimanenti)
+        </button>
+      )}
 
       {formAperto && tipoForm && (
         <FormNuovaRichiesta

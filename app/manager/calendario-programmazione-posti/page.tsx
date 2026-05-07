@@ -7,22 +7,35 @@ import { HeaderProgrammazione } from '@/components/programmazione/HeaderProgramm
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
+import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
+import { SkeletonCalendarioMobile } from '@/components/ui/SkeletonCalendarioMobile'
+import { AlertErrore } from '@/components/ui/AlertErrore'
 
 export default function ManagerProgrammazionePostiPage() {
   const [periodo, setPeriodo] = useState<Periodo>(() => presetPeriodo('mese-corrente'))
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [errore, setErrore] = useState('')
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
 
   const caricaDati = useCallback(async () => {
-    const [trn, pst] = await Promise.all([
-      fetch(`/api/turni?stato=bozza&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
-      fetch('/api/posti').then(r => r.json()),
-    ])
-    setTurni(Array.isArray(trn) ? trn : [])
-    setPosti(Array.isArray(pst) ? pst : [])
+    setLoading(true)
+    setErrore('')
+    try {
+      const [trn, pst] = await Promise.all([
+        fetch(`/api/turni?stato=bozza&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
+        fetch('/api/posti').then(r => r.json()),
+      ])
+      setTurni(Array.isArray(trn) ? trn : [])
+      setPosti(Array.isArray(pst) ? pst : [])
+    } catch {
+      setErrore('Errore nel caricamento dei dati.')
+    } finally {
+      setLoading(false)
+    }
   }, [periodo])
 
   useEffect(() => { caricaDati() }, [caricaDati])
@@ -80,11 +93,17 @@ export default function ManagerProgrammazionePostiPage() {
         </div>
       )}
 
+      {errore && <AlertErrore messaggio={errore} onRetry={caricaDati} />}
+
       <div className="hidden md:block bg-white rounded-xl border border-slate-900/20 p-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
-        <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiFiltrati} />
+        {loading ? <SkeletonCalendario righe={3} colonne={giorni.length} /> : (
+          <GrigliaCalendarioPosti giorni={giorni} turni={turniFiltrati} posti={postiFiltrati} />
+        )}
       </div>
       <div className="md:hidden">
-        <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        {loading ? <SkeletonCalendarioMobile /> : (
+          <GrigliaCalendarioPostiMobile giorni={giorni} turni={turniFiltrati} />
+        )}
       </div>
     </div>
   )
