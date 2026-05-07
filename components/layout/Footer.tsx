@@ -5,9 +5,9 @@ export function Footer() {
     <footer className="border-t border-slate-100 bg-white px-6 py-5">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
         <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-center sm:text-left">
-          <span className="font-medium text-slate-500">Opero Hub S.r.l.</span>
+          <span className="font-medium text-slate-500">S.I.A. S.r.l.s.</span>
           <span className="hidden sm:inline text-slate-300">·</span>
-          <span>P.IVA: [LA TUA P.IVA]</span>
+          <span>P.IVA: 14840881008</span>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy Policy</Link>
