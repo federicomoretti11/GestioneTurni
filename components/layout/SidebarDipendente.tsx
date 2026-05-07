@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
+import { createClient } from '@/lib/supabase/client'
 
 const BASE_ITEMS = [
   { label: 'Home',         href: '/home',                icon: '🏠' },
@@ -14,7 +15,19 @@ const BASE_ITEMS = [
 
 export function SidebarDipendente() {
   const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  const [tenantName, setTenantName] = useState<string>('')
+  useEffect(() => {
+    setMounted(true)
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from('profiles').select('tenants(nome)').eq('id', user.id).single()
+        .then(({ data }) => {
+          const t = data?.tenants as { nome?: string } | null
+          if (t?.nome) setTenantName(t.nome)
+        })
+    })
+  }, [])
   const count = useRichiesteCount()
   const pathname = usePathname()
 
@@ -25,5 +38,5 @@ export function SidebarDipendente() {
     }
     return it
   })
-  return <Sidebar items={items} title="I Miei Turni" ruolo="dipendente" />
+  return <Sidebar items={items} title="I Miei Turni" ruolo="dipendente" tenantName={tenantName} />
 }

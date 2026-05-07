@@ -13,9 +13,10 @@ interface HeaderProps {
   ruolo: RuoloUtente
   userId: string
   navItems?: NavItem[]
+  tenantName?: string
 }
 
-export function Header({ nomeUtente, ruolo, userId, navItems }: HeaderProps) {
+export function Header({ nomeUtente, ruolo, userId, navItems, tenantName }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -32,7 +33,11 @@ export function Header({ nomeUtente, ruolo, userId, navItems }: HeaderProps) {
         {navItems && navItems.length > 0 && (
           <MobileMenu items={navItems} nomeUtente={nomeUtente} onLogout={handleLogout} />
         )}
-        <span className="text-sm text-gray-500 capitalize md:block hidden">{ruolo}</span>
+        <div className="hidden md:flex items-center gap-1.5 text-sm text-gray-500">
+          {tenantName && <span className="font-medium text-gray-700">{tenantName}</span>}
+          {tenantName && <span className="text-gray-300">/</span>}
+          <span className="capitalize">{ruolo}</span>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <Notifiche userId={userId} ruolo={ruolo} />

@@ -14,7 +14,7 @@ export function Footer() {
           <Link href="/cookie-policy" className="hover:text-slate-600 transition-colors">Cookie Policy</Link>
           <Link href="/contatti" className="hover:text-slate-600 transition-colors">Contatti</Link>
         </div>
-        <span className="text-slate-300 text-center">© 2025 Opero Hub. Tutti i diritti riservati.</span>
+        <span className="text-slate-300 text-center">© 2026 Opero Hub. Tutti i diritti riservati.</span>
       </div>
     </footer>
   )

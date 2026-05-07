@@ -24,13 +24,18 @@ const SUPER_ADMIN_ITEMS = [
 export function SidebarAdmin() {
   const [mounted, setMounted] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [tenantName, setTenantName] = useState<string>('')
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
-      supabase.from('profiles').select('is_super_admin').eq('id', user.id).single()
-        .then(({ data }) => { if (data?.is_super_admin) setIsSuperAdmin(true) })
+      supabase.from('profiles').select('is_super_admin, tenants(nome)').eq('id', user.id).single()
+        .then(({ data }) => {
+          if (data?.is_super_admin) setIsSuperAdmin(true)
+          const t = data?.tenants as { nome?: string } | null
+          if (t?.nome) setTenantName(t.nome)
+        })
     })
   }, [])
   const bozza = useBozzaCount()
@@ -51,5 +56,5 @@ export function SidebarAdmin() {
     }
     return it
   })
-  return <Sidebar items={items} title="Opero Hub" ruolo="admin" logoSrc="/logo-white.svg" />
+  return <Sidebar items={items} title="Opero Hub" ruolo="admin" tenantName={tenantName} />
 }

@@ -109,13 +109,20 @@ export async function PATCH(request: Request) {
   if (!user) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
 
   const body = await request.json()
-  const { id, attivo } = body
+  const { id, attivo, nome } = body
   if (!id) return NextResponse.json({ error: 'id obbligatorio' }, { status: 400 })
+
+  const updates: Record<string, unknown> = {}
+  if (attivo !== undefined) updates.attivo = attivo
+  if (nome !== undefined) {
+    if (!nome.trim()) return NextResponse.json({ error: 'nome non può essere vuoto' }, { status: 400 })
+    updates.nome = nome.trim()
+  }
 
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('tenants')
-    .update({ attivo })
+    .update(updates)
     .eq('id', id)
     .select()
     .single()

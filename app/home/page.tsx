@@ -291,19 +291,19 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
 
       {/* ── TopBar ── */}
-      <div className="h-14 bg-white/80 backdrop-blur border-b border-slate-200/70 flex items-center gap-3 px-4 md:px-6 sticky top-0 z-30">
-        {/* Sinistra: logo + breadcrumb */}
-        <div className="flex items-center gap-2 shrink-0">
-          <Logo size={20} variant="dark" />
-          <span className="text-[14px] font-semibold tracking-tight text-slate-900">Opero Hub</span>
-          <span className="hidden sm:block text-slate-300 mx-0.5">/</span>
-          <span className="hidden sm:block text-[13px] text-slate-500 capitalize">{isSuperAdmin ? 'Super Admin' : ruolo}</span>
+      <div className="h-20 bg-white/80 backdrop-blur border-b border-slate-200/70 flex items-center px-4 md:px-6 sticky top-0 z-30">
+        {/* Sinistra: ruolo */}
+        <div className="flex items-center shrink-0 w-1/3">
+          <span className="text-[13px] text-slate-500 capitalize">{isSuperAdmin ? 'Super Admin' : ruolo}</span>
         </div>
 
-        <div className="flex-1" />
+        {/* Centro: logo */}
+        <div className="flex-1 flex justify-center">
+          <img src="/logo-extended-dark.svg" alt="Opero Hub" className="h-16 w-auto" />
+        </div>
 
-{/* Destra: notifiche + avatar + logout */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        {/* Destra: notifiche + avatar + logout */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 w-1/3 justify-end">
           <Notifiche userId={user.id} ruolo={ruolo} />
           <Avatar nome={profile.nome} cognome={profile.cognome} size={28} />
           <HomeLogout />

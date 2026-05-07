@@ -1,31 +1,17 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Logo } from '@/components/ui/Logo'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string; altHrefs?: string[] }
 
-interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string }
+interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string; tenantName?: string }
 
-export function Sidebar({ items, title, ruolo, logoSrc }: SidebarProps) {
+export function Sidebar({ items, title, ruolo, tenantName }: SidebarProps) {
   const pathname = usePathname()
   return (
     <aside className="hidden md:flex flex-col w-56 bg-slate-900 text-white flex-shrink-0">
-      <div className="px-4 py-4 border-b border-white/5">
-        {logoSrc ? (
-          <div className="flex items-center gap-2.5">
-            <Logo size={28} variant="white" />
-            <div>
-              <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
-              {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="text-[13px] font-bold tracking-tight text-white">{title}</div>
-            {ruolo && <div className="text-[10px] text-slate-500 mt-0.5 capitalize">{ruolo}</div>}
-          </>
-        )}
+      <div className="px-4 pt-4 pb-3 border-b border-white/5">
+        <img src="/logo-extended-white.svg" alt="Opero Hub" className="h-11 w-auto" />
       </div>
       <nav className="flex-1 p-2">
         {items.map((item, i) => {

@@ -22,7 +22,7 @@ const IconBack     = (p: { size?: number }) => <I {...p}><path d="M15 6l-6 6 6 6
 const BULLETS = [
   { icon: IconCalendar, label: 'Pianificazione turni' },
   { icon: IconPin,      label: 'Check-in GPS' },
-  { icon: IconCheck,    label: 'Gestione richieste (ferie, permessi)' },
+  { icon: IconCheck,    label: 'Gestione richieste' },
   { icon: IconDoc,      label: 'Documenti aziendali' },
   { icon: IconChat,     label: 'Task e comunicazioni interne' },
 ]
@@ -67,9 +67,9 @@ export default function LoginPage() {
 
       {/* ── Colonna sinistra: marketing panel (solo desktop) ── */}
       <aside className="hidden lg:flex relative bg-slate-900 text-white flex-col p-8 xl:p-10">
-        <div className="relative z-10 flex flex-col h-full max-w-sm">
-          <div className="flex justify-center">
-            <Logo size={40} variant="white" />
+        <div className="relative z-10 flex flex-col h-full max-w-sm mx-auto w-full">
+          <div className="flex justify-center items-center">
+            <img src="/logo-extended-white.svg" alt="Opero Hub" className="h-28 w-auto mx-auto" />
           </div>
 
           <div className="flex-1 flex flex-col justify-center py-12">
@@ -101,19 +101,18 @@ export default function LoginPage() {
             </ul>
           </div>
 
-          <footer className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500 leading-relaxed">
-            © 2025 Opero Hub — S.I.A. S.r.l.s.<br />
-            P.IVA 14840881008
-          </footer>
         </div>
+        <footer className="absolute bottom-6 left-0 right-0 px-8 xl:px-10 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500 whitespace-nowrap text-center">
+          © 2026 Opero Hub — S.I.A. S.r.l.s. — P.IVA 14840881008
+        </footer>
       </aside>
 
       {/* ── Colonna destra: form ── */}
       <section className="flex flex-col flex-1 bg-[#FAFAF8] min-h-screen">
         {/* Header mobile */}
-        <header className="lg:hidden flex items-center px-5 py-5 border-b border-slate-200">
+        <header className="lg:hidden flex items-center gap-2 px-5 py-5 border-b border-slate-200">
           <Logo size={28} variant="dark" />
-          <span className="ml-2 text-[15px] font-semibold tracking-tight text-slate-900">Opero Hub</span>
+          <span className="text-[15px] font-semibold tracking-tight text-slate-900">Opero Hub</span>
         </header>
 
         <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-10 sm:py-16">
@@ -231,7 +230,7 @@ export default function LoginPage() {
 
         {/* Footer mobile */}
         <footer className="lg:hidden px-5 py-5 border-t border-slate-200 font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-400 text-center leading-relaxed">
-          © 2025 Opero Hub — S.I.A. S.r.l.s.<br />P.IVA 14840881008
+          © 2026 Opero Hub — S.I.A. S.r.l.s.<br />P.IVA 14840881008
         </footer>
       </section>
     </div>

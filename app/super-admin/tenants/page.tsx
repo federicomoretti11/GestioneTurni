@@ -16,6 +16,9 @@ export default function TenantsPage() {
   const [saving, setSaving] = useState(false)
   const [errore, setErrore] = useState('')
   const [eliminando, setEliminando] = useState<string | null>(null)
+  const [modificando, setModificando] = useState<string | null>(null)
+  const [nomeEdit, setNomeEdit] = useState('')
+  const [salvandoEdit, setSalvandoEdit] = useState(false)
   const [form, setForm] = useState({
     nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '',
   })
@@ -67,6 +70,23 @@ export default function TenantsPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: tenant.id, attivo: !tenant.attivo }),
     })
+    carica()
+  }
+
+  function avviaModifica(tenant: Tenant) {
+    setModificando(tenant.id)
+    setNomeEdit(tenant.nome)
+  }
+
+  async function salvaModifica(id: string) {
+    setSalvandoEdit(true)
+    await fetch('/api/super-admin/tenants', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, nome: nomeEdit }),
+    })
+    setSalvandoEdit(false)
+    setModificando(null)
     carica()
   }
 
@@ -161,7 +181,17 @@ export default function TenantsPage() {
             <tbody className="divide-y divide-gray-100">
               {tenants.map(t => (
                 <tr key={t.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{t.nome}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">
+                    {modificando === t.id ? (
+                      <input
+                        autoFocus
+                        value={nomeEdit}
+                        onChange={e => setNomeEdit(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') salvaModifica(t.id); if (e.key === 'Escape') setModificando(null) }}
+                        className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
+                      />
+                    ) : t.nome}
+                  </td>
                   <td className="px-4 py-3 font-mono text-gray-500 text-xs">{t.slug}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {new Date(t.created_at).toLocaleDateString('it-IT')}
@@ -174,19 +204,33 @@ export default function TenantsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
-                    <button
-                      onClick={() => toggleAttivo(t)}
-                      className="text-xs text-gray-500 hover:text-gray-800 underline"
-                    >
-                      {t.attivo ? 'Disattiva' : 'Attiva'}
-                    </button>
-                    <button
-                      onClick={() => elimina(t)}
-                      disabled={eliminando === t.id}
-                      className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40"
-                    >
-                      {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
-                    </button>
+                    {modificando === t.id ? (
+                      <>
+                        <button onClick={() => salvaModifica(t.id)} disabled={salvandoEdit}
+                          className="text-xs text-blue-600 hover:text-blue-800 underline disabled:opacity-40">
+                          {salvandoEdit ? 'Salvo…' : 'Salva'}
+                        </button>
+                        <button onClick={() => setModificando(null)}
+                          className="text-xs text-gray-500 hover:text-gray-800 underline">
+                          Annulla
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => avviaModifica(t)}
+                          className="text-xs text-blue-500 hover:text-blue-700 underline">
+                          Modifica
+                        </button>
+                        <button onClick={() => toggleAttivo(t)}
+                          className="text-xs text-gray-500 hover:text-gray-800 underline">
+                          {t.attivo ? 'Disattiva' : 'Attiva'}
+                        </button>
+                        <button onClick={() => elimina(t)} disabled={eliminando === t.id}
+                          className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40">
+                          {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

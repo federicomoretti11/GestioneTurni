@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { useBozzaCount } from './BozzaCounter'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
+import { createClient } from '@/lib/supabase/client'
 
 const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                                              icon: '🏠' },
@@ -21,7 +22,19 @@ const BASE_ITEMS = [
 
 export function SidebarManager() {
   const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  const [tenantName, setTenantName] = useState<string>('')
+  useEffect(() => {
+    setMounted(true)
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from('profiles').select('tenants(nome)').eq('id', user.id).single()
+        .then(({ data }) => {
+          const t = data?.tenants as { nome?: string } | null
+          if (t?.nome) setTenantName(t.nome)
+        })
+    })
+  }, [])
   const bozza = useBozzaCount()
   const richieste = useRichiesteCount()
   const pathname = usePathname()
@@ -37,5 +50,5 @@ export function SidebarManager() {
     }
     return it
   })
-  return <Sidebar items={items} title="Opero Hub" ruolo="manager" logoSrc="/logo-white.svg" />
+  return <Sidebar items={items} title="Opero Hub" ruolo="manager" tenantName={tenantName} />
 }
