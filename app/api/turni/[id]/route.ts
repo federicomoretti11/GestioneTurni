@@ -7,8 +7,10 @@ import { requireTenantId } from '@/lib/tenant'
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
   const tenantId = requireTenantId()
-  const body = await request.json()
+  let body: Record<string, unknown>
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
 
   // Snapshot prima della modifica per confronto
   const { data: prev } = await supabase
@@ -74,6 +76,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
   const tenantId = requireTenantId()
 
   const { data: turno } = await supabase

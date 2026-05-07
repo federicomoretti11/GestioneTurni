@@ -51,13 +51,16 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
   const tenantId = requireTenantId()
-  const body = await request.json()
+  let body: { tipo?: string; data_inizio?: string; data_fine?: string; permesso_tipo?: string; ora_inizio?: string; ora_fine?: string; turno_id?: string; note_dipendente?: string }
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   const { tipo, data_inizio, data_fine, permesso_tipo, ora_inizio, ora_fine,
           turno_id, note_dipendente } = body
 
+  if (!tipo) return NextResponse.json({ error: 'tipo obbligatorio' }, { status: 400 })
+
   // Validazione lead time (non si applica a sblocco_checkin)
   if (tipo !== 'sblocco_checkin') {
-    const leadError = validateLeadTime(tipo, data_inizio)
+    const leadError = validateLeadTime(tipo as import('@/lib/types').TipoRichiesta, data_inizio ?? '')
     if (leadError) return NextResponse.json({ error: leadError }, { status: 422 })
   }
 
@@ -105,9 +108,9 @@ export async function POST(request: Request) {
   const nome = profilo ? `${profilo.nome} ${profilo.cognome}` : 'Dipendente'
 
   if (tipo === 'malattia') {
-    notificaMalattiaComunicata({ tipo: 'malattia', dataInizio: data_inizio, nomeDipendente: nome, tenantId })
+    await notificaMalattiaComunicata({ tipo: 'malattia', dataInizio: data_inizio ?? '', nomeDipendente: nome, tenantId })
   } else {
-    notificaRichiestaCreata({ tipo, dataInizio: data_inizio, dataFine: data_fine ?? null, nomeDipendente: nome, tenantId })
+    await notificaRichiestaCreata({ tipo: tipo as import('@/lib/types').TipoRichiesta, dataInizio: data_inizio ?? '', dataFine: data_fine ?? null, nomeDipendente: nome, tenantId })
   }
 
   return NextResponse.json(data, { status: 201 })

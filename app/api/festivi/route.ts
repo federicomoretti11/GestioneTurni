@@ -4,6 +4,8 @@ import { requireTenantId } from '@/lib/tenant'
 
 export async function GET(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
   const { searchParams } = new URL(request.url)
   const anno = searchParams.get('anno')
 
@@ -18,8 +20,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
   const tenantId = requireTenantId()
-  const body = await request.json()
+  let body: { data?: string; nome?: string; tipo?: string }
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   if (!body.data || !body.nome) {
     return NextResponse.json({ error: 'data e nome sono obbligatori' }, { status: 400 })
   }

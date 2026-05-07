@@ -3,7 +3,14 @@ import { NextResponse } from 'next/server'
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
-  const body = await request.json()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const { data: profilo } = await supabase.from('profiles').select('ruolo').eq('id', user.id).single()
+  if (profilo?.ruolo !== 'admin' && profilo?.ruolo !== 'manager') {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  }
+  let body: Record<string, unknown>
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   const { data, error } = await supabase
     .from('posti_di_servizio')
     .update({
@@ -24,6 +31,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const { data: profilo } = await supabase.from('profiles').select('ruolo').eq('id', user.id).single()
+  if (profilo?.ruolo !== 'admin' && profilo?.ruolo !== 'manager') {
+    return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  }
   const { error } = await supabase.from('posti_di_servizio').delete().eq('id', params.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return new NextResponse(null, { status: 204 })

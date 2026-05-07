@@ -22,7 +22,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
   }
   const tenantId = requireTenantId()
-  const body = await request.json()
+  let body: Record<string, unknown>
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   const { data, error } = await supabase
     .from('turni_template')
     .insert({

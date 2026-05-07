@@ -42,8 +42,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     .from('profiles').select('ruolo').eq('id', user.id).single()
   const ruolo = profilo?.ruolo as RuoloUtente
 
-  const body: { azione: AzioneRichiesta; motivazione?: string; sovrascrivi_conflitti?: boolean }
-    = await request.json()
+  let body: { azione: AzioneRichiesta; motivazione?: string; sovrascrivi_conflitti?: boolean }
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   const { azione, motivazione, sovrascrivi_conflitti } = body
 
   // Leggi richiesta corrente
@@ -134,21 +134,22 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
   }
 
-  // Notifiche non-bloccanti
+  // Operazioni background — tutte attese prima di rispondere (Vercel termina la funzione al return)
   const profile = updated.profile as Profile | undefined
   const nomeRichiedente = profile ? `${profile.nome} ${profile.cognome}` : 'Dipendente'
 
+  const ops: Promise<unknown>[] = []
+
   if (nuovoStato === 'approvata_manager') {
-    notificaRichiestaApprovataManager({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId })
+    ops.push(notificaRichiestaApprovataManager({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId }))
   } else if (nuovoStato === 'approvata') {
-    notificaRichiestaApprovata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, dataFine: richiesta.data_fine, tenantId })
+    ops.push(notificaRichiestaApprovata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, dataFine: richiesta.data_fine, tenantId }))
   } else if (nuovoStato === 'rifiutata') {
-    notificaRichiestaRifiutata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, motivazione: motivazione!, tenantId })
+    ops.push(notificaRichiestaRifiutata({ dipendenteId: richiesta.dipendente_id, tipo: richiesta.tipo, motivazione: motivazione!, tenantId }))
   } else if (nuovoStato === 'annullata') {
-    notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId })
+    ops.push(notificaRichiestaCancellata({ tipo: richiesta.tipo, dataInizio: richiesta.data_inizio, nomeDipendente: nomeRichiedente, tenantId }))
   }
 
-  // Email non-bloccante
   const [emailOn, { data: userData }] = await Promise.all([
     isEmailAbilitata(),
     createAdminClient().auth.admin.getUserById(richiesta.dipendente_id),
@@ -157,28 +158,30 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const emailDipendente = userData?.user?.email
   if (emailOn && emailDipendente) {
     if (nuovoStato === 'approvata' && richiesta.tipo === 'sblocco_checkin') {
-      sendEmailSbloccoApprovato({ toEmail: emailDipendente, dataTurno: richiesta.data_inizio })
+      ops.push(sendEmailSbloccoApprovato({ toEmail: emailDipendente, dataTurno: richiesta.data_inizio }))
     } else if (nuovoStato === 'approvata') {
-      sendEmailRichiestaApprovata({
+      ops.push(sendEmailRichiestaApprovata({
         toEmail: emailDipendente,
         tipo: richiesta.tipo,
         dataInizio: richiesta.data_inizio,
         dataFine: richiesta.data_fine,
-      })
+      }))
     } else if (nuovoStato === 'rifiutata' && motivazione) {
-      sendEmailRichiestaRifiutata({
+      ops.push(sendEmailRichiestaRifiutata({
         toEmail: emailDipendente,
         tipo: richiesta.tipo,
         motivazione,
-      })
+      }))
     }
   }
 
-  logAzione({
+  ops.push(logAzione({
     tabella: 'richieste', recordId: params.id, azione: nuovoStato, utenteId: user.id,
     dettagli: { tipo: richiesta.tipo, da_stato: richiesta.stato, motivazione: motivazione ?? null },
     tenantId,
-  })
+  }))
+
+  await Promise.allSettled(ops)
 
   return NextResponse.json(avviso ? { ...updated, avviso } : updated)
 }

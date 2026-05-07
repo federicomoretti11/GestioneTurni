@@ -46,7 +46,8 @@ export async function POST(request: Request) {
 
   const tenantId = requireTenantId()
 
-  const body = await request.json()
+  let body: { titolo?: string; descrizione?: string; priorita?: string; scadenza?: string; assegnati?: string[] }
+  try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
   const { titolo, descrizione, priorita, scadenza, assegnati } = body
 
   if (!titolo?.trim()) return NextResponse.json({ error: 'titolo obbligatorio' }, { status: 400 })
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  if (assegnati?.length > 0) {
+  if (assegnati && assegnati.length > 0) {
     const rows = (assegnati as string[]).map(id => ({ task_id: task.id, dipendente_id: id }))
     await ctx.supabase.from('task_assegnazioni').insert(rows)
   }
