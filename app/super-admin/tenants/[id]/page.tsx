@@ -31,26 +31,34 @@ export default function TenantDettaglioPage() {
   const [noteDraft, setNoteDraft] = useState('')
   const [savingPiano, setSavingPiano] = useState(false)
   const [togglingFlag, setTogglingFlag] = useState<string | null>(null)
+  const [errore, setErrore] = useState<string | null>(null)
 
   async function carica() {
     setLoading(true)
-    const res = await fetch(`/api/super-admin/tenants/${id}`)
-    if (res.ok) {
+    setErrore(null)
+    try {
+      const res = await fetch(`/api/super-admin/tenants/${id}`)
+      if (res.status === 404) { setErrore('Tenant non trovato.'); return }
+      if (!res.ok) { setErrore('Errore nel caricamento.'); return }
       const data: TenantDettaglio = await res.json()
       setTenant(data)
       setPianoDraft(data.piano)
       setScadenzaDraft(data.piano_scadenza ? data.piano_scadenza.slice(0, 10) : '')
       setNoteDraft(data.piano_note ?? '')
+    } catch {
+      setErrore('Errore di rete.')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { carica() }, [id])
 
   async function salvaPiano() {
     if (!tenant) return
     setSavingPiano(true)
-    await fetch(`/api/super-admin/tenants/${id}`, {
+    const res = await fetch(`/api/super-admin/tenants/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -59,26 +67,39 @@ export default function TenantDettaglioPage() {
         piano_note: noteDraft || null,
       }),
     })
+    if (!res.ok) {
+      alert('Errore nel salvataggio del piano.')
+      setSavingPiano(false)
+      return
+    }
     await carica()
     setSavingPiano(false)
   }
 
   async function toggleFlag(key: string, currentValue: boolean) {
     setTogglingFlag(key)
-    await fetch(`/api/super-admin/tenants/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ [key]: !currentValue }),
-    })
     setTenant(prev => prev ? {
       ...prev,
       impostazioni: { ...prev.impostazioni, [key]: !currentValue }
     } : prev)
+    const res = await fetch(`/api/super-admin/tenants/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [key]: !currentValue }),
+    })
+    if (!res.ok) {
+      // revert on failure
+      setTenant(prev => prev ? {
+        ...prev,
+        impostazioni: { ...prev.impostazioni, [key]: currentValue }
+      } : prev)
+    }
     setTogglingFlag(null)
   }
 
   if (loading) return <p className="text-sm text-gray-500 p-6">Caricamento…</p>
-  if (!tenant) return <p className="text-sm text-red-500 p-6">Tenant non trovato.</p>
+  if (errore) return <p className="text-sm text-red-500 p-6">{errore}</p>
+  if (!tenant) return null
 
   const imp = tenant.impostazioni
 
@@ -159,13 +180,13 @@ export default function TenantDettaglioPage() {
           {/* Card Storico */}
           <div className="bg-white rounded-xl border border-slate-900/20 p-5">
             <h2 className="text-sm font-semibold text-gray-900 mb-3">Storico piano</h2>
-            {tenant.piano_log.length === 0 ? (
+            {(tenant.piano_log ?? []).length === 0 ? (
               <p className="text-xs text-gray-400">Nessuna modifica registrata.</p>
             ) : (
               <ul className="divide-y divide-gray-100">
-                {tenant.piano_log.map(log => (
+                {(tenant.piano_log ?? []).map(log => (
                   <li key={log.id} className="py-2.5 flex items-start gap-3">
-                    <span className={`mt-0.5 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold capitalize ${PIANO_COLORS[log.piano as PianoTenant]}`}>
+                    <span className={`mt-0.5 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold capitalize ${PIANO_COLORS[log.piano as PianoTenant] ?? 'bg-gray-100 text-gray-500'}`}>
                       {log.piano}
                     </span>
                     <div className="flex-1 min-w-0">
@@ -191,7 +212,8 @@ export default function TenantDettaglioPage() {
             {imp ? (
               <ul className="space-y-3">
                 {Object.entries(FLAG_LABELS).map(([key, meta]) => {
-                  const val = (imp as unknown as Record<string, boolean>)[key] ?? false
+                  const impMap = imp as unknown as Record<string, boolean>
+                  const val = impMap[key] ?? false
                   const isToggling = togglingFlag === key
                   return (
                     <li key={key} className="flex items-center justify-between gap-3">
@@ -206,6 +228,9 @@ export default function TenantDettaglioPage() {
                       <button
                         onClick={() => toggleFlag(key, val)}
                         disabled={isToggling}
+                        aria-label={`${meta.label}: ${val ? 'disattiva' : 'attiva'}`}
+                        role="switch"
+                        aria-checked={val}
                         className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${val ? 'bg-slate-900' : 'bg-gray-200'}`}
                       >
                         <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${val ? 'translate-x-5' : 'translate-x-0'}`} />
