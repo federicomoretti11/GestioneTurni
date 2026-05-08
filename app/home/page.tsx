@@ -5,6 +5,7 @@ import { HomeLogout } from '@/components/layout/HomeLogout'
 import { Avatar } from '@/components/ui/Avatar'
 import { Notifiche } from '@/components/layout/Notifiche'
 import { Footer } from '@/components/layout/Footer'
+import { isAnalyticsAbilitato } from '@/lib/impostazioni'
 
 // ── Icone SVG ────────────────────────────────────────────────
 const ICalendar = (p: React.SVGProps<SVGSVGElement>) => (
@@ -159,6 +160,18 @@ export default async function HomePage() {
   const isAdmin = ruolo === 'admin' || isSuperAdmin
   const isManager = ruolo === 'manager'
   const isDipendente = ruolo === 'dipendente'
+
+  // Analytics flag + turni mese corrente (solo admin)
+  const analyticsAbilitato = isAdmin ? await isAnalyticsAbilitato() : false
+  let turniMese = 0
+  if (isAdmin && analyticsAbilitato) {
+    const d = new Date()
+    const meseInizio = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+    const meseFine = new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().slice(0, 10)
+    const { count } = await supabase.from('turni').select('*', { count: 'exact', head: true })
+      .eq('stato', 'confermato').gte('data', meseInizio).lte('data', meseFine)
+    turniMese = count ?? 0
+  }
 
   // Richieste in attesa
   let richiesteInAttesa = 0
@@ -450,6 +463,18 @@ export default async function HomePage() {
                 meta={richiesteInAttesa > 0 ? 'Ferie, permessi o cambi turno da rivedere' : 'Tutto in ordine al momento'}
                 ctaLabel="Apri richieste"
                 ctaHref={isAdmin ? '/admin/richieste' : '/manager/richieste'}
+              />
+            )}
+
+            {/* Analytics */}
+            {isAdmin && analyticsAbilitato && (
+              <NudgeCard
+                accent="teal"
+                eyebrow="Analytics"
+                big={turniMese > 0 ? `${turniMese} turni questo mese` : 'Nessun turno questo mese'}
+                meta="Ore, presenze e anomalie GPS"
+                ctaLabel="Apri analytics"
+                ctaHref="/admin/analytics"
               />
             )}
 

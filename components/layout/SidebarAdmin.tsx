@@ -17,7 +17,7 @@ const BASE_ITEMS = [
   { section: 'Account',         label: 'Profilo',        href: '/admin/profilo',                           icon: '👤' },
 ]
 
-interface Moduli { cedolini?: boolean }
+interface Moduli { cedolini?: boolean; analytics?: boolean }
 
 const SUPER_ADMIN_ITEMS = [
   { section: 'Super Admin', label: 'Tenant', href: '/super-admin/tenants', icon: '🏢' },
@@ -45,7 +45,8 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const pathname = usePathname()
 
   const gestioneExtra = [
-    ...(moduli?.cedolini ? [{ label: 'Cedolini', href: '/admin/cedolini', icon: '💰' }] : []),
+    ...(moduli?.cedolini   ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
+    ...(moduli?.analytics  ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
   ]
 
   // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
