@@ -132,3 +132,12 @@ export interface Richiesta {
   profile?: Profile
   turno?: Turno | null
 }
+
+export interface ImpostazioniTenant {
+  gps_checkin_abilitato: boolean
+  email_notifiche_abilitato: boolean
+  modulo_cedolini_abilitato: boolean
+  modulo_analytics_abilitato: boolean
+  modulo_tasks_abilitato: boolean
+  modulo_documenti_abilitato: boolean
+}
