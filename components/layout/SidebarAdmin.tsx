@@ -10,14 +10,17 @@ const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                    icon: '🏠' },
   { section: 'Calendario',     label: 'Calendario',     href: '/admin/calendario',               icon: '📅', altHrefs: ['/admin/calendario-posti'] },
   { section: 'Programmazione', label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝', altHrefs: ['/admin/calendario-programmazione-posti'] },
-  { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                         icon: '📋' },
-  {                             label: 'Task',           href: '/admin/task',                              icon: '✅' },
-  {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
-  {                             label: 'Impostazioni',   href: '/admin/impostazioni',                      icon: '⚙️' },
-  { section: 'Account',         label: 'Profilo',        href: '/admin/profilo',                           icon: '👤' },
+  { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                icon: '📋' },
+  {                             label: 'Impostazioni',   href: '/admin/impostazioni',             icon: '⚙️' },
+  { section: 'Account',        label: 'Profilo',        href: '/admin/profilo',                  icon: '👤' },
 ]
 
-interface Moduli { cedolini?: boolean; analytics?: boolean }
+interface Moduli {
+  tasks?: boolean
+  documenti?: boolean
+  cedolini?: boolean
+  analytics?: boolean
+}
 
 const SUPER_ADMIN_ITEMS = [
   { section: 'Super Admin', label: 'Tenant', href: '/super-admin/tenants', icon: '🏢' },
@@ -44,9 +47,12 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const richieste = useRichiesteCount()
   const pathname = usePathname()
 
+  // Voci Gestione condizionali — default true per tasks e documenti
   const gestioneExtra = [
-    ...(moduli?.cedolini   ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
-    ...(moduli?.analytics  ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
+    ...(moduli?.tasks      !== false ? [{ label: 'Task',      href: '/admin/task',      icon: '✅' }] : []),
+    ...(moduli?.documenti  !== false ? [{ label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
+    ...(moduli?.cedolini             ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
+    ...(moduli?.analytics            ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
   ]
 
   // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
