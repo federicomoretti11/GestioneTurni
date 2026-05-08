@@ -12,6 +12,13 @@ async function checkSuperAdmin() {
   return { userId: user.id }
 }
 
+const FLAG_KEYS = [
+  'gps_checkin_abilitato', 'email_notifiche_abilitato',
+  'modulo_tasks_abilitato', 'modulo_documenti_abilitato',
+  'modulo_cedolini_abilitato', 'modulo_analytics_abilitato',
+  'modulo_paghe_abilitato', 'modulo_ai_copilot_abilitato', 'white_label_abilitato',
+]
+
 const PIANO_FLAGS: Record<PianoTenant, Record<string, boolean>> = {
   starter: {
     gps_checkin_abilitato: true,
@@ -51,6 +58,10 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   const admin = createAdminClient()
   const { id } = params
+
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: 'ID non valido' }, { status: 400 })
+  }
 
   const { data: tenant, error } = await admin
     .from('tenants')
@@ -94,15 +105,20 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const { id } = params
   const admin = createAdminClient()
 
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: 'ID non valido' }, { status: 400 })
+  }
+
   const { data: tenantCheck } = await admin.from('tenants').select('id').eq('id', id).single()
   if (!tenantCheck) return NextResponse.json({ error: 'Tenant non trovato' }, { status: 404 })
 
   // Aggiornamento piano (applica flag automaticamente)
   if (body.piano !== undefined) {
-    const piano = body.piano as PianoTenant
-    if (!['starter', 'professional', 'enterprise'].includes(piano)) {
+    const rawPiano = body.piano
+    if (!['starter', 'professional', 'enterprise'].includes(rawPiano)) {
       return NextResponse.json({ error: 'Piano non valido' }, { status: 400 })
     }
+    const piano = rawPiano as PianoTenant
 
     const tenantUpdates: Record<string, unknown> = { piano }
     if ('piano_scadenza' in body) tenantUpdates.piano_scadenza = body.piano_scadenza ?? null
@@ -111,17 +127,19 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const { error: tErr } = await admin.from('tenants').update(tenantUpdates).eq('id', id)
     if (tErr) return NextResponse.json({ error: tErr.message }, { status: 500 })
 
-    await admin.from('impostazioni').upsert(
+    const { error: impErr } = await admin.from('impostazioni').upsert(
       { tenant_id: id, ...PIANO_FLAGS[piano] },
       { onConflict: 'tenant_id' }
     )
+    if (impErr) return NextResponse.json({ error: impErr.message }, { status: 500 })
 
-    await admin.from('tenant_piano_log').insert({
+    const { error: logErr } = await admin.from('tenant_piano_log').insert({
       tenant_id: id,
       piano,
       cambiato_da: ctx.userId,
       note: body.piano_note ?? null,
     })
+    if (logErr) return NextResponse.json({ error: logErr.message }, { status: 500 })
 
     return NextResponse.json({ ok: true })
   }
@@ -131,26 +149,22 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const updates: Record<string, unknown> = {}
     if ('piano_scadenza' in body) updates.piano_scadenza = body.piano_scadenza ?? null
     if ('piano_note' in body) updates.piano_note = body.piano_note ?? null
-    await admin.from('tenants').update(updates).eq('id', id)
+    const { error: metaErr } = await admin.from('tenants').update(updates).eq('id', id)
+    if (metaErr) return NextResponse.json({ error: metaErr.message }, { status: 500 })
     return NextResponse.json({ ok: true })
   }
 
   // Override manuale singolo flag
-  const FLAG_KEYS = [
-    'gps_checkin_abilitato', 'email_notifiche_abilitato',
-    'modulo_tasks_abilitato', 'modulo_documenti_abilitato',
-    'modulo_cedolini_abilitato', 'modulo_analytics_abilitato',
-    'modulo_paghe_abilitato', 'modulo_ai_copilot_abilitato', 'white_label_abilitato',
-  ]
   const flagUpdates: Record<string, boolean> = {}
   for (const key of FLAG_KEYS) {
     if (key in body && typeof body[key] === 'boolean') flagUpdates[key] = body[key]
   }
   if (Object.keys(flagUpdates).length > 0) {
-    await admin.from('impostazioni').upsert(
+    const { error: flagErr } = await admin.from('impostazioni').upsert(
       { tenant_id: id, ...flagUpdates },
       { onConflict: 'tenant_id' }
     )
+    if (flagErr) return NextResponse.json({ error: flagErr.message }, { status: 500 })
     return NextResponse.json({ ok: true })
   }
 
