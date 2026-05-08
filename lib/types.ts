@@ -140,6 +140,9 @@ export interface ImpostazioniTenant {
   modulo_analytics_abilitato: boolean
   modulo_tasks_abilitato: boolean
   modulo_documenti_abilitato: boolean
+  modulo_paghe_abilitato: boolean
+  modulo_ai_copilot_abilitato: boolean
+  white_label_abilitato: boolean
 }
 
 export interface Cedolino {
@@ -153,4 +156,32 @@ export interface Cedolino {
   created_at: string
   created_by: string | null
   profile?: { nome: string; cognome: string } | null
+}
+
+export type PianoTenant = 'starter' | 'professional' | 'enterprise'
+
+export interface TenantConPiano {
+  id: string
+  nome: string
+  slug: string
+  attivo: boolean
+  piano: PianoTenant
+  piano_scadenza: string | null
+  piano_note: string | null
+  created_at: string
+}
+
+export interface TenantDettaglio extends TenantConPiano {
+  impostazioni: ImpostazioniTenant
+  utenti_count: number
+  piano_log: TenantPianoLog[]
+}
+
+export interface TenantPianoLog {
+  id: string
+  tenant_id: string
+  piano: PianoTenant
+  cambiato_da: string | null
+  note: string | null
+  created_at: string
 }

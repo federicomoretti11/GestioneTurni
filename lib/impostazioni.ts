@@ -44,7 +44,7 @@ export async function getImpostazioni(): Promise<ImpostazioniTenant> {
     if (!tenantId) return defaultImpostazioni()
     const { data } = await createAdminClient()
       .from('impostazioni')
-      .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato')
+      .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato, modulo_paghe_abilitato, modulo_ai_copilot_abilitato, white_label_abilitato')
       .eq('tenant_id', tenantId)
       .single()
     if (!data) return defaultImpostazioni()
@@ -55,6 +55,9 @@ export async function getImpostazioni(): Promise<ImpostazioniTenant> {
       modulo_analytics_abilitato: data.modulo_analytics_abilitato ?? false,
       modulo_tasks_abilitato: data.modulo_tasks_abilitato ?? true,
       modulo_documenti_abilitato: data.modulo_documenti_abilitato ?? true,
+      modulo_paghe_abilitato: data.modulo_paghe_abilitato ?? false,
+      modulo_ai_copilot_abilitato: data.modulo_ai_copilot_abilitato ?? false,
+      white_label_abilitato: data.white_label_abilitato ?? false,
     }
   } catch {
     return defaultImpostazioni()
@@ -69,5 +72,8 @@ function defaultImpostazioni(): ImpostazioniTenant {
     modulo_analytics_abilitato: false,
     modulo_tasks_abilitato: true,
     modulo_documenti_abilitato: true,
+    modulo_paghe_abilitato: false,
+    modulo_ai_copilot_abilitato: false,
+    white_label_abilitato: false,
   }
 }
