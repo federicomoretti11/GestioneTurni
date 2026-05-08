@@ -58,22 +58,26 @@ export default function TenantDettaglioPage() {
   async function salvaPiano() {
     if (!tenant) return
     setSavingPiano(true)
-    const res = await fetch(`/api/super-admin/tenants/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        piano: pianoDraft,
-        piano_scadenza: scadenzaDraft || null,
-        piano_note: noteDraft || null,
-      }),
-    })
-    if (!res.ok) {
-      alert('Errore nel salvataggio del piano.')
+    try {
+      const res = await fetch(`/api/super-admin/tenants/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          piano: pianoDraft,
+          piano_scadenza: scadenzaDraft || null,
+          piano_note: noteDraft || null,
+        }),
+      })
+      if (!res.ok) {
+        alert('Errore nel salvataggio del piano.')
+        return
+      }
+      await carica()
+    } catch {
+      alert('Errore di rete.')
+    } finally {
       setSavingPiano(false)
-      return
     }
-    await carica()
-    setSavingPiano(false)
   }
 
   async function toggleFlag(key: string, currentValue: boolean) {
