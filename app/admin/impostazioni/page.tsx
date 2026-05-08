@@ -1,12 +1,9 @@
-﻿'use client'
+'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-
-interface Impostazioni {
-  gps_checkin_abilitato: boolean
-  email_notifiche_abilitato: boolean
-}
+import type { ImpostazioniTenant } from '@/lib/types'
 
 function ToggleRow({
   label,
@@ -64,9 +61,14 @@ function CardLink({
 }
 
 export default function ImpostazioniPage() {
-  const [imp, setImp] = useState<Impostazioni | null>(null)
+  const router = useRouter()
+  const [imp, setImp] = useState<ImpostazioniTenant | null>(null)
   const [loadingGps, setLoadingGps] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
+  const [loadingCedolini, setLoadingCedolini] = useState(false)
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false)
+  const [loadingTasks, setLoadingTasks] = useState(false)
+  const [loadingDocumenti, setLoadingDocumenti] = useState(false)
   const [testEmailStato, setTestEmailStato] = useState<'idle' | 'loading' | 'ok' | 'errore'>('idle')
   const [testEmailMsg, setTestEmailMsg] = useState('')
 
@@ -134,7 +136,7 @@ export default function ImpostazioniPage() {
     setTimeout(() => setTestEmailStato('idle'), 5000)
   }
 
-  async function toggle(campo: keyof Impostazioni, setLoading: (v: boolean) => void) {
+  async function toggle(campo: keyof ImpostazioniTenant, setLoading: (v: boolean) => void) {
     if (!imp) return
     setLoading(true)
     const nuovoValore = !imp[campo]
@@ -145,6 +147,7 @@ export default function ImpostazioniPage() {
     })
     setImp(prev => prev ? { ...prev, [campo]: nuovoValore } : prev)
     setLoading(false)
+    router.refresh()
   }
 
   return (
@@ -197,28 +200,64 @@ export default function ImpostazioniPage() {
         </div>
       </section>
 
+      {/* Moduli attivi */}
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Moduli attivi</h2>
+        <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
+          <ToggleRow
+            label="Modulo Task"
+            descrizione={
+              imp?.modulo_tasks_abilitato
+                ? 'Attivo — la sezione task è visibile e utilizzabile'
+                : 'Disattivato — la sezione task è nascosta per tutti gli utenti'
+            }
+            valore={imp?.modulo_tasks_abilitato ?? true}
+            loading={loadingTasks || !imp}
+            onChange={() => toggle('modulo_tasks_abilitato', setLoadingTasks)}
+          />
+          <ToggleRow
+            label="Modulo Documenti"
+            descrizione={
+              imp?.modulo_documenti_abilitato
+                ? 'Attivo — l\'archivio documenti aziendali è accessibile'
+                : 'Disattivato — l\'archivio documenti è nascosto per tutti gli utenti'
+            }
+            valore={imp?.modulo_documenti_abilitato ?? true}
+            loading={loadingDocumenti || !imp}
+            onChange={() => toggle('modulo_documenti_abilitato', setLoadingDocumenti)}
+          />
+          <ToggleRow
+            label="Modulo Cedolini"
+            descrizione={
+              imp?.modulo_cedolini_abilitato
+                ? 'Attivo — la gestione cedolini è abilitata'
+                : 'Disattivato — il modulo cedolini non è ancora disponibile per questo tenant'
+            }
+            valore={imp?.modulo_cedolini_abilitato ?? false}
+            loading={loadingCedolini || !imp}
+            onChange={() => toggle('modulo_cedolini_abilitato', setLoadingCedolini)}
+          />
+          <ToggleRow
+            label="Modulo Analytics"
+            descrizione={
+              imp?.modulo_analytics_abilitato
+                ? 'Attivo — le statistiche e i report sono accessibili'
+                : 'Disattivato — il modulo analytics non è ancora disponibile per questo tenant'
+            }
+            valore={imp?.modulo_analytics_abilitato ?? false}
+            loading={loadingAnalytics || !imp}
+            onChange={() => toggle('modulo_analytics_abilitato', setLoadingAnalytics)}
+          />
+        </div>
+      </section>
+
       {/* Gestione */}
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Gestione</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <CardLink
-            icon="👥"
-            titolo="Utenti"
-            descrizione="Gestisci dipendenti, manager e ruoli"
-            href="/admin/utenti"
-          />
-          <CardLink
-            icon="🏢"
-            titolo="Posti di servizio"
-            descrizione="Sedi, coordinate GPS e raggio check-in"
-            href="/admin/posti"
-          />
-          <CardLink
-            icon="🎉"
-            titolo="Festivi"
-            descrizione="Giorni festivi nazionali, patronali e custom"
-            href="/admin/festivi"
-          />
+          <CardLink icon="👥" titolo="Utenti" descrizione="Gestisci dipendenti, manager e ruoli" href="/admin/utenti" />
+          <CardLink icon="🏢" titolo="Posti di servizio" descrizione="Sedi, coordinate GPS e raggio check-in" href="/admin/posti" />
+          <CardLink icon="🎉" titolo="Festivi" descrizione="Giorni festivi nazionali, patronali e custom" href="/admin/festivi" />
         </div>
       </section>
 
@@ -226,24 +265,9 @@ export default function ImpostazioniPage() {
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Sistema</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <CardLink
-            icon="📤"
-            titolo="Export turni"
-            descrizione="Esporta presenze e ore in PDF, Excel o CSV"
-            href="/admin/export"
-          />
-          <CardLink
-            icon="📋"
-            titolo="Audit log"
-            descrizione="Traccia di tutte le azioni amministrative"
-            href="/admin/audit"
-          />
-          <CardLink
-            icon="🏷️"
-            titolo="Modelli turno"
-            descrizione="Template riutilizzabili per la pianificazione"
-            href="/admin/template"
-          />
+          <CardLink icon="📤" titolo="Export turni" descrizione="Esporta presenze e ore in PDF, Excel o CSV" href="/admin/export" />
+          <CardLink icon="📋" titolo="Audit log" descrizione="Traccia di tutte le azioni amministrative" href="/admin/audit" />
+          <CardLink icon="🏷️" titolo="Modelli turno" descrizione="Template riutilizzabili per la pianificazione" href="/admin/template" />
         </div>
       </section>
 

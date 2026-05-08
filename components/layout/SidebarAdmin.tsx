@@ -10,18 +10,23 @@ const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                    icon: '🏠' },
   { section: 'Calendario',     label: 'Calendario',     href: '/admin/calendario',               icon: '📅', altHrefs: ['/admin/calendario-posti'] },
   { section: 'Programmazione', label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝', altHrefs: ['/admin/calendario-programmazione-posti'] },
-  { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                         icon: '📋' },
-  {                             label: 'Task',           href: '/admin/task',                              icon: '✅' },
-  {                             label: 'Documenti',      href: '/admin/documenti',                         icon: '🗄️' },
-  {                             label: 'Impostazioni',   href: '/admin/impostazioni',                      icon: '⚙️' },
-  { section: 'Account',         label: 'Profilo',        href: '/admin/profilo',                           icon: '👤' },
+  { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                icon: '📋' },
+  {                             label: 'Impostazioni',   href: '/admin/impostazioni',             icon: '⚙️' },
+  { section: 'Account',        label: 'Profilo',        href: '/admin/profilo',                  icon: '👤' },
 ]
+
+interface Moduli {
+  tasks?: boolean
+  documenti?: boolean
+  cedolini?: boolean
+  analytics?: boolean
+}
 
 const SUPER_ADMIN_ITEMS = [
   { section: 'Super Admin', label: 'Tenant', href: '/super-admin/tenants', icon: '🏢' },
 ]
 
-export function SidebarAdmin() {
+export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const [mounted, setMounted] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
@@ -42,8 +47,23 @@ export function SidebarAdmin() {
   const richieste = useRichiesteCount()
   const pathname = usePathname()
 
+  // Voci Gestione condizionali — default true per tasks e documenti
+  const gestioneExtra = [
+    ...(moduli?.tasks      !== false ? [{ label: 'Task',      href: '/admin/task',      icon: '✅' }] : []),
+    ...(moduli?.documenti  !== false ? [{ label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
+    ...(moduli?.cedolini             ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
+    ...(moduli?.analytics            ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
+  ]
+
+  // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
+  const baseWithExtra = BASE_ITEMS.flatMap(item =>
+    item.href === '/admin/impostazioni' && gestioneExtra.length > 0
+      ? [...gestioneExtra, item]
+      : [item]
+  )
+
   const items = [
-    ...BASE_ITEMS,
+    ...baseWithExtra,
     ...(isSuperAdmin ? SUPER_ADMIN_ITEMS : []),
   ].map(it => {
     if (it.href === '/admin/calendario-programmazione' && mounted) {

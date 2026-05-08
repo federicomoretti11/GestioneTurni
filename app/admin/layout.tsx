@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
+import { getImpostazioni } from '@/lib/impostazioni'
 import { SidebarAdmin } from '@/components/layout/SidebarAdmin'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'Calendario', href: '/admin/calendario', icon: '📅' },
   { label: 'Per sito', href: '/admin/calendario-posti', icon: '📍' },
@@ -23,11 +24,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: profile } = await supabase.from('profiles').select('nome, cognome, tenants(nome)').eq('id', user!.id).single()
   const tenantName = (profile?.tenants as { nome?: string } | null)?.nome ?? ''
 
+  const imp = await getImpostazioni()
+  const navItems = [
+    ...BASE_NAV_ITEMS,
+    ...(imp.modulo_cedolini_abilitato ? [{ label: 'Cedolini', href: '/admin/cedolini', icon: '💰' }] : []),
+  ]
+
   return (
     <div className="flex h-screen bg-[#FAFAF8]">
-      <SidebarAdmin />
+      <SidebarAdmin moduli={{ tasks: imp.modulo_tasks_abilitato, documenti: imp.modulo_documenti_abilitato, cedolini: imp.modulo_cedolini_abilitato, analytics: imp.modulo_analytics_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="admin" userId={user!.id} navItems={NAV_ITEMS} tenantName={tenantName} />
+        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="admin" userId={user!.id} navItems={navItems} tenantName={tenantName} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
           <div className="flex-1 flex flex-col px-4 sm:px-6 pt-6 pb-8">
             <div className="flex-1">{children}</div>
