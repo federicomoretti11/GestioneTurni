@@ -22,4 +22,4 @@ CREATE TABLE tenant_piano_log (
 );
 ALTER TABLE tenant_piano_log ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "solo_super_admin" ON tenant_piano_log
-  FOR ALL USING (get_is_super_admin());
+  FOR ALL USING (get_is_super_admin()) WITH CHECK (get_is_super_admin());
