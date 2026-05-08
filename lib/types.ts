@@ -141,3 +141,16 @@ export interface ImpostazioniTenant {
   modulo_tasks_abilitato: boolean
   modulo_documenti_abilitato: boolean
 }
+
+export interface Cedolino {
+  id: string
+  tenant_id: string
+  dipendente_id: string
+  nome: string
+  mese: string            // "YYYY-MM-DD" (primo giorno del mese)
+  storage_path: string
+  dimensione_bytes: number
+  created_at: string
+  created_by: string | null
+  profile?: { nome: string; cognome: string } | null
+}
