@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const pubbliche = ['/', '/login', '/reset-password', '/auth/callback']
+  const pubbliche = ['/login', '/reset-password', '/auth/callback']
 
   if (!user && !pubbliche.includes(path)) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -94,7 +94,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (path.startsWith('/super-admin') && !isSuperAdmin) {
-      return NextResponse.redirect(new URL('/home', request.url))
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url))
     }
     if (path.startsWith('/admin') && ruolo !== 'admin' && !isSuperAdmin) {
       return NextResponse.redirect(new URL('/login', request.url))
