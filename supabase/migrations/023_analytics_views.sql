@@ -3,7 +3,9 @@
 
 -- ── Vista 1: ore lavorate per dipendente per mese ─────────────
 -- Usa ore_ingresso/uscita_effettiva quando disponibili, altrimenti pianificate
-CREATE OR REPLACE VIEW analytics_ore_mensili AS
+CREATE OR REPLACE VIEW analytics_ore_mensili
+WITH (security_invoker = true)
+AS
 SELECT
   t.tenant_id,
   t.dipendente_id,
@@ -22,7 +24,9 @@ WHERE t.stato = 'confermato'
 GROUP BY t.tenant_id, t.dipendente_id, anno, mese;
 
 -- ── Vista 2: riepilogo richieste per tipo e mese ──────────────
-CREATE OR REPLACE VIEW analytics_richieste_mensili AS
+CREATE OR REPLACE VIEW analytics_richieste_mensili
+WITH (security_invoker = true)
+AS
 SELECT
   r.tenant_id,
   r.tipo,
@@ -34,7 +38,9 @@ FROM richieste r
 GROUP BY r.tenant_id, r.tipo, r.stato, anno, mese;
 
 -- ── Vista 3: statistiche dipendenti ultimi 30 giorni ──────────
-CREATE OR REPLACE VIEW analytics_dipendenti_30gg AS
+CREATE OR REPLACE VIEW analytics_dipendenti_30gg
+WITH (security_invoker = true)
+AS
 SELECT
   t.tenant_id,
   t.dipendente_id,
