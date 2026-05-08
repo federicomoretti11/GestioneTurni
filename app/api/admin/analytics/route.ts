@@ -52,7 +52,7 @@ export async function GET(request: Request) {
 
   // Nomi dipendenti per join lato server
   const dipIds = (oreRaw ?? []).map(r => r.dipendente_id)
-  let profiles: Record<string, { nome: string; cognome: string }> = {}
+  const profiles: Record<string, { nome: string; cognome: string }> = {}
   if (dipIds.length > 0) {
     const { data: pRaw } = await db
       .from('profiles')
