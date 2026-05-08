@@ -94,6 +94,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const { id } = params
   const admin = createAdminClient()
 
+  const { data: tenantCheck } = await admin.from('tenants').select('id').eq('id', id).single()
+  if (!tenantCheck) return NextResponse.json({ error: 'Tenant non trovato' }, { status: 404 })
+
   // Aggiornamento piano (applica flag automaticamente)
   if (body.piano !== undefined) {
     const piano = body.piano as PianoTenant
