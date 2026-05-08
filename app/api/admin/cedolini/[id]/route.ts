@@ -22,6 +22,8 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
     .eq('id', params.id)
     .single()
 
+  if (!cedolino) return NextResponse.json({ error: 'Cedolino non trovato' }, { status: 404 })
+
   const { error } = await ctx.supabase
     .from('cedolini')
     .delete()

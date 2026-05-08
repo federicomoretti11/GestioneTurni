@@ -31,7 +31,10 @@ export async function POST(request: Request) {
   const ctx = await checkAdmin()
   if (!ctx) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
 
-  const tenantId = requireTenantId()
+  let tenantId: string
+  try { tenantId = requireTenantId() } catch {
+    return NextResponse.json({ error: 'Tenant non risolto' }, { status: 400 })
+  }
   const formData = await request.formData()
   const file = formData.get('file') as File | null
   const dipendenteId = formData.get('dipendente_id') as string | null
@@ -39,6 +42,14 @@ export async function POST(request: Request) {
 
   if (!file || !dipendenteId || !mese) {
     return NextResponse.json({ error: 'file, dipendente_id e mese obbligatori' }, { status: 400 })
+  }
+
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(mese)) {
+    return NextResponse.json({ error: 'Formato mese non valido (YYYY-MM)' }, { status: 400 })
+  }
+
+  if (file.type !== 'application/pdf') {
+    return NextResponse.json({ error: 'Solo file PDF accettati' }, { status: 400 })
   }
 
   const [anno, meseNum] = mese.split('-')

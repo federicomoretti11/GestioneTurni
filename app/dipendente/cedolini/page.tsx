@@ -17,7 +17,7 @@ function formatBytes(bytes: number): string {
 }
 
 function formatMese(dateStr: string): string {
-  const d = new Date(dateStr)
+  const d = new Date(dateStr + 'T12:00:00')
   return d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
 }
 
