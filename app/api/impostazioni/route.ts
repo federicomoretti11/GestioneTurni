@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { requireTenantId } from '@/lib/tenant'
+import type { ImpostazioniTenant } from '@/lib/types'
 
 export async function GET() {
   const supabase = createClient()
@@ -10,12 +11,18 @@ export async function GET() {
 
   const { data } = await supabase
     .from('impostazioni')
-    .select('gps_checkin_abilitato, email_notifiche_abilitato')
+    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato')
     .single()
-  return NextResponse.json({
+
+  const imp: ImpostazioniTenant = {
     gps_checkin_abilitato: data?.gps_checkin_abilitato ?? true,
     email_notifiche_abilitato: data?.email_notifiche_abilitato ?? false,
-  })
+    modulo_cedolini_abilitato: data?.modulo_cedolini_abilitato ?? false,
+    modulo_analytics_abilitato: data?.modulo_analytics_abilitato ?? false,
+    modulo_tasks_abilitato: data?.modulo_tasks_abilitato ?? true,
+    modulo_documenti_abilitato: data?.modulo_documenti_abilitato ?? true,
+  }
+  return NextResponse.json(imp)
 }
 
 export async function PATCH(req: Request) {
@@ -29,14 +36,23 @@ export async function PATCH(req: Request) {
   }
 
   const tenantId = requireTenantId()
-  const body = await req.json() as { gps_checkin_abilitato?: boolean; email_notifiche_abilitato?: boolean }
+  const body = await req.json() as Partial<ImpostazioniTenant>
+  const campiConsentiti: (keyof ImpostazioniTenant)[] = [
+    'gps_checkin_abilitato',
+    'email_notifiche_abilitato',
+    'modulo_cedolini_abilitato',
+    'modulo_analytics_abilitato',
+    'modulo_tasks_abilitato',
+    'modulo_documenti_abilitato',
+  ]
+
   const update: Record<string, boolean> = {}
-  if (typeof body.gps_checkin_abilitato === 'boolean') update.gps_checkin_abilitato = body.gps_checkin_abilitato
-  if (typeof body.email_notifiche_abilitato === 'boolean') update.email_notifiche_abilitato = body.email_notifiche_abilitato
+  for (const campo of campiConsentiti) {
+    if (typeof body[campo] === 'boolean') update[campo] = body[campo] as boolean
+  }
   if (!Object.keys(update).length) return NextResponse.json({ error: 'Nessun campo da aggiornare' }, { status: 400 })
 
-  const admin = createAdminClient()
-  const { error } = await admin.from('impostazioni').update(update).eq('tenant_id', tenantId)
+  const { error } = await createAdminClient().from('impostazioni').update(update).eq('tenant_id', tenantId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
