@@ -8,7 +8,6 @@ const BASE_NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
   { label: 'I miei turni', href: '/dipendente/turni', icon: '📅' },
   { label: 'Richieste', href: '/dipendente/richieste', icon: '📋' },
-  { label: 'Task', href: '/dipendente/task', icon: '✅' },
   { label: 'Profilo', href: '/dipendente/profilo', icon: '👤' },
 ]
 
@@ -21,12 +20,13 @@ export default async function DipendenteLayout({ children }: { children: React.R
   const imp = await getImpostazioni()
   const navItems = [
     ...BASE_NAV_ITEMS,
-    ...(imp.modulo_cedolini_abilitato ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
+    ...(imp.modulo_tasks_abilitato     ? [{ label: 'Task',     href: '/dipendente/task',     icon: '✅' }] : []),
+    ...(imp.modulo_cedolini_abilitato  ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
   ]
 
   return (
     <div className="flex h-screen bg-[#FAFAF8]">
-      <SidebarDipendente />
+      <SidebarDipendente moduli={{ tasks: imp.modulo_tasks_abilitato, cedolini: imp.modulo_cedolini_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="dipendente" userId={user!.id} navItems={navItems} tenantName={tenantName} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
