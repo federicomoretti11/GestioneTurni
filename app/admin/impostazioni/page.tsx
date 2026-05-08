@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import type { ImpostazioniTenant } from '@/lib/types'
@@ -60,6 +61,7 @@ function CardLink({
 }
 
 export default function ImpostazioniPage() {
+  const router = useRouter()
   const [imp, setImp] = useState<ImpostazioniTenant | null>(null)
   const [loadingGps, setLoadingGps] = useState(false)
   const [loadingEmail, setLoadingEmail] = useState(false)
@@ -145,6 +147,7 @@ export default function ImpostazioniPage() {
     })
     setImp(prev => prev ? { ...prev, [campo]: nuovoValore } : prev)
     setLoading(false)
+    router.refresh()
   }
 
   return (
