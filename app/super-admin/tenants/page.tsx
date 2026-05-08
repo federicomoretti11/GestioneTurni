@@ -21,9 +21,14 @@ export default function TenantsPage() {
   })
 
   async function carica() {
-    const res = await fetch('/api/super-admin/tenants')
-    if (res.ok) setTenants(await res.json())
-    setLoading(false)
+    try {
+      const res = await fetch('/api/super-admin/tenants')
+      if (res.ok) setTenants(await res.json())
+    } catch {
+      // silently ignore — list stays empty
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { carica() }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -37,37 +42,52 @@ export default function TenantsPage() {
     e.preventDefault()
     setSaving(true)
     setErrore('')
-    const res = await fetch('/api/super-admin/tenants', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    if (res.ok) {
-      setShowForm(false)
-      setForm({ nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '' })
-      carica()
-    } else {
-      const d = await res.json()
-      setErrore(d.error ?? 'Errore')
+    try {
+      const res = await fetch('/api/super-admin/tenants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setShowForm(false)
+        setForm({ nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '' })
+        carica()
+      } else {
+        const d = await res.json()
+        setErrore(d.error ?? 'Errore')
+      }
+    } catch {
+      setErrore('Errore di rete.')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   async function elimina(tenant: TenantConPiano) {
     if (!confirm(`Eliminare "${tenant.nome}"?\n\nQuesta azione è irreversibile.`)) return
     setEliminando(tenant.id)
-    await fetch(`/api/super-admin/tenants?id=${tenant.id}`, { method: 'DELETE' })
-    setEliminando(null)
-    carica()
+    try {
+      const res = await fetch(`/api/super-admin/tenants?id=${tenant.id}`, { method: 'DELETE' })
+      if (!res.ok) alert('Errore durante l\'eliminazione.')
+      else carica()
+    } catch {
+      alert('Errore di rete.')
+    } finally {
+      setEliminando(null)
+    }
   }
 
   async function toggleAttivo(tenant: TenantConPiano) {
-    await fetch('/api/super-admin/tenants', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: tenant.id, attivo: !tenant.attivo }),
-    })
-    carica()
+    try {
+      const res = await fetch('/api/super-admin/tenants', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: tenant.id, attivo: !tenant.attivo }),
+      })
+      if (res.ok) carica()
+    } catch {
+      // ignore
+    }
   }
 
   return (
@@ -180,19 +200,21 @@ export default function TenantsPage() {
                       {t.attivo ? 'Attivo' : 'Disattivo'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
-                    <Link href={`/super-admin/tenants/${t.id}`}
-                      className="text-xs text-blue-500 hover:text-blue-700 underline">
-                      Gestisci
-                    </Link>
-                    <button onClick={() => toggleAttivo(t)}
-                      className="text-xs text-gray-500 hover:text-gray-800 underline">
-                      {t.attivo ? 'Disattiva' : 'Attiva'}
-                    </button>
-                    <button onClick={() => elimina(t)} disabled={eliminando === t.id}
-                      className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40">
-                      {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
-                    </button>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link href={`/super-admin/tenants/${t.id}`}
+                        className="text-xs text-blue-500 hover:text-blue-700 underline">
+                        Gestisci
+                      </Link>
+                      <button onClick={() => toggleAttivo(t)}
+                        className="text-xs text-gray-500 hover:text-gray-800 underline">
+                        {t.attivo ? 'Disattiva' : 'Attiva'}
+                      </button>
+                      <button onClick={() => elimina(t)} disabled={eliminando === t.id}
+                        className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40">
+                        {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
