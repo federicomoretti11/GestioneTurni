@@ -1,35 +1,37 @@
-﻿'use client'
+'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import type { TenantConPiano, PianoTenant } from '@/lib/types'
 
-interface Tenant {
-  id: string
-  nome: string
-  slug: string
-  attivo: boolean
-  created_at: string
+const PIANO_COLORS: Record<PianoTenant, string> = {
+  starter:      'bg-slate-100 text-slate-700',
+  professional: 'bg-blue-100 text-blue-700',
+  enterprise:   'bg-amber-100 text-amber-700',
 }
 
 export default function TenantsPage() {
-  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [tenants, setTenants] = useState<TenantConPiano[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [errore, setErrore] = useState('')
   const [eliminando, setEliminando] = useState<string | null>(null)
-  const [modificando, setModificando] = useState<string | null>(null)
-  const [nomeEdit, setNomeEdit] = useState('')
-  const [salvandoEdit, setSalvandoEdit] = useState(false)
   const [form, setForm] = useState({
     nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '',
   })
 
   async function carica() {
-    const res = await fetch('/api/super-admin/tenants')
-    if (res.ok) setTenants(await res.json())
-    setLoading(false)
+    try {
+      const res = await fetch('/api/super-admin/tenants')
+      if (res.ok) setTenants(await res.json())
+    } catch {
+      // silently ignore — list stays empty
+    } finally {
+      setLoading(false)
+    }
   }
 
-  useEffect(() => { carica() }, [])
+  useEffect(() => { carica() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function onNomeChange(nome: string) {
     const slug = nome.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -40,54 +42,52 @@ export default function TenantsPage() {
     e.preventDefault()
     setSaving(true)
     setErrore('')
-    const res = await fetch('/api/super-admin/tenants', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    if (res.ok) {
-      setShowForm(false)
-      setForm({ nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '' })
-      carica()
-    } else {
-      const d = await res.json()
-      setErrore(d.error ?? 'Errore')
+    try {
+      const res = await fetch('/api/super-admin/tenants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setShowForm(false)
+        setForm({ nome: '', slug: '', email_admin: '', password_admin: '', nome_admin: '', cognome_admin: '' })
+        carica()
+      } else {
+        const d = await res.json()
+        setErrore(d.error ?? 'Errore')
+      }
+    } catch {
+      setErrore('Errore di rete.')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
-  async function elimina(tenant: Tenant) {
-    if (!confirm(`Eliminare "${tenant.nome}"?\n\nQuesta azione è irreversibile: verranno cancellati tutti i dati e gli utenti del tenant.`)) return
+  async function elimina(tenant: TenantConPiano) {
+    if (!confirm(`Eliminare "${tenant.nome}"?\n\nQuesta azione è irreversibile.`)) return
     setEliminando(tenant.id)
-    await fetch(`/api/super-admin/tenants?id=${tenant.id}`, { method: 'DELETE' })
-    setEliminando(null)
-    carica()
+    try {
+      const res = await fetch(`/api/super-admin/tenants?id=${tenant.id}`, { method: 'DELETE' })
+      if (!res.ok) alert('Errore durante l\'eliminazione.')
+      else carica()
+    } catch {
+      alert('Errore di rete.')
+    } finally {
+      setEliminando(null)
+    }
   }
 
-  async function toggleAttivo(tenant: Tenant) {
-    await fetch('/api/super-admin/tenants', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: tenant.id, attivo: !tenant.attivo }),
-    })
-    carica()
-  }
-
-  function avviaModifica(tenant: Tenant) {
-    setModificando(tenant.id)
-    setNomeEdit(tenant.nome)
-  }
-
-  async function salvaModifica(id: string) {
-    setSalvandoEdit(true)
-    await fetch('/api/super-admin/tenants', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, nome: nomeEdit }),
-    })
-    setSalvandoEdit(false)
-    setModificando(null)
-    carica()
+  async function toggleAttivo(tenant: TenantConPiano) {
+    try {
+      const res = await fetch('/api/super-admin/tenants', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: tenant.id, attivo: !tenant.attivo }),
+      })
+      if (res.ok) carica()
+    } catch {
+      // ignore
+    }
   }
 
   return (
@@ -129,7 +129,7 @@ export default function TenantsPage() {
             </div>
           </div>
           <div className="border-t pt-4">
-            <p className="text-xs text-gray-500 mb-3">Utente admin (opzionale — puoi crearlo dopo)</p>
+            <p className="text-xs text-gray-500 mb-3">Utente admin (opzionale)</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Nome</label>
@@ -154,11 +154,8 @@ export default function TenantsPage() {
             </div>
           </div>
           {errore && <p className="text-sm text-red-600">{errore}</p>}
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
+          <button type="submit" disabled={saving}
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50">
             {saving ? 'Creazione…' : 'Crea tenant'}
           </button>
         </form>
@@ -173,7 +170,8 @@ export default function TenantsPage() {
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nome</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Slug</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Creato</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Piano</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Scadenza</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Stato</th>
                 <th className="px-4 py-3"></th>
               </tr>
@@ -182,61 +180,47 @@ export default function TenantsPage() {
               {tenants.map(t => (
                 <tr key={t.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">
-                    {modificando === t.id ? (
-                      <input
-                        autoFocus
-                        value={nomeEdit}
-                        onChange={e => setNomeEdit(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter') salvaModifica(t.id); if (e.key === 'Escape') setModificando(null) }}
-                        className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
-                      />
-                    ) : t.nome}
+                    <Link href={`/super-admin/tenants/${t.id}`} className="hover:underline text-blue-600">
+                      {t.nome}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 font-mono text-gray-500 text-xs">{t.slug}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${PIANO_COLORS[t.piano as PianoTenant] ?? 'bg-gray-100 text-gray-500'}`}>
+                      {t.piano}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
-                    {new Date(t.created_at).toLocaleDateString('it-IT')}
+                    {t.piano_scadenza
+                      ? new Date(t.piano_scadenza).toLocaleDateString('it-IT')
+                      : '—'}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      t.attivo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${t.attivo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                       {t.attivo ? 'Attivo' : 'Disattivo'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right flex items-center justify-end gap-3">
-                    {modificando === t.id ? (
-                      <>
-                        <button onClick={() => salvaModifica(t.id)} disabled={salvandoEdit}
-                          className="text-xs text-blue-600 hover:text-blue-800 underline disabled:opacity-40">
-                          {salvandoEdit ? 'Salvo…' : 'Salva'}
-                        </button>
-                        <button onClick={() => setModificando(null)}
-                          className="text-xs text-gray-500 hover:text-gray-800 underline">
-                          Annulla
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => avviaModifica(t)}
-                          className="text-xs text-blue-500 hover:text-blue-700 underline">
-                          Modifica
-                        </button>
-                        <button onClick={() => toggleAttivo(t)}
-                          className="text-xs text-gray-500 hover:text-gray-800 underline">
-                          {t.attivo ? 'Disattiva' : 'Attiva'}
-                        </button>
-                        <button onClick={() => elimina(t)} disabled={eliminando === t.id}
-                          className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40">
-                          {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
-                        </button>
-                      </>
-                    )}
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link href={`/super-admin/tenants/${t.id}`}
+                        className="text-xs text-blue-500 hover:text-blue-700 underline">
+                        Gestisci
+                      </Link>
+                      <button onClick={() => toggleAttivo(t)}
+                        className="text-xs text-gray-500 hover:text-gray-800 underline">
+                        {t.attivo ? 'Disattiva' : 'Attiva'}
+                      </button>
+                      <button onClick={() => elimina(t)} disabled={eliminando === t.id}
+                        className="text-xs text-red-500 hover:text-red-700 underline disabled:opacity-40">
+                        {eliminando === t.id ? 'Eliminazione…' : 'Elimina'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
               {tenants.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">Nessun tenant</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">Nessun tenant</td>
                 </tr>
               )}
             </tbody>

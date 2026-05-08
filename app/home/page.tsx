@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { HomeLogout } from '@/components/layout/HomeLogout'
@@ -54,6 +55,11 @@ const IUser = (p: React.SVGProps<SVGSVGElement>) => (
 const ITask = (p: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
     <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+  </svg>
+)
+const IBuilding = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M3 21h18M3 21V7l9-4 9 4v14M9 21V13h6v8M9 9h.01M15 9h.01M9 13h.01" />
   </svg>
 )
 
@@ -161,6 +167,17 @@ export default async function HomePage() {
   const isManager = ruolo === 'manager'
   const isDipendente = ruolo === 'dipendente'
 
+  // Conteggio tenant attivi (solo super admin)
+  let tenantsAttivi = 0
+  if (isSuperAdmin) {
+    const db = createAdminClient()
+    const { count } = await db
+      .from('tenants')
+      .select('*', { count: 'exact', head: true })
+      .eq('attivo', true)
+    tenantsAttivi = count ?? 0
+  }
+
   // Analytics flag + turni mese corrente (solo admin)
   const analyticsAbilitato = isAdmin ? await isAnalyticsAbilitato() : false
   let turniMese = 0
@@ -258,6 +275,13 @@ export default async function HomePage() {
 
   const aree: AreaDef[] = isAdmin
     ? [
+        ...(isSuperAdmin ? [{
+          titolo: 'Gestione tenant',
+          descrizione: `${tenantsAttivi} tenant attiv${tenantsAttivi === 1 ? 'o' : 'i'} sulla piattaforma`,
+          href: '/super-admin/tenants',
+          IconComp: IBuilding,
+          accent: 'violet' as AccentKey,
+        }] : []),
         { titolo: 'Turni',          descrizione: 'Visualizza e gestisci i turni.',       href: '/admin/calendario',                 IconComp: ICalendar, accent: 'blue' },
         { titolo: 'Pianificazione', descrizione: 'Programma i turni settimanali.',      href: '/admin/calendario-programmazione',  IconComp: IDoc,      accent: 'violet' },
         { titolo: 'Richieste',      descrizione: 'Approva ferie, permessi, cambi.',     href: '/admin/richieste',                  IconComp: IInbox,    accent: 'amber', badge: richiesteInAttesa || undefined },

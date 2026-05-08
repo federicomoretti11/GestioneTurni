@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from('impostazioni')
-    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato')
+    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato, modulo_paghe_abilitato, modulo_ai_copilot_abilitato, white_label_abilitato')
     .single()
 
   const imp: ImpostazioniTenant = {
@@ -21,6 +21,9 @@ export async function GET() {
     modulo_analytics_abilitato: data?.modulo_analytics_abilitato ?? false,
     modulo_tasks_abilitato: data?.modulo_tasks_abilitato ?? true,
     modulo_documenti_abilitato: data?.modulo_documenti_abilitato ?? true,
+    modulo_paghe_abilitato: data?.modulo_paghe_abilitato ?? false,
+    modulo_ai_copilot_abilitato: data?.modulo_ai_copilot_abilitato ?? false,
+    white_label_abilitato: data?.white_label_abilitato ?? false,
   }
   return NextResponse.json(imp)
 }
@@ -44,6 +47,9 @@ export async function PATCH(req: Request) {
     'modulo_analytics_abilitato',
     'modulo_tasks_abilitato',
     'modulo_documenti_abilitato',
+    'modulo_paghe_abilitato',
+    'modulo_ai_copilot_abilitato',
+    'white_label_abilitato',
   ]
 
   const update: Record<string, boolean> = {}
