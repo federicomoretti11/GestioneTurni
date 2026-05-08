@@ -17,11 +17,13 @@ const BASE_ITEMS = [
   { section: 'Account',         label: 'Profilo',        href: '/admin/profilo',                           icon: '👤' },
 ]
 
+interface Moduli { cedolini?: boolean }
+
 const SUPER_ADMIN_ITEMS = [
   { section: 'Super Admin', label: 'Tenant', href: '/super-admin/tenants', icon: '🏢' },
 ]
 
-export function SidebarAdmin() {
+export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const [mounted, setMounted] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
@@ -42,8 +44,19 @@ export function SidebarAdmin() {
   const richieste = useRichiesteCount()
   const pathname = usePathname()
 
+  const gestioneExtra = [
+    ...(moduli?.cedolini ? [{ label: 'Cedolini', href: '/admin/cedolini', icon: '💰' }] : []),
+  ]
+
+  // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
+  const baseWithExtra = BASE_ITEMS.flatMap(item =>
+    item.href === '/admin/impostazioni' && gestioneExtra.length > 0
+      ? [...gestioneExtra, item]
+      : [item]
+  )
+
   const items = [
-    ...BASE_ITEMS,
+    ...baseWithExtra,
     ...(isSuperAdmin ? SUPER_ADMIN_ITEMS : []),
   ].map(it => {
     if (it.href === '/admin/calendario-programmazione' && mounted) {
