@@ -19,6 +19,11 @@ const FLAG_KEYS = [
   'modulo_paghe_abilitato', 'modulo_ai_copilot_abilitato', 'white_label_abilitato',
 ]
 
+const RUOLI_KEYS = [
+  'modulo_tasks_ruoli', 'modulo_documenti_ruoli', 'modulo_cedolini_ruoli',
+  'modulo_analytics_ruoli', 'modulo_paghe_ruoli', 'modulo_ai_copilot_ruoli',
+]
+
 const PIANO_FLAGS: Record<PianoTenant, Record<string, boolean>> = {
   starter: {
     gps_checkin_abilitato: true,
@@ -72,7 +77,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   const { data: imp } = await admin
     .from('impostazioni')
-    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_paghe_abilitato, modulo_ai_copilot_abilitato, white_label_abilitato')
+    .select(`${FLAG_KEYS.join(', ')}, ${RUOLI_KEYS.join(', ')}`)
     .eq('tenant_id', id)
     .single()
 
@@ -154,17 +159,22 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ ok: true })
   }
 
-  // Override manuale singolo flag
-  const flagUpdates: Record<string, boolean> = {}
+  // Override manuale flag booleani e/o ruoli
+  const impUpdates: Record<string, boolean | string[]> = {}
   for (const key of FLAG_KEYS) {
-    if (key in body && typeof body[key] === 'boolean') flagUpdates[key] = body[key]
+    if (key in body && typeof body[key] === 'boolean') impUpdates[key] = body[key]
   }
-  if (Object.keys(flagUpdates).length > 0) {
-    const { error: flagErr } = await admin.from('impostazioni').upsert(
-      { tenant_id: id, ...flagUpdates },
+  for (const key of RUOLI_KEYS) {
+    if (key in body && Array.isArray(body[key]) && (body[key] as unknown[]).every(r => typeof r === 'string')) {
+      impUpdates[key] = body[key] as string[]
+    }
+  }
+  if (Object.keys(impUpdates).length > 0) {
+    const { error: impErr } = await admin.from('impostazioni').upsert(
+      { tenant_id: id, ...impUpdates },
       { onConflict: 'tenant_id' }
     )
-    if (flagErr) return NextResponse.json({ error: flagErr.message }, { status: 500 })
+    if (impErr) return NextResponse.json({ error: impErr.message }, { status: 500 })
     return NextResponse.json({ ok: true })
   }
 

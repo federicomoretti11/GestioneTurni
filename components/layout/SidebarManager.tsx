@@ -6,21 +6,27 @@ import { useBozzaCount } from './BozzaCounter'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 import { createClient } from '@/lib/supabase/client'
 
+interface Moduli {
+  tasks?: boolean
+  documenti?: boolean
+  cedolini?: boolean
+  analytics?: boolean
+}
+
 const BASE_ITEMS = [
   { label: 'Home',             href: '/home',                                                              icon: '🏠' },
   { section: 'Calendario',     label: 'Calendario',     href: '/manager/calendario',               icon: '📅', altHrefs: ['/manager/calendario-posti'] },
   { section: 'Programmazione', label: 'Programmazione', href: '/manager/calendario-programmazione', icon: '📝', altHrefs: ['/manager/calendario-programmazione-posti'] },
   { section: 'Gestione',       label: 'Richieste',      href: '/manager/richieste',                 icon: '📋' },
-  {                             label: 'Task',           href: '/manager/task',                      icon: '✅' },
+  // Task e Documenti inseriti dinamicamente qui
   {                             label: 'Utenti',         href: '/manager/utenti',                    icon: '👥' },
   {                             label: 'Posti',          href: '/manager/posti',                     icon: '📍' },
-  {                             label: 'Documenti',      href: '/manager/documenti',                 icon: '🗄️' },
   {                             label: 'Modelli turno',  href: '/manager/template',                  icon: '🏷️' },
   {                             label: 'Impostazioni',   href: '/manager/impostazioni',              icon: '⚙️' },
   { section: 'Account',         label: 'Profilo',        href: '/manager/profilo',                   icon: '👤' },
 ]
 
-export function SidebarManager() {
+export function SidebarManager({ moduli }: { moduli?: Moduli }) {
   const [mounted, setMounted] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
   useEffect(() => {
@@ -39,7 +45,21 @@ export function SidebarManager() {
   const richieste = useRichiesteCount()
   const pathname = usePathname()
 
-  const items = BASE_ITEMS.map(it => {
+  const gestioneExtra = [
+    ...(moduli?.tasks     !== false ? [{ label: 'Task',      href: '/manager/task',      icon: '✅' }] : []),
+    ...(moduli?.documenti !== false ? [{ label: 'Documenti', href: '/manager/documenti', icon: '🗄️' }] : []),
+    ...(moduli?.cedolini            ? [{ label: 'Cedolini',  href: '/manager/cedolini',  icon: '💰' }] : []),
+    ...(moduli?.analytics           ? [{ label: 'Analytics', href: '/manager/analytics', icon: '📊' }] : []),
+  ]
+
+  // Inserisci extra dopo Richieste (prima di Utenti)
+  const baseWithExtra = BASE_ITEMS.flatMap(item =>
+    item.href === '/manager/utenti' && gestioneExtra.length > 0
+      ? [...gestioneExtra, item]
+      : [item]
+  )
+
+  const items = baseWithExtra.map(it => {
     if (it.href === '/manager/calendario-programmazione' && mounted) {
       const badge = (pathname === '/manager/calendario-programmazione' || pathname === '/manager/calendario-programmazione-posti') ? 0 : bozza
       return { ...it, badge }

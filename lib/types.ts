@@ -145,6 +145,13 @@ export interface ImpostazioniTenant {
   modulo_paghe_abilitato: boolean
   modulo_ai_copilot_abilitato: boolean
   white_label_abilitato: boolean
+  // Ruoli che possono vedere ogni modulo (default: tutti e tre)
+  modulo_tasks_ruoli: string[]
+  modulo_documenti_ruoli: string[]
+  modulo_cedolini_ruoli: string[]
+  modulo_analytics_ruoli: string[]
+  modulo_paghe_ruoli: string[]
+  modulo_ai_copilot_ruoli: string[]
 }
 
 export interface Cedolino {

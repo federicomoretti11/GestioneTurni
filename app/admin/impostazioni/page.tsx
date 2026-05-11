@@ -5,18 +5,21 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import type { ImpostazioniTenant } from '@/lib/types'
 
-function ToggleRow({
-  label,
-  descrizione,
-  valore,
-  loading,
-  onChange,
-}: {
-  label: string
-  descrizione: string
-  valore: boolean
-  loading: boolean
-  onChange: () => void
+function Toggle({ label, valore, loading, onChange }: { label: string; valore: boolean; loading: boolean; onChange: () => void }) {
+  return (
+    <button
+      onClick={onChange}
+      disabled={loading}
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50 ${valore ? 'bg-green-500' : 'bg-gray-300'}`}
+      aria-label={label}
+    >
+      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${valore ? 'translate-x-5' : 'translate-x-0'}`} />
+    </button>
+  )
+}
+
+function ToggleRow({ label, descrizione, valore, loading, onChange }: {
+  label: string; descrizione: string; valore: boolean; loading: boolean; onChange: () => void
 }) {
   return (
     <div className="flex items-center justify-between gap-4 py-4">
@@ -24,18 +27,45 @@ function ToggleRow({
         <p className="text-sm font-medium text-gray-800">{label}</p>
         <p className="text-xs text-gray-500 mt-0.5">{descrizione}</p>
       </div>
-      <button
-        onClick={onChange}
-        disabled={loading}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50 ${
-          valore ? 'bg-green-500' : 'bg-gray-300'
-        }`}
-        aria-label={label}
-      >
-        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-          valore ? 'translate-x-5' : 'translate-x-0'
-        }`} />
-      </button>
+      <Toggle label={label} valore={valore} loading={loading} onChange={onChange} />
+    </div>
+  )
+}
+
+const ROLE_LABELS: Record<string, string> = { admin: 'Admin', manager: 'Manager', dipendente: 'Dipendente' }
+
+function ModuloRow({ label, descrizione, valore, loading, onChange, ruoli, loadingRuoli, onToggleRuolo }: {
+  label: string; descrizione: string; valore: boolean; loading: boolean; onChange: () => void
+  ruoli: string[]; loadingRuoli: boolean; onToggleRuolo: (r: string) => void
+}) {
+  return (
+    <div className="py-4 space-y-2">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-800">{label}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{descrizione}</p>
+        </div>
+        <Toggle label={label} valore={valore} loading={loading} onChange={onChange} />
+      </div>
+      {valore && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-gray-400">Visibile a:</span>
+          {(['admin', 'manager', 'dipendente'] as const).map(r => (
+            <button
+              key={r}
+              onClick={() => onToggleRuolo(r)}
+              disabled={loadingRuoli}
+              className={`px-2 py-0.5 text-xs font-medium rounded-md border transition disabled:opacity-50 ${
+                ruoli.includes(r)
+                  ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                  : 'bg-white border-gray-200 text-gray-400 hover:border-gray-400'
+              }`}
+            >
+              {ROLE_LABELS[r]}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -69,6 +99,7 @@ export default function ImpostazioniPage() {
   const [loadingAnalytics, setLoadingAnalytics] = useState(false)
   const [loadingTasks, setLoadingTasks] = useState(false)
   const [loadingDocumenti, setLoadingDocumenti] = useState(false)
+  const [loadingRuoli, setLoadingRuoli] = useState(false)
   const [testEmailStato, setTestEmailStato] = useState<'idle' | 'loading' | 'ok' | 'errore'>('idle')
   const [testEmailMsg, setTestEmailMsg] = useState('')
 
@@ -150,6 +181,21 @@ export default function ImpostazioniPage() {
     router.refresh()
   }
 
+  async function toggleRuolo(campoRuoli: keyof ImpostazioniTenant, ruolo: string) {
+    if (!imp) return
+    const current = (imp[campoRuoli] as string[]) ?? []
+    const nuovi = current.includes(ruolo) ? current.filter(r => r !== ruolo) : [...current, ruolo]
+    setImp(prev => prev ? { ...prev, [campoRuoli]: nuovi } : prev)
+    setLoadingRuoli(true)
+    await fetch('/api/impostazioni', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [campoRuoli]: nuovi }),
+    })
+    setLoadingRuoli(false)
+    router.refresh()
+  }
+
   return (
     <div className="max-w-2xl space-y-8">
       <h1 className="text-xl font-bold text-gray-900">Impostazioni</h1>
@@ -204,49 +250,45 @@ export default function ImpostazioniPage() {
       <section>
         <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Moduli attivi</h2>
         <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
-          <ToggleRow
+          <ModuloRow
             label="Modulo Task"
-            descrizione={
-              imp?.modulo_tasks_abilitato
-                ? 'Attivo — la sezione task è visibile e utilizzabile'
-                : 'Disattivato — la sezione task è nascosta per tutti gli utenti'
-            }
+            descrizione={imp?.modulo_tasks_abilitato ? 'Attivo — la sezione task è visibile e utilizzabile' : 'Disattivato — la sezione task è nascosta per tutti'}
             valore={imp?.modulo_tasks_abilitato ?? true}
             loading={loadingTasks || !imp}
             onChange={() => toggle('modulo_tasks_abilitato', setLoadingTasks)}
+            ruoli={imp?.modulo_tasks_ruoli ?? ['admin', 'manager', 'dipendente']}
+            loadingRuoli={loadingRuoli}
+            onToggleRuolo={r => toggleRuolo('modulo_tasks_ruoli', r)}
           />
-          <ToggleRow
+          <ModuloRow
             label="Modulo Documenti"
-            descrizione={
-              imp?.modulo_documenti_abilitato
-                ? 'Attivo — l\'archivio documenti aziendali è accessibile'
-                : 'Disattivato — l\'archivio documenti è nascosto per tutti gli utenti'
-            }
+            descrizione={imp?.modulo_documenti_abilitato ? 'Attivo — l\'archivio documenti è accessibile' : 'Disattivato — l\'archivio documenti è nascosto per tutti'}
             valore={imp?.modulo_documenti_abilitato ?? true}
             loading={loadingDocumenti || !imp}
             onChange={() => toggle('modulo_documenti_abilitato', setLoadingDocumenti)}
+            ruoli={imp?.modulo_documenti_ruoli ?? ['admin', 'manager', 'dipendente']}
+            loadingRuoli={loadingRuoli}
+            onToggleRuolo={r => toggleRuolo('modulo_documenti_ruoli', r)}
           />
-          <ToggleRow
+          <ModuloRow
             label="Modulo Cedolini"
-            descrizione={
-              imp?.modulo_cedolini_abilitato
-                ? 'Attivo — la gestione cedolini è abilitata'
-                : 'Disattivato — il modulo cedolini non è ancora disponibile per questo tenant'
-            }
+            descrizione={imp?.modulo_cedolini_abilitato ? 'Attivo — la gestione cedolini è abilitata' : 'Disattivato — non disponibile per questo tenant'}
             valore={imp?.modulo_cedolini_abilitato ?? false}
             loading={loadingCedolini || !imp}
             onChange={() => toggle('modulo_cedolini_abilitato', setLoadingCedolini)}
+            ruoli={imp?.modulo_cedolini_ruoli ?? ['admin', 'manager', 'dipendente']}
+            loadingRuoli={loadingRuoli}
+            onToggleRuolo={r => toggleRuolo('modulo_cedolini_ruoli', r)}
           />
-          <ToggleRow
+          <ModuloRow
             label="Modulo Analytics"
-            descrizione={
-              imp?.modulo_analytics_abilitato
-                ? 'Attivo — le statistiche e i report sono accessibili'
-                : 'Disattivato — il modulo analytics non è ancora disponibile per questo tenant'
-            }
+            descrizione={imp?.modulo_analytics_abilitato ? 'Attivo — le statistiche e i report sono accessibili' : 'Disattivato — non disponibile per questo tenant'}
             valore={imp?.modulo_analytics_abilitato ?? false}
             loading={loadingAnalytics || !imp}
             onChange={() => toggle('modulo_analytics_abilitato', setLoadingAnalytics)}
+            ruoli={imp?.modulo_analytics_ruoli ?? ['admin', 'manager', 'dipendente']}
+            loadingRuoli={loadingRuoli}
+            onToggleRuolo={r => toggleRuolo('modulo_analytics_ruoli', r)}
           />
         </div>
       </section>
