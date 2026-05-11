@@ -29,6 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const navItems = [
     ...BASE_NAV_ITEMS,
     ...(moduli.modulo_cedolini_abilitato ? [{ label: 'Cedolini', href: '/admin/cedolini', icon: '💰' }] : []),
+    ...(moduli.modulo_paghe_abilitato ? [{ label: 'Paghe', href: '/admin/paghe', icon: '📊' }] : []),
   ]
 
   return (
