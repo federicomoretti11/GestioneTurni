@@ -69,7 +69,7 @@ export function Notifiche({ userId, ruolo }: Props) {
       .channel(`notifiche_${userId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'notifiche', filter: `destinatario_id=eq.${userId}` },
+        { event: 'INSERT', schema: 'public', table: 'notifiche' },
         payload => {
           setNotifiche(prev => [payload.new as Notifica, ...prev].slice(0, 20))
         }
