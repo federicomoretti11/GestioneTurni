@@ -92,9 +92,9 @@ export default function MieiTurniPage() {
 
   useEffect(() => {
     if (!profilo) return
-    const ch = supabase.channel('turni-dipendente')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'turni',
-        filter: `dipendente_id=eq.${profilo.id}` }, () => { caricaTurni(); caricaTurnoOggi() })
+    const ch = supabase.channel(`turni-dipendente-${profilo.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'turni' },
+        () => { caricaTurni(); caricaTurnoOggi() })
       .subscribe()
     return () => { supabase.removeChannel(ch) }
   }, [caricaTurni, caricaTurnoOggi, profilo])
