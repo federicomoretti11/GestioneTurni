@@ -35,7 +35,7 @@ export async function GET(request: Request) {
   // Overlap: l'assenza è attiva nel periodo se inizia prima della fine e finisce dopo l'inizio
   const { data, error } = await supabase
     .from('richieste')
-    .select('id, dipendente_id, tipo, data_inizio, data_fine, note')
+    .select('id, dipendente_id, tipo, data_inizio, data_fine')
     .eq('tenant_id', tenantId)
     .eq('stato', 'approvata')
     .in('tipo', ['ferie', 'permesso', 'malattia'])

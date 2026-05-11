@@ -285,12 +285,6 @@ export default function CalendarioPage() {
                     : `${assenzaDettaglio.data_inizio} — ${assenzaDettaglio.data_fine}`}
                 </span>
               </div>
-              {assenzaDettaglio.note && (
-                <div className="pt-2">
-                  <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 mb-1">Note</p>
-                  <p className="text-slate-700 whitespace-pre-wrap">{assenzaDettaglio.note}</p>
-                </div>
-              )}
             </div>
             <button
               onClick={() => setAssenzaDettaglio(null)}

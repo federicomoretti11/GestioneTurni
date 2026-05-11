@@ -14,7 +14,6 @@ export interface AssenzaCalendario {
   tipo: TipoAssenza
   data_inizio: string
   data_fine: string
-  note: string | null
 }
 
 interface GrigliaProps {
