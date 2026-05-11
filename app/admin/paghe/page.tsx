@@ -47,7 +47,8 @@ function formatData(iso: string): string {
 
 function formatMese(iso: string): string {
   const [y, m] = iso.split('-').map(Number)
-  return new Date(y, m - 1, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+  const s = new Date(y, m - 1, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 export default function PaghePage() {
