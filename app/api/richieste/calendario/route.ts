@@ -28,6 +28,9 @@ export async function GET(request: Request) {
       !/^\d{4}-\d{2}-\d{2}$/.test(data_fine)) {
     return NextResponse.json({ error: 'data_inizio e data_fine (YYYY-MM-DD) richiesti' }, { status: 400 })
   }
+  if (data_inizio > data_fine) {
+    return NextResponse.json({ error: 'data_inizio deve essere <= data_fine' }, { status: 400 })
+  }
 
   // Overlap: l'assenza è attiva nel periodo se inizia prima della fine e finisce dopo l'inizio
   const { data, error } = await supabase
