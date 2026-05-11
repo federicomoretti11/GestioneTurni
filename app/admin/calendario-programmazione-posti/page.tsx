@@ -11,7 +11,6 @@ import { ModaleConfermaAggiuntaTurno } from '@/components/programmazione/ModaleC
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
 import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
-import { isTurnoBloccato } from '@/lib/utils/turni'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { useToast } from '@/components/ui/ToastProvider'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
@@ -262,7 +261,6 @@ export default function CalendarioProgrammazionePostiPage() {
         dipendenti={dipendenti}
         data={modale.data ?? modale.turno?.data}
         postoIdDefault={modale.postoId}
-        readOnly={!!(modale.turno && isTurnoBloccato(modale.turno))}
       />
 
       {modaleAggiunta && (
