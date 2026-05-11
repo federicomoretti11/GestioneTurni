@@ -28,11 +28,37 @@ function formatOraISO(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
+async function broadcastNotifiche(destinatarioIds: string[]) {
+  const unique = [...new Set(destinatarioIds)]
+  if (!unique.length) return
+  try {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/realtime/v1/api/broadcast`
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
+      body: JSON.stringify({
+        messages: unique.map(id => ({
+          topic: `notifiche_${id}`,
+          event: 'nuova',
+          payload: {},
+        })),
+      }),
+    })
+  } catch (e) {
+    console.error('[broadcast] fallita', e)
+  }
+}
+
 async function insertNotifiche(righe: Riga[]) {
   if (!righe.length) return
   try {
     const admin = createAdminClient()
     await admin.from('notifiche').insert(righe)
+    await broadcastNotifiche(righe.map(r => r.destinatario_id))
   } catch (e) {
     console.error('[notifiche] insert fallita', e)
   }

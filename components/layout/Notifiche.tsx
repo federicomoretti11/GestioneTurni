@@ -67,7 +67,7 @@ export function Notifiche({ userId, ruolo }: Props) {
     const sb = createClient()
     const canale = sb
       .channel(`notifiche_${userId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifiche' }, () => { carica() })
+      .on('broadcast', { event: 'nuova' }, () => { carica() })
       .subscribe()
     return () => { sb.removeChannel(canale) }
   }, [userId, carica])
