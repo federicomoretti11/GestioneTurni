@@ -10,17 +10,20 @@ const PIANO_COLORS: Record<PianoTenant, string> = {
   enterprise:   'bg-amber-100 text-amber-700',
 }
 
-const FLAG_LABELS: Record<string, { label: string; piano: PianoTenant | null }> = {
+const FLAG_LABELS: Record<string, { label: string; piano: PianoTenant | null; ruoliKey?: string }> = {
   gps_checkin_abilitato:       { label: 'GPS Check-in',      piano: 'starter' },
   email_notifiche_abilitato:   { label: 'Email notifiche',   piano: null },
-  modulo_tasks_abilitato:      { label: 'Modulo Task',       piano: 'professional' },
-  modulo_documenti_abilitato:  { label: 'Modulo Documenti',  piano: 'professional' },
-  modulo_cedolini_abilitato:   { label: 'Modulo Cedolini',   piano: 'professional' },
-  modulo_analytics_abilitato:  { label: 'Modulo Analytics',  piano: 'professional' },
-  modulo_paghe_abilitato:      { label: 'Modulo Paghe',      piano: 'enterprise' },
-  modulo_ai_copilot_abilitato: { label: 'AI Copilot',        piano: 'enterprise' },
+  modulo_tasks_abilitato:      { label: 'Modulo Task',       piano: 'professional', ruoliKey: 'modulo_tasks_ruoli' },
+  modulo_documenti_abilitato:  { label: 'Modulo Documenti',  piano: 'professional', ruoliKey: 'modulo_documenti_ruoli' },
+  modulo_cedolini_abilitato:   { label: 'Modulo Cedolini',   piano: 'professional', ruoliKey: 'modulo_cedolini_ruoli' },
+  modulo_analytics_abilitato:  { label: 'Modulo Analytics',  piano: 'professional', ruoliKey: 'modulo_analytics_ruoli' },
+  modulo_paghe_abilitato:      { label: 'Modulo Paghe',      piano: 'enterprise',   ruoliKey: 'modulo_paghe_ruoli' },
+  modulo_ai_copilot_abilitato: { label: 'AI Copilot',        piano: 'enterprise',   ruoliKey: 'modulo_ai_copilot_ruoli' },
   white_label_abilitato:       { label: 'White Label',       piano: 'enterprise' },
 }
+
+const ROLE_LABELS: Record<string, string> = { admin: 'Admin', manager: 'Manager', dipendente: 'Dipendente' }
+const DEFAULT_RUOLI = ['admin', 'manager', 'dipendente']
 
 export default function TenantDettaglioPage() {
   const { id } = useParams<{ id: string }>()
@@ -31,6 +34,7 @@ export default function TenantDettaglioPage() {
   const [noteDraft, setNoteDraft] = useState('')
   const [savingPiano, setSavingPiano] = useState(false)
   const [togglingFlag, setTogglingFlag] = useState<string | null>(null)
+  const [togglingRuoli, setTogglingRuoli] = useState<string | null>(null)
   const [errore, setErrore] = useState<string | null>(null)
 
   async function carica() {
@@ -92,13 +96,36 @@ export default function TenantDettaglioPage() {
       body: JSON.stringify({ [key]: !currentValue }),
     })
     if (!res.ok) {
-      // revert on failure
       setTenant(prev => prev ? {
         ...prev,
         impostazioni: { ...prev.impostazioni, [key]: currentValue }
       } : prev)
     }
     setTogglingFlag(null)
+  }
+
+  async function toggleRuolo(ruoliKey: string, ruolo: string) {
+    if (!tenant?.impostazioni) return
+    const impMap = tenant.impostazioni as unknown as Record<string, unknown>
+    const current = (impMap[ruoliKey] as string[] | null) ?? DEFAULT_RUOLI
+    const nuovi = current.includes(ruolo) ? current.filter(r => r !== ruolo) : [...current, ruolo]
+    setTogglingRuoli(ruoliKey)
+    setTenant(prev => prev ? {
+      ...prev,
+      impostazioni: { ...prev.impostazioni, [ruoliKey]: nuovi }
+    } : prev)
+    const res = await fetch(`/api/super-admin/tenants/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [ruoliKey]: nuovi }),
+    })
+    if (!res.ok) {
+      setTenant(prev => prev ? {
+        ...prev,
+        impostazioni: { ...prev.impostazioni, [ruoliKey]: current }
+      } : prev)
+    }
+    setTogglingRuoli(null)
   }
 
   if (loading) return <p className="text-sm text-gray-500 p-6">Caricamento…</p>
@@ -216,29 +243,53 @@ export default function TenantDettaglioPage() {
             {imp ? (
               <ul className="space-y-3">
                 {Object.entries(FLAG_LABELS).map(([key, meta]) => {
-                  const impMap = imp as unknown as Record<string, boolean>
-                  const val = impMap[key] ?? false
+                  const impMap = imp as unknown as Record<string, unknown>
+                  const val = (impMap[key] as boolean) ?? false
                   const isToggling = togglingFlag === key
+                  const ruoli = meta.ruoliKey
+                    ? ((impMap[meta.ruoliKey] as string[] | null) ?? DEFAULT_RUOLI)
+                    : null
                   return (
-                    <li key={key} className="flex items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-gray-800">{meta.label}</span>
-                        {meta.piano && (
-                          <span className={`ml-1.5 text-[11px] px-1.5 py-0.5 rounded capitalize ${PIANO_COLORS[meta.piano]}`}>
-                            {meta.piano}
-                          </span>
-                        )}
+                    <li key={key} className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-gray-800">{meta.label}</span>
+                          {meta.piano && (
+                            <span className={`ml-1.5 text-[11px] px-1.5 py-0.5 rounded capitalize ${PIANO_COLORS[meta.piano]}`}>
+                              {meta.piano}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => toggleFlag(key, val)}
+                          disabled={isToggling}
+                          aria-label={`${meta.label}: ${val ? 'disattiva' : 'attiva'}`}
+                          role="switch"
+                          aria-checked={val}
+                          className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${val ? 'bg-slate-900' : 'bg-gray-200'}`}
+                        >
+                          <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${val ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => toggleFlag(key, val)}
-                        disabled={isToggling}
-                        aria-label={`${meta.label}: ${val ? 'disattiva' : 'attiva'}`}
-                        role="switch"
-                        aria-checked={val}
-                        className={`relative w-10 h-5 rounded-full transition-colors disabled:opacity-50 ${val ? 'bg-slate-900' : 'bg-gray-200'}`}
-                      >
-                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${val ? 'translate-x-5' : 'translate-x-0'}`} />
-                      </button>
+                      {val && ruoli && meta.ruoliKey && (
+                        <div className="flex items-center gap-1.5 flex-wrap pl-0">
+                          <span className="text-[11px] text-gray-400">Ruoli:</span>
+                          {(['admin', 'manager', 'dipendente'] as const).map(r => (
+                            <button
+                              key={r}
+                              onClick={() => toggleRuolo(meta.ruoliKey!, r)}
+                              disabled={togglingRuoli === meta.ruoliKey}
+                              className={`px-1.5 py-0.5 text-[11px] font-medium rounded border transition disabled:opacity-50 ${
+                                ruoli.includes(r)
+                                  ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                                  : 'bg-white border-gray-200 text-gray-400 hover:border-gray-400'
+                              }`}
+                            >
+                              {ROLE_LABELS[r]}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </li>
                   )
                 })}

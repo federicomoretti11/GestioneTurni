@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getImpostazioni } from '@/lib/impostazioni'
+import { getImpostazioni, moduliPerRuolo } from '@/lib/impostazioni'
 import { SidebarDipendente } from '@/components/layout/SidebarDipendente'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -18,15 +18,16 @@ export default async function DipendenteLayout({ children }: { children: React.R
   const tenantName = (profile?.tenants as { nome?: string } | null)?.nome ?? ''
 
   const imp = await getImpostazioni()
+  const moduli = moduliPerRuolo(imp, 'dipendente')
   const navItems = [
     ...BASE_NAV_ITEMS,
-    ...(imp.modulo_tasks_abilitato     ? [{ label: 'Task',     href: '/dipendente/task',     icon: '✅' }] : []),
-    ...(imp.modulo_cedolini_abilitato  ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
+    ...(moduli.modulo_tasks_abilitato    ? [{ label: 'Task',     href: '/dipendente/task',     icon: '✅' }] : []),
+    ...(moduli.modulo_cedolini_abilitato ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
   ]
 
   return (
     <div className="flex h-screen bg-[#FAFAF8]">
-      <SidebarDipendente moduli={{ tasks: imp.modulo_tasks_abilitato, cedolini: imp.modulo_cedolini_abilitato }} />
+      <SidebarDipendente moduli={{ tasks: moduli.modulo_tasks_abilitato, cedolini: moduli.modulo_cedolini_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="dipendente" userId={user!.id} navItems={navItems} tenantName={tenantName} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
