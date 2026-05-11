@@ -43,7 +43,6 @@ const iconaPerTipo: Record<Notifica['tipo'], string> = {
 
 export function Notifiche({ userId, ruolo }: Props) {
   const router = useRouter()
-  const supabase = createClient()
   const [aperto, setAperto] = useState(false)
   const [notifiche, setNotifiche] = useState<Notifica[]>([])
   const [loading, setLoading] = useState(false)
@@ -65,18 +64,13 @@ export function Notifiche({ userId, ruolo }: Props) {
   useEffect(() => { carica() }, [carica])
 
   useEffect(() => {
-    const canale = supabase
+    const sb = createClient()
+    const canale = sb
       .channel(`notifiche_${userId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'notifiche' },
-        payload => {
-          setNotifiche(prev => [payload.new as Notifica, ...prev].slice(0, 20))
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifiche' }, () => { carica() })
       .subscribe()
-    return () => { supabase.removeChannel(canale) }
-  }, [supabase, userId])
+    return () => { sb.removeChannel(canale) }
+  }, [userId, carica])
 
   useEffect(() => {
     if (!aperto) return
