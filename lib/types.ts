@@ -81,6 +81,8 @@ export type TipoNotifica =
   | 'richiesta_cancellata'
   | 'malattia_comunicata'
   | 'sblocco_approvato'
+  | 'menzione_task'
+  | 'task_assegnato'
 
 export interface Notifica {
   id: string
