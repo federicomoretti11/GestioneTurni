@@ -21,6 +21,7 @@ interface ModaleTurnoProps {
   data?: string   // YYYY-MM-DD (formattata internamente per display)
   postoIdDefault?: string
   readOnly?: boolean
+  onTimbriAggiornati?: (ingresso: string | null, uscita: string | null) => void
 }
 
 function formatDataIT(iso: string): string {
@@ -30,7 +31,7 @@ function formatDataIT(iso: string): string {
   return giorno.charAt(0).toUpperCase() + giorno.slice(1)
 }
 
-export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault, readOnly }: ModaleTurnoProps) {
+export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault, readOnly, onTimbriAggiornati }: ModaleTurnoProps) {
   const [templateId, setTemplateId] = useState<string>('')
   const [oraInizio, setOraInizio] = useState('08:00')
   const [oraFine, setOraFine] = useState('16:00')
@@ -41,6 +42,11 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const [confermaElimina, setConfermaElimina] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [modificato, setModificato] = useState(false)
+  const [correzioneAperta, setCorrezioneAperta] = useState(false)
+  const [ingressoCorretto, setIngressoCorretto] = useState('')
+  const [uscitaCorretto, setUscitaCorretto] = useState('')
+  const [salvandoTimbri, setSalvandoTimbri] = useState(false)
+  const [erroreTimbri, setErroreTimbri] = useState('')
 
   const mostraSelectDipendente = !turno && !dipendenteNome && !!dipendenti && dipendenti.length > 0
 
@@ -63,6 +69,11 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     setConfermaElimina(false)
     setSalvando(false)
     setModificato(false)
+    setCorrezioneAperta(false)
+    setIngressoCorretto('')
+    setUscitaCorretto('')
+    setSalvandoTimbri(false)
+    setErroreTimbri('')
   }, [turno, open])
 
   function handleTemplateChange(id: string) {
@@ -84,6 +95,27 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
 
   const templateSelezionato = templates.find(t => t.id === templateId)
   const isRiposo = templateSelezionato?.nome.toLowerCase().includes('riposo') ?? false
+
+  async function handleSalvaTimbri() {
+    if (!turno) return
+    setSalvandoTimbri(true)
+    setErroreTimbri('')
+    const res = await fetch(`/api/turni/${turno.id}/timbri`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ora_ingresso_effettiva: ingressoCorretto || null,
+        ora_uscita_effettiva: uscitaCorretto || null,
+      }),
+    })
+    setSalvandoTimbri(false)
+    if (!res.ok) {
+      setErroreTimbri('Errore nel salvataggio dei timbri.')
+      return
+    }
+    setCorrezioneAperta(false)
+    onTimbriAggiornati?.(ingressoCorretto || null, uscitaCorretto || null)
+  }
 
   async function handleSave() {
     if (mostraSelectDipendente && !dipendenteId) { setErrore('Seleziona un dipendente'); return }
@@ -296,9 +328,23 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
           )}
         </div>
       )}
-      {mostraTimbri && (
+      {turno && (
         <div className="mb-5 rounded-xl bg-slate-50 border border-slate-200/60 px-4 py-3">
-          <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500 mb-2">Timbrature</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-500">Timbrature</p>
+            <button
+              type="button"
+              onClick={() => {
+                setCorrezioneAperta(v => !v)
+                setIngressoCorretto(timbroIngresso ? oraDaISO(timbroIngresso) : '')
+                setUscitaCorretto(timbroUscita ? oraDaISO(timbroUscita) : '')
+                setErroreTimbri('')
+              }}
+              className="text-[11px] text-blue-600 hover:underline"
+            >
+              {correzioneAperta ? 'Annulla' : 'Correggi timbri'}
+            </button>
+          </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <span className="inline-flex items-center gap-2 text-slate-700">
               <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -311,6 +357,39 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
               <span className="font-semibold">{timbroUscita ? oraDaISO(timbroUscita) : '—'}</span>
             </span>
           </div>
+          {correzioneAperta && (
+            <div className="mt-3 pt-3 border-t border-slate-200 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-semibold tracking-wider uppercase text-slate-500">Ingresso</label>
+                  <input
+                    type="time"
+                    value={ingressoCorretto}
+                    onChange={e => setIngressoCorretto(e.target.value)}
+                    className="w-full h-9 border border-slate-200 rounded-lg px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-semibold tracking-wider uppercase text-slate-500">Uscita</label>
+                  <input
+                    type="time"
+                    value={uscitaCorretto}
+                    onChange={e => setUscitaCorretto(e.target.value)}
+                    className="w-full h-9 border border-slate-200 rounded-lg px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              {erroreTimbri && <p className="text-xs text-red-600">{erroreTimbri}</p>}
+              <button
+                type="button"
+                onClick={handleSalvaTimbri}
+                disabled={salvandoTimbri}
+                className="w-full py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-colors"
+              >
+                {salvandoTimbri ? 'Salvataggio...' : 'Salva correzione'}
+              </button>
+            </div>
+          )}
         </div>
       )}
       <div className="space-y-4">
