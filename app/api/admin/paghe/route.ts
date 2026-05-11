@@ -233,7 +233,7 @@ export async function POST(request: Request) {
 
   if (errDelete) return NextResponse.json({ error: errDelete.message }, { status: 500 })
 
-  const nuoveRighe = righe.map(r => ({ ...r, consuntivo_id: consuntivo.id, tenant_id: tenantId }))
+  const nuoveRighe = righe.map(r => ({ ...r, consuntivo_id: consuntivo.id }))
   const { error: errInsert } = await admin.from('consuntivi_righe').insert(nuoveRighe)
 
   if (errInsert) return NextResponse.json({ error: errInsert.message }, { status: 500 })

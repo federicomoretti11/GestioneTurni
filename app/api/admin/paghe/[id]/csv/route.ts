@@ -86,7 +86,7 @@ export async function GET(
         Math.floor(riga.giorni_ferie ?? 0),
         Math.floor(riga.giorni_permesso ?? 0),
         Math.floor(riga.giorni_malattia ?? 0),
-        Math.floor(riga.totale_turni ?? 0),
+        Math.floor(riga.turni_count ?? 0),
       ].join(',')
     })
 
