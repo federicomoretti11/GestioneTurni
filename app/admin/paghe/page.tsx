@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { FeatureGate } from '@/components/ui/FeatureGate'
 
@@ -29,6 +29,13 @@ interface DatiConsuntivo {
   righe: RigaConsuntivo[]
 }
 
+interface StoricoItem {
+  id: string
+  mese: string
+  approvato_at: string
+  approvato_da_nome: string | null
+}
+
 function oreLabel(n: number) {
   return n % 1 === 0 ? `${n}h` : `${n.toFixed(1)}h`
 }
@@ -36,6 +43,11 @@ function oreLabel(n: number) {
 function formatData(iso: string): string {
   const d = new Date(iso)
   return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+function formatMese(iso: string): string {
+  const [y, m] = iso.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
 }
 
 export default function PaghePage() {
@@ -48,6 +60,18 @@ export default function PaghePage() {
   const [salvando, setSalvando] = useState(false)
   const [errore, setErrore] = useState('')
   const [dati, setDati] = useState<DatiConsuntivo | null>(null)
+  const [storico, setStorico] = useState<StoricoItem[]>([])
+  const [storicoAperto, setStoricoAperto] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/admin/paghe/storico')
+      .then(r => r.ok ? r.json() : { storico: [] })
+      .then(d => {
+        setStorico(d.storico ?? [])
+        setStoricoAperto((d.storico ?? []).length > 0)
+      })
+      .catch(() => {})
+  }, [])
 
   async function handleCalcola() {
     if (!mese) return
@@ -80,6 +104,19 @@ export default function PaghePage() {
     window.location.href = `/api/admin/paghe/${dati.consuntivo_esistente.id}/csv`
   }
 
+  function handleRiapri(item: StoricoItem) {
+    const mesePart = item.mese.slice(0, 7)
+    setMese(mesePart)
+    setDati(null)
+    setLoading(true)
+    setErrore('')
+    fetch(`/api/admin/paghe?mese=${mesePart}`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => setDati(d))
+      .catch(() => setErrore('Errore nel caricamento.'))
+      .finally(() => setLoading(false))
+  }
+
   const totali = dati?.righe.reduce(
     (acc, r) => ({
       ore_ordinarie: acc.ore_ordinarie + r.ore_ordinarie,
@@ -98,6 +135,49 @@ export default function PaghePage() {
     <FeatureGate modulo="modulo_paghe_abilitato">
       <div className="space-y-6 max-w-4xl">
         <h1 className="text-xl font-semibold tracking-tight text-slate-900">Pre-elaborazione Paghe</h1>
+
+        {storico.length > 0 && (
+          <div className="bg-white rounded-xl border border-slate-900/20 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+            <button
+              onClick={() => setStoricoAperto(v => !v)}
+              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+            >
+              <span className="text-sm font-semibold text-slate-900">Storico approvazioni</span>
+              <span className="text-slate-400 text-sm">{storicoAperto ? '▲' : '▼'}</span>
+            </button>
+            {storicoAperto && (
+              <div className="border-t border-slate-900/10">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50">
+                      <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide px-6 py-2">Mese</th>
+                      <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide px-4 py-2">Approvato il</th>
+                      <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide px-4 py-2">Da</th>
+                      <th className="px-4 py-2"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {storico.map(item => (
+                      <tr key={item.id} className="hover:bg-slate-50/50">
+                        <td className="px-6 py-3 font-medium text-slate-900 capitalize">{formatMese(item.mese)}</td>
+                        <td className="px-4 py-3 text-slate-600">{formatData(item.approvato_at)}</td>
+                        <td className="px-4 py-3 text-slate-600">{item.approvato_da_nome ?? '—'}</td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => handleRiapri(item)}
+                            className="text-xs font-medium text-blue-600 hover:underline"
+                          >
+                            Riapri
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
           <div className="flex flex-wrap items-end gap-3">
