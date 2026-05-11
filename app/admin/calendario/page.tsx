@@ -65,7 +65,7 @@ export default function CalendarioPage() {
       fetch('/api/posti'),
       fetch(`/api/richieste/calendario?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
     ])
-    const [utenti, tmpl, trn, pst, asz] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json(), assenzeRes.json()])
+    const [utenti, tmpl, trn, pst, asz] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json(), assenzeRes.ok ? assenzeRes.json() : Promise.resolve([])])
     setDipendenti(utenti.filter((u: Profile) => u.includi_in_turni && u.attivo))
     setTemplates(tmpl)
     setTurni(trn)
