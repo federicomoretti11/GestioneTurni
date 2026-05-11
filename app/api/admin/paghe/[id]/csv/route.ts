@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
 import { NextResponse } from 'next/server'
@@ -13,6 +14,23 @@ export async function GET(
   }
 ) {
   try {
+    // Verify user authentication and role
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('ruolo')
+      .eq('id', user.id)
+      .single()
+
+    if (!['admin', 'manager'].includes(profile?.ruolo ?? '')) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+    }
+
     // Verify auth and get tenant
     const tenantId = await requireTenantId()
     const { id } = await params
@@ -33,6 +51,7 @@ export async function GET(
     }
 
     // Fetch righe with profile info
+    // Sicuro: consuntivo_id già verificato appartenere al tenant tramite consuntivo_paghe
     const { data: righe, error: righeError } = await admin
       .from('consuntivi_righe')
       .select('*, profile:profiles!consuntivi_righe_dipendente_id_fkey(nome, cognome)')
