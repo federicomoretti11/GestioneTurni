@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
+import { broadcastNotifiche } from '@/lib/notifiche'
 import { NextResponse } from 'next/server'
 
 async function getCtx() {
@@ -52,6 +53,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   if (mentionedNames.size > 0) {
     const admin = createAdminClient()
     const { data: task } = await ctx.supabase.from('tasks').select('titolo').eq('id', params.id).single()
+    const destinatari: string[] = []
     for (const key of mentionedNames) {
       const [nome, cognome] = key.split('|')
       const { data: profile } = await admin
@@ -64,8 +66,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
           messaggio: `Menzione nel task "${task?.titolo ?? ''}"`,
           tenant_id: tenantId,
         })
+        destinatari.push(profile.id)
       }
     }
+    if (destinatari.length > 0) await broadcastNotifiche(destinatari)
   }
 
   return NextResponse.json(data, { status: 201 })

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { broadcastNotifiche } from '@/lib/notifiche'
 import { NextResponse } from 'next/server'
 import { dateRange } from '@/lib/richieste/turni'
 import { requireTenantId } from '@/lib/tenant'
@@ -57,6 +58,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     messaggio: `Il tuo rientro dalla malattia è stato impostato al ${data_fine}`,
     tenant_id: tenantId,
   })
+  await broadcastNotifiche([richiesta.dipendente_id])
 
   return NextResponse.json({ ok: true })
 }

@@ -39,6 +39,7 @@ const iconaPerTipo: Record<Notifica['tipo'], string> = {
   sblocco_approvato: '🔓',
   menzione_task: '💬',
   task_assegnato: '📋',
+  cedolino_disponibile: '💰',
 }
 
 export function Notifiche({ userId, ruolo }: Props) {

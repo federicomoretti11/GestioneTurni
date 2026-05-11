@@ -83,6 +83,7 @@ export type TipoNotifica =
   | 'sblocco_approvato'
   | 'menzione_task'
   | 'task_assegnato'
+  | 'cedolino_disponibile'
 
 export interface Notifica {
   id: string

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
+import { broadcastNotifiche } from '@/lib/notifiche'
 import { NextResponse } from 'next/server'
 
 const MESI_IT = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']
@@ -86,5 +87,15 @@ export async function POST(request: Request) {
     await adminClient.storage.from('documenti').remove([storagePath])
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  await adminClient.from('notifiche').insert({
+    destinatario_id: dipendenteId,
+    tipo: 'cedolino_disponibile',
+    titolo: 'Cedolino disponibile',
+    messaggio: `È disponibile il tuo cedolino: ${nome}`,
+    tenant_id: tenantId,
+  })
+  await broadcastNotifiche([dipendenteId])
+
   return NextResponse.json(data, { status: 201 })
 }

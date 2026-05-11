@@ -1,6 +1,7 @@
 // lib/richieste/notifiche.ts
 import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { broadcastNotifiche } from '@/lib/notifiche'
 import { formatDateIT } from '@/lib/utils/date'
 import type { TipoRichiesta } from '@/lib/types'
 
@@ -16,6 +17,7 @@ async function insert(righe: Riga[]) {
   if (!righe.length) return
   try {
     await createAdminClient().from('notifiche').insert(righe)
+    await broadcastNotifiche(righe.map(r => r.destinatario_id))
   } catch (e) {
     console.error('[notifiche-richieste] insert fallita', e)
   }

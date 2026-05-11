@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
+import { broadcastNotifiche } from '@/lib/notifiche'
 import { NextResponse } from 'next/server'
 
 async function getCtx() {
@@ -58,7 +59,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
             messaggio: `Task: "${task?.titolo ?? ''}"`,
             tenant_id: tenantId,
           }))
-        if (notifiche.length > 0) await admin.from('notifiche').insert(notifiche)
+        if (notifiche.length > 0) {
+          await admin.from('notifiche').insert(notifiche)
+          await broadcastNotifiche(notifiche.map(n => n.destinatario_id))
+        }
       }
     }
   } else {

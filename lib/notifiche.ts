@@ -28,7 +28,7 @@ function formatOraISO(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-async function broadcastNotifiche(destinatarioIds: string[]) {
+export async function broadcastNotifiche(destinatarioIds: string[]) {
   const unique = [...new Set(destinatarioIds)]
   if (!unique.length) return
   try {
