@@ -34,7 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex h-screen bg-[#FAFAF8]">
-      <SidebarAdmin moduli={{ tasks: moduli.modulo_tasks_abilitato, documenti: moduli.modulo_documenti_abilitato, cedolini: moduli.modulo_cedolini_abilitato, analytics: moduli.modulo_analytics_abilitato }} />
+      <SidebarAdmin moduli={{ tasks: moduli.modulo_tasks_abilitato, documenti: moduli.modulo_documenti_abilitato, cedolini: moduli.modulo_cedolini_abilitato, analytics: moduli.modulo_analytics_abilitato, paghe: moduli.modulo_paghe_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="admin" userId={user!.id} navItems={navItems} tenantName={tenantName} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
