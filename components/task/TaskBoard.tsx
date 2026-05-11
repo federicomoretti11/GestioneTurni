@@ -80,18 +80,18 @@ function TaskCard({ task, draggable, onDragStart, onClick }: {
       draggable={draggable}
       onDragStart={onDragStart}
       onClick={onClick}
-      className="group relative w-full text-left bg-white border border-slate-900/20 rounded-md p-3 hover:border-slate-300 hover:shadow-[0_1px_0_rgba(15,23,42,.04),0_4px_12px_-6px_rgba(15,23,42,.18)] transition cursor-pointer select-none"
+      className="group relative w-full text-left bg-white border border-slate-900/20 rounded-lg p-4 hover:border-slate-300 hover:shadow-[0_1px_0_rgba(15,23,42,.04),0_4px_12px_-6px_rgba(15,23,42,.18)] transition cursor-pointer select-none"
     >
-      <span className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-l-md ${P[task.priorita].bar}`} />
-      <div className="flex items-center justify-between mb-1.5 ml-1.5">
+      <span className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg ${P[task.priorita].bar}`} />
+      <div className="flex items-center justify-between mb-2 ml-2">
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">TASK · {shortId(task.id)}</span>
         <PPill p={task.priorita} />
       </div>
-      <div className="ml-1.5 text-[13.5px] font-medium text-slate-900 leading-snug">{task.titolo}</div>
+      <div className="ml-2 text-[14px] font-medium text-slate-900 leading-snug">{task.titolo}</div>
       {task.descrizione && (
-        <div className="ml-1.5 mt-1 text-[12px] text-slate-500 line-clamp-2 leading-snug">{task.descrizione}</div>
+        <div className="ml-2 mt-1.5 text-[12.5px] text-slate-500 line-clamp-3 leading-snug">{task.descrizione}</div>
       )}
-      <div className="ml-1.5 mt-2.5 flex items-center justify-between">
+      <div className="ml-2 mt-3 flex items-center justify-between">
         <div className="flex -space-x-1.5">
           {task.task_assegnazioni.slice(0,3).map(a => (
             <Av key={a.dipendente_id} nome={a.profile.nome} cognome={a.profile.cognome} id={a.dipendente_id} size="xs" />
@@ -128,7 +128,7 @@ function KanbanColumn({ col, tasks, canManage, dragOver, onDragOver, onDrop, onC
 }) {
   const over = col.max && tasks.length > col.max
   return (
-    <div className="flex flex-col min-w-[300px] w-[300px] shrink-0">
+    <div className="flex flex-col min-w-[340px] w-[340px] shrink-0">
       <div className="flex items-center justify-between px-1 mb-2">
         <div className="flex items-center gap-2">
           <span className={`w-1.5 h-1.5 rounded-full ${col.dot}`} />

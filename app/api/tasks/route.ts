@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
 import { NextResponse } from 'next/server'
 
@@ -70,6 +71,18 @@ export async function POST(request: Request) {
   if (assegnati && assegnati.length > 0) {
     const rows = (assegnati as string[]).map(id => ({ task_id: task.id, dipendente_id: id }))
     await ctx.supabase.from('task_assegnazioni').insert(rows)
+
+    const admin = createAdminClient()
+    const notifiche = (assegnati as string[])
+      .filter(id => id !== ctx.user.id)
+      .map(id => ({
+        destinatario_id: id,
+        tipo: 'task_assegnato',
+        titolo: 'Sei stato assegnato a un task',
+        messaggio: `Task: "${titolo.trim()}"`,
+        tenant_id: tenantId,
+      }))
+    if (notifiche.length > 0) await admin.from('notifiche').insert(notifiche)
   }
 
   return NextResponse.json(task, { status: 201 })

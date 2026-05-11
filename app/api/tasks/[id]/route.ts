@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { requireTenantId } from '@/lib/tenant'
 import { NextResponse } from 'next/server'
 
@@ -34,10 +35,30 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     if (assegnati !== undefined) {
+      const { data: esistenti } = await ctx.supabase
+        .from('task_assegnazioni').select('dipendente_id').eq('task_id', params.id)
+      const idEsistenti = new Set((esistenti ?? []).map((r: { dipendente_id: string }) => r.dipendente_id))
+      const nuovi = (assegnati as string[]).filter(id => !idEsistenti.has(id))
+
       await ctx.supabase.from('task_assegnazioni').delete().eq('task_id', params.id)
       if (assegnati.length > 0) {
         const rows = (assegnati as string[]).map(id => ({ task_id: params.id, dipendente_id: id }))
         await ctx.supabase.from('task_assegnazioni').insert(rows)
+      }
+
+      if (nuovi.length > 0) {
+        const { data: task } = await ctx.supabase.from('tasks').select('titolo').eq('id', params.id).single()
+        const admin = createAdminClient()
+        const notifiche = nuovi
+          .filter(id => id !== ctx.user.id)
+          .map(id => ({
+            destinatario_id: id,
+            tipo: 'task_assegnato',
+            titolo: 'Sei stato assegnato a un task',
+            messaggio: `Task: "${task?.titolo ?? ''}"`,
+            tenant_id: tenantId,
+          }))
+        if (notifiche.length > 0) await admin.from('notifiche').insert(notifiche)
       }
     }
   } else {
