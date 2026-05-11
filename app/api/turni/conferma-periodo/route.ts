@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   // Legge i turni bozza nel periodo con dettagli per le email.
   const { data: bozze, error: readErr } = await admin
     .from('turni')
-    .select('dipendente_id, data, ora_inizio, ora_fine')
+    .select('dipendente_id, data, ora_inizio, ora_fine, posto:posti_di_servizio(nome)')
     .eq('stato', 'bozza')
     .eq('tenant_id', tenantId)
     .gte('data', data_inizio)
@@ -41,10 +41,15 @@ export async function POST(request: Request) {
   }
 
   // Raggruppa per dipendente
-  const turniPerDipendente: Record<string, Array<{ data: string; ora_inizio: string; ora_fine: string }>> = {}
+  const turniPerDipendente: Record<string, Array<{ data: string; ora_inizio: string; ora_fine: string; posto_nome: string | null }>> = {}
   for (const t of bozze) {
     if (!turniPerDipendente[t.dipendente_id]) turniPerDipendente[t.dipendente_id] = []
-    turniPerDipendente[t.dipendente_id].push({ data: t.data, ora_inizio: t.ora_inizio, ora_fine: t.ora_fine })
+    turniPerDipendente[t.dipendente_id].push({
+      data: t.data,
+      ora_inizio: t.ora_inizio,
+      ora_fine: t.ora_fine,
+      posto_nome: (t.posto as { nome: string } | null)?.nome ?? null,
+    })
   }
   const dipendenteIds = Object.keys(turniPerDipendente)
   const conteggio: Record<string, number> = Object.fromEntries(

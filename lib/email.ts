@@ -74,7 +74,7 @@ export async function sendEmailTurniPubblicati(params: {
   toEmail: string
   dataInizio: string
   dataFine: string
-  turni: Array<{ data: string; ora_inizio: string; ora_fine: string }>
+  turni: Array<{ data: string; ora_inizio: string; ora_fine: string; posto_nome?: string | null }>
 }) {
   const formatData = (s: string) => {
     const [y, m, d] = s.split('-').map(Number)
@@ -92,6 +92,7 @@ export async function sendEmailTurniPubblicati(params: {
       return `<tr>
         <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">${formatData(t.data)}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">${orario}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#6b7280">${t.posto_nome ?? '—'}</td>
       </tr>`
     })
     .join('')
@@ -109,6 +110,7 @@ export async function sendEmailTurniPubblicati(params: {
               <tr style="background:#f8fafc">
                 <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Giorno</th>
                 <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Orario</th>
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Posto</th>
               </tr>
             </thead>
             <tbody>${righe}</tbody>
