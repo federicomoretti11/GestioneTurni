@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       data: t.data,
       ora_inizio: t.ora_inizio,
       ora_fine: t.ora_fine,
-      posto_nome: (t.posto as { nome: string } | null)?.nome ?? null,
+      posto_nome: (t.posto as unknown as { nome: string } | null)?.nome ?? null,
     })
   }
   const dipendenteIds = Object.keys(turniPerDipendente)

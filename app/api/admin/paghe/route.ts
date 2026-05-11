@@ -94,7 +94,7 @@ export async function GET(request: Request) {
   const righeMap = new Map<string, RigaMap>()
 
   for (const turno of turni ?? []) {
-    const profile = turno.profile as { id: string; nome: string; cognome: string } | null
+    const profile = turno.profile as unknown as { id: string; nome: string; cognome: string } | null
     if (!profile) continue
 
     if (!righeMap.has(turno.dipendente_id)) {
@@ -164,7 +164,7 @@ export async function GET(request: Request) {
 
   let consuntivo_esistente = null
   if (consuntivo) {
-    const approvatore = consuntivo.profiles as { nome: string; cognome: string } | null
+    const approvatore = consuntivo.profiles as unknown as { nome: string; cognome: string } | null
     consuntivo_esistente = {
       id: consuntivo.id,
       stato: consuntivo.stato,

@@ -96,7 +96,7 @@ export async function GET(
     const meseParts = consuntivo.mese.split('-') // es. "2026-05-01" -> ["2026", "05", "01"]
     const yearMonth = `${meseParts[0]}-${meseParts[1]}` // "2026-05"
 
-    const tenantNome = (consuntivo.tenants?.nome || 'tenant')
+    const tenantNome = ((consuntivo.tenants as unknown as { nome: string } | null)?.nome || 'tenant')
       .toLowerCase()
       .replace(/\s+/g, '_') // spazi -> underscore
       .replace(/[^a-z0-9_]/g, '') // rimuovi caratteri speciali
