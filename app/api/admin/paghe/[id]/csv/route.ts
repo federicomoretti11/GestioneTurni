@@ -69,10 +69,14 @@ export async function GET(
     const csvHeader =
       'Cognome,Nome,Ore Ordinarie,Ore Notturne,Ore Festive,Ore Straordinarie,Giorni Ferie,Giorni Permesso,Giorni Malattia,Totale Turni'
 
-    const csvRows = (righe || []).map((riga: any) => {
-      const profile = riga.profile as any
-      const cognome = (profile?.cognome || '').replace(/,/g, ' ')
-      const nome = (profile?.nome || '').replace(/,/g, ' ')
+    type RigaConProfile = {
+      ore_ordinarie: number; ore_notturne: number; ore_festive: number; ore_straordinarie: number
+      giorni_ferie: number; giorni_permesso: number; giorni_malattia: number; turni_count: number
+      profile: { nome: string; cognome: string } | null
+    }
+    const csvRows = (righe || []).map((riga: RigaConProfile) => {
+      const cognome = (riga.profile?.cognome || '').replace(/,/g, ' ')
+      const nome = (riga.profile?.nome || '').replace(/,/g, ' ')
 
       return [
         cognome,
