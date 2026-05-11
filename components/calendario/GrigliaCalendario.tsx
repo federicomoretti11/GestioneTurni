@@ -2,10 +2,20 @@
 import { useRef, useEffect } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { CellaCalendario } from './CellaCalendario'
+import { BloccoAssenza, TipoAssenza } from './BloccoAssenza'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
 import { calcolaOreTurno } from '@/lib/utils/turni'
 
 const oggi = toDateString(new Date())
+
+export interface AssenzaCalendario {
+  id: string
+  dipendente_id: string
+  tipo: TipoAssenza
+  data_inizio: string
+  data_fine: string
+  note: string | null
+}
 
 interface GrigliaProps {
   giorni: Date[]
@@ -16,6 +26,8 @@ interface GrigliaProps {
   readonly?: boolean
   onTurnoClick?: (turno: TurnoConDettagli) => void
   compact?: boolean
+  assenze?: AssenzaCalendario[]
+  onAssenzaClick?: (assenza: AssenzaCalendario) => void
 }
 
 function oreLabel(ore: number) {
@@ -23,7 +35,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick, compact }: GrigliaProps) {
+export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick, compact, assenze, onAssenzaClick }: GrigliaProps) {
   const todayRef = useRef<HTMLTableCellElement>(null)
   useEffect(() => {
     todayRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
@@ -31,6 +43,12 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
 
   function getTurniCella(dipendenteId: string, data: string) {
     return turni.filter(t => t.dipendente_id === dipendenteId && t.data === data)
+  }
+
+  function getAssenzaCella(dipendenteId: string, data: string): AssenzaCalendario | null {
+    return (assenze ?? []).find(
+      a => a.dipendente_id === dipendenteId && a.data_inizio <= data && a.data_fine >= data
+    ) ?? null
   }
 
   function oreCella(dipendenteId: string, data: string) {
@@ -78,6 +96,18 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
               </td>
               {giorni.map(g => {
                 const data = toDateString(g)
+                const assenza = getAssenzaCella(d.id, data)
+                if (assenza) {
+                  return (
+                    <td key={data} className="border border-slate-200/60 px-1 py-1">
+                      <BloccoAssenza
+                        tipo={assenza.tipo}
+                        onClick={() => onAssenzaClick?.(assenza)}
+                        compact={compact}
+                      />
+                    </td>
+                  )
+                }
                 return (
                   <CellaCalendario
                     key={data}
