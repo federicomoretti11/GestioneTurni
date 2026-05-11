@@ -1,5 +1,6 @@
 ﻿'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 // ── Types ────────────────────────────────────────────────────
 interface Assegnato { dipendente_id: string; profile: { nome: string; cognome: string } }
@@ -587,16 +588,26 @@ export function TaskBoard({ canManage }: { canManage: boolean }) {
   const [selected, setSelected] = useState<Task | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTask, setEditTask] = useState<Task | null>(null)
+  const supabase = createClient()
 
-  async function carica() {
+  const carica = useCallback(async () => {
     setLoading(true)
     const [tr, ur] = await Promise.all([fetch('/api/tasks'), canManage ? fetch('/api/tasks/utenti') : Promise.resolve(null)])
     if (tr.ok) setTasks(await tr.json())
     if (ur?.ok) setUtenti(await ur.json())
     setLoading(false)
-  }
+  }, [canManage])
 
-  useEffect(() => { carica() }, [])
+  useEffect(() => { carica() }, [carica])
+
+  useEffect(() => {
+    const ch = supabase.channel('tasks-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, carica)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_assegnazioni' }, carica)
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carica])
 
   async function cambiaStato(id: string, stato: Stato) {
     await fetch(`/api/tasks/${id}`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ stato }) })

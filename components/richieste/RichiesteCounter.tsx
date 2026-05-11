@@ -20,6 +20,7 @@ export function useRichiesteCount() {
       .channel('richieste-badge')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'richieste' }, fetch)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifiche' }, fetch)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notifiche' }, fetch)
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
