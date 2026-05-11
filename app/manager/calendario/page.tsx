@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
-import { GrigliaCalendario } from '@/components/calendario/GrigliaCalendario'
+import { GrigliaCalendario, AssenzaCalendario } from '@/components/calendario/GrigliaCalendario'
 import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
@@ -39,6 +39,8 @@ export default function CalendarioPage() {
   })
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
+  const [assenze, setAssenze] = useState<AssenzaCalendario[]>([])
+  const [assenzaDettaglio, setAssenzaDettaglio] = useState<AssenzaCalendario | null>(null)
 
   useEffect(() => {
     const d = parseDataParam(searchParams.get('data'))
@@ -56,17 +58,19 @@ export default function CalendarioPage() {
     setErrore('')
     setLoading(true)
     try {
-    const [utentiRes, templateRes, turniRes, postiRes] = await Promise.all([
+    const [utentiRes, templateRes, turniRes, postiRes, assenzeRes] = await Promise.all([
       fetch('/api/utenti'),
       fetch('/api/template'),
       fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
       fetch('/api/posti'),
+      fetch(`/api/richieste/calendario?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
     ])
-    const [utenti, tmpl, trn, pst] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json()])
+    const [utenti, tmpl, trn, pst, asz] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json(), assenzeRes.ok ? assenzeRes.json() : Promise.resolve([])])
     setDipendenti(utenti.filter((u: Profile) => u.includi_in_turni && u.attivo))
     setTemplates(tmpl)
     setTurni(trn)
     setPosti(pst)
+    setAssenze(Array.isArray(asz) ? asz : [])
     } catch {
       setErrore('Errore nel caricamento dei dati. Riprova.')
     } finally {
@@ -229,6 +233,8 @@ export default function CalendarioPage() {
               turni={turniFiltrati}
               onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
               onEditTurno={turno => setModale({ open: true, turno })}
+              assenze={assenze}
+              onAssenzaClick={setAssenzaDettaglio}
             />
           </div>
           <div className="md:hidden">
@@ -264,6 +270,37 @@ export default function CalendarioPage() {
         dipendenti={dipendentiFiltrati}
         data={modale.data}
       />
+      {assenzaDettaglio && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={() => setAssenzaDettaglio(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+            <h2 className="text-base font-semibold text-slate-900 mb-4">
+              {assenzaDettaglio.tipo === 'ferie' ? 'Ferie' : assenzaDettaglio.tipo === 'malattia' ? 'Malattia' : 'Permesso'}
+            </h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Periodo</span>
+                <span className="font-medium text-slate-900">
+                  {assenzaDettaglio.data_inizio === assenzaDettaglio.data_fine
+                    ? assenzaDettaglio.data_inizio
+                    : `${assenzaDettaglio.data_inizio} — ${assenzaDettaglio.data_fine}`}
+                </span>
+              </div>
+              {assenzaDettaglio.note && (
+                <div className="pt-2">
+                  <p className="text-[10px] font-semibold tracking-wider uppercase text-slate-400 mb-1">Note</p>
+                  <p className="text-slate-700 whitespace-pre-wrap">{assenzaDettaglio.note}</p>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setAssenzaDettaglio(null)}
+              className="mt-5 w-full py-2 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+            >
+              Chiudi
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
