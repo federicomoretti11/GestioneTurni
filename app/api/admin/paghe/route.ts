@@ -205,6 +205,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'mese e righe obbligatori' }, { status: 400 })
   }
 
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(mese)) {
+    return NextResponse.json({ error: 'Parametro mese non valido (YYYY-MM)' }, { status: 400 })
+  }
+
   const data_inizio = `${mese}-01`
   const admin = createAdminClient()
 
