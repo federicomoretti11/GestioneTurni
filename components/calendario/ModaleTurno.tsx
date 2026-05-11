@@ -141,7 +141,6 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   }
   const timbroIngresso = turno?.ora_ingresso_effettiva ?? null
   const timbroUscita = turno?.ora_uscita_effettiva ?? null
-  const mostraTimbri = !!(timbroIngresso || timbroUscita)
 
   const festivi = useFestivi()
   const dataISO = turno?.data ?? data ?? ''
