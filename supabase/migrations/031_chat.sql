@@ -24,14 +24,23 @@ ALTER TABLE chat_conversazioni ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messaggi      ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "utente_chat_conv" ON chat_conversazioni
-  FOR ALL USING (utente_id = auth.uid());
+  FOR ALL USING (utente_id = auth.uid())
+  WITH CHECK (tenant_id = get_my_tenant_id() AND utente_id = auth.uid());
 
 CREATE POLICY "superadmin_chat_conv" ON chat_conversazioni
   FOR ALL USING (get_is_super_admin());
 
-CREATE POLICY "utente_chat_msg" ON chat_messaggi
-  FOR ALL USING (
+CREATE POLICY "utente_chat_msg_select" ON chat_messaggi
+  FOR SELECT USING (
     conversazione_id IN (
+      SELECT id FROM chat_conversazioni WHERE utente_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "utente_chat_msg_insert" ON chat_messaggi
+  FOR INSERT WITH CHECK (
+    mittente_id = auth.uid()
+    AND conversazione_id IN (
       SELECT id FROM chat_conversazioni WHERE utente_id = auth.uid()
     )
   );
