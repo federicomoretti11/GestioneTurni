@@ -48,6 +48,17 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
+  // Non-super-admin: verifica che la conversazione appartenga all'utente
+  if (!profile?.is_super_admin) {
+    const { data: conv } = await supabase
+      .from('chat_conversazioni')
+      .select('id')
+      .eq('id', conversazione_id)
+      .eq('utente_id', user.id)
+      .maybeSingle()
+    if (!conv) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  }
+
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('chat_messaggi')
@@ -63,7 +74,7 @@ export async function POST(request: Request) {
     await sendEmailChatMessaggio({
       nomeUtente: `${profile?.nome ?? ''} ${profile?.cognome ?? ''}`.trim(),
       nomeAzienda,
-      testo: testo.trim(),
+      testo,
     })
   }
 
