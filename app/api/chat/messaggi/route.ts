@@ -12,16 +12,25 @@ export async function GET(request: Request) {
   const conversazione_id = searchParams.get('conversazione_id')
   if (!conversazione_id) return NextResponse.json({ error: 'conversazione_id obbligatorio' }, { status: 400 })
 
-  // Verifica appartenenza conversazione all'utente
-  const { data: conv } = await supabase
-    .from('chat_conversazioni')
-    .select('id')
-    .eq('id', conversazione_id)
-    .eq('utente_id', user.id)
-    .maybeSingle()
-  if (!conv) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_super_admin')
+    .eq('id', user.id)
+    .single()
 
-  const { data, error } = await supabase
+  if (!profile?.is_super_admin) {
+    // Verifica appartenenza conversazione all'utente
+    const { data: conv } = await supabase
+      .from('chat_conversazioni')
+      .select('id')
+      .eq('id', conversazione_id)
+      .eq('utente_id', user.id)
+      .maybeSingle()
+    if (!conv) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+  }
+
+  const queryClient = profile?.is_super_admin ? createAdminClient() : supabase
+  const { data, error } = await queryClient
     .from('chat_messaggi')
     .select('*')
     .eq('conversazione_id', conversazione_id)
@@ -62,7 +71,12 @@ export async function POST(request: Request) {
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('chat_messaggi')
-    .insert({ conversazione_id, mittente_id: user.id, testo: testo.trim() })
+    .insert({
+      conversazione_id,
+      mittente_id: user.id,
+      testo: testo.trim(),
+      letto_superadmin: profile?.is_super_admin ?? false,
+    })
     .select()
     .single()
 
