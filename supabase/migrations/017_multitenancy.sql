@@ -1,9 +1,8 @@
 -- supabase/migrations/017_multitenancy.sql
 -- Multi-tenancy: tabella tenants, tenant_id su tutte le tabelle, RLS aggiornate
--- Applicare manualmente nel SQL Editor di Supabase Dashboard
 
 -- =====================================================================
--- 1. TABELLA TENANTS
+-- 1. TABELLA TENANTS (senza policy ancora — la funzione non esiste)
 -- =====================================================================
 CREATE TABLE tenants (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -13,12 +12,6 @@ CREATE TABLE tenants (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
--- Solo super_admin legge/modifica (tutto il resto via service_role).
--- Usa get_is_super_admin() definita nella sezione 7 (applicare dopo).
-CREATE POLICY "tenants_super_admin" ON tenants
-  FOR ALL USING (get_is_super_admin());
-
 -- =====================================================================
 -- 2. FLAG SUPER_ADMIN SU PROFILES
 -- =====================================================================
@@ -27,7 +20,7 @@ ALTER TABLE profiles ADD COLUMN is_super_admin BOOLEAN NOT NULL DEFAULT false;
 -- =====================================================================
 -- 3. TENANT_ID (nullable inizialmente, poi NOT NULL dopo migrazione dati)
 -- =====================================================================
--- Nota: la tabella reparti non esiste in questo schema (mai utilizzata)
+-- Nota: reparti non usa tenant_id (tabella non più utilizzata)
 ALTER TABLE profiles          ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
 ALTER TABLE turni             ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
 ALTER TABLE turni_template    ADD COLUMN tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE;
@@ -77,7 +70,6 @@ END $$;
 -- 5. NOT NULL CONSTRAINTS (dopo aver popolato i dati)
 -- =====================================================================
 ALTER TABLE profiles          ALTER COLUMN tenant_id SET NOT NULL;
-ALTER TABLE reparti           ALTER COLUMN tenant_id SET NOT NULL;
 ALTER TABLE turni             ALTER COLUMN tenant_id SET NOT NULL;
 ALTER TABLE turni_template    ALTER COLUMN tenant_id SET NOT NULL;
 ALTER TABLE posti_di_servizio ALTER COLUMN tenant_id SET NOT NULL;
@@ -98,7 +90,7 @@ CREATE INDEX idx_notifiche_tenant         ON notifiche(tenant_id);
 CREATE INDEX idx_audit_log_tenant         ON audit_log(tenant_id);
 
 -- =====================================================================
--- 7. FUNZIONI HELPER
+-- 7. FUNZIONI HELPER (dopo che le colonne esistono)
 -- =====================================================================
 CREATE OR REPLACE FUNCTION get_my_tenant_id()
 RETURNS UUID LANGUAGE sql STABLE SECURITY DEFINER
@@ -113,6 +105,13 @@ RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path = public, pg_temp AS $$
   SELECT COALESCE(is_super_admin, false) FROM profiles WHERE id = auth.uid()
 $$;
+
+-- =====================================================================
+-- 7b. RLS su tenants (ora che le funzioni esistono)
+-- =====================================================================
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "tenants_super_admin" ON tenants
+  FOR ALL USING (get_is_super_admin());
 
 -- =====================================================================
 -- 8. AGGIORNA TRIGGER handle_new_user PER LEGGERE tenant_id DAI METADATA
