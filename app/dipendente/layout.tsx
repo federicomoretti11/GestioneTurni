@@ -27,7 +27,7 @@ export default async function DipendenteLayout({ children }: { children: React.R
 
   return (
     <div className="flex h-screen bg-[#FAFAF8]">
-      <SidebarDipendente moduli={{ tasks: moduli.modulo_tasks_abilitato, cedolini: moduli.modulo_cedolini_abilitato }} />
+      <SidebarDipendente moduli={{ tasks: moduli.modulo_tasks_abilitato, cedolini: moduli.modulo_cedolini_abilitato, whiteLabelAbilitato: imp.white_label_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="dipendente" userId={user!.id} navItems={navItems} tenantName={tenantName} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>

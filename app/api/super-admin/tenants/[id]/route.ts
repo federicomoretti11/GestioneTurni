@@ -70,7 +70,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 
   const { data: tenant, error } = await admin
     .from('tenants')
-    .select('id, nome, slug, attivo, piano, piano_scadenza, piano_note, created_at')
+    .select('id, nome, slug, attivo, piano, piano_scadenza, piano_note, created_at, nome_app, colore_primario, logo_url')
     .eq('id', id)
     .single()
   if (error || !tenant) return NextResponse.json({ error: 'Tenant non trovato' }, { status: 404 })
@@ -99,6 +99,9 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     impostazioni: imp ?? null,
     utenti_count: utenti_count ?? 0,
     piano_log: piano_log ?? [],
+    nome_app: tenant.nome_app ?? null,
+    colore_primario: tenant.colore_primario ?? null,
+    logo_url: tenant.logo_url ?? null,
   })
 }
 
@@ -175,6 +178,18 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       { onConflict: 'tenant_id' }
     )
     if (impErr) return NextResponse.json({ error: impErr.message }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  }
+
+  // Aggiornamento branding
+  const brandingKeys = ['nome_app', 'colore_primario', 'logo_url'] as const
+  const brandingUpdates: Record<string, string | null> = {}
+  for (const key of brandingKeys) {
+    if (key in body) brandingUpdates[key] = body[key] ?? null
+  }
+  if (Object.keys(brandingUpdates).length > 0) {
+    const { error: bErr } = await admin.from('tenants').update(brandingUpdates).eq('id', id)
+    if (bErr) return NextResponse.json({ error: bErr.message }, { status: 500 })
     return NextResponse.json({ ok: true })
   }
 

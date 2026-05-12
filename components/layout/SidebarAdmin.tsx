@@ -21,7 +21,10 @@ interface Moduli {
   cedolini?: boolean
   analytics?: boolean
   paghe?: boolean
+  whiteLabelAbilitato?: boolean
 }
+
+interface Branding { logoUrl?: string; nomeApp?: string; colorePrimario?: string }
 
 const SUPER_ADMIN_ITEMS = [
   { section: 'Super Admin', label: 'Tenant', href: '/super-admin/tenants', icon: '🏢' },
@@ -31,16 +34,20 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const [mounted, setMounted] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
+  const [branding, setBranding] = useState<Branding | undefined>(undefined)
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
-      supabase.from('profiles').select('is_super_admin, tenants(nome)').eq('id', user.id).single()
+      supabase.from('profiles').select('is_super_admin, tenants(nome, nome_app, colore_primario, logo_url)').eq('id', user.id).single()
         .then(({ data }) => {
           if (data?.is_super_admin) setIsSuperAdmin(true)
-          const t = data?.tenants as { nome?: string } | null
+          const t = data?.tenants as { nome?: string; nome_app?: string; colore_primario?: string; logo_url?: string } | null
           if (t?.nome) setTenantName(t.nome)
+          if (moduli?.whiteLabelAbilitato && t) {
+            setBranding({ logoUrl: t.logo_url, nomeApp: t.nome_app, colorePrimario: t.colore_primario })
+          }
         })
     })
   }, [])
@@ -78,5 +85,5 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
     }
     return it
   })
-  return <Sidebar items={items} title="Opero Hub" ruolo="admin" tenantName={tenantName} />
+  return <Sidebar items={items} title="Opero Hub" ruolo="admin" tenantName={tenantName} branding={branding} />
 }

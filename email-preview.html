@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview Email — Opero Hub</title>
+  <style>
+    body { font-family: sans-serif; background: #f1f5f9; padding: 32px; }
+    h1 { font-size: 20px; color: #1e293b; margin-bottom: 32px; }
+    .email-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.12); margin-bottom: 40px; overflow: hidden; }
+    .email-meta { background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 20px; font-size: 13px; color: #64748b; }
+    .email-meta strong { color: #1e293b; }
+    .email-body { padding: 0; }
+    iframe { width: 100%; border: none; display: block; }
+  </style>
+</head>
+<body>
+  <h1>📧 Preview Email — Opero Hub</h1>
+
+  <!-- 1. Attivazione account -->
+  <div class="email-card">
+    <div class="email-meta">
+      <strong>Da:</strong> Opero Hub &lt;noreply@operohub.com&gt; &nbsp;|&nbsp;
+      <strong>Oggetto:</strong> Attiva il tuo account Opero Hub
+    </div>
+    <div class="email-body">
+      <iframe srcdoc='
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#1e40af">Benvenuto in Opero Hub 👋</h2>
+          <p>Ciao <strong>Marco Rossi</strong>,</p>
+          <p>Il tuo account è stato creato. Clicca sul pulsante qui sotto per attivarlo e impostare la tua password.</p>
+          <a href="#" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#1e40af;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Attiva account</a>
+          <p style="color:#6b7280;font-size:13px;margin-top:24px">Se non riesci a cliccare il pulsante, copia questo link nel browser:</p>
+          <p style="color:#6b7280;font-size:12px;word-break:break-all">https://app.operohub.com/auth/confirm?token=abc123...</p>
+          <p style="color:#9ca3af;font-size:12px;margin-top:24px">Il link scade dopo 24 ore.</p>
+        </div>' height="320"></iframe>
+    </div>
+  </div>
+
+  <!-- 2. Turni pubblicati -->
+  <div class="email-card">
+    <div class="email-meta">
+      <strong>Da:</strong> Opero Hub &lt;noreply@operohub.com&gt; &nbsp;|&nbsp;
+      <strong>Oggetto:</strong> Turni pubblicati — dal 1 maggio 2026 al 31 maggio 2026
+    </div>
+    <div class="email-body">
+      <iframe srcdoc='
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+          <h2 style="color:#1e40af;margin-bottom:4px">Turni pubblicati 📅</h2>
+          <p style="color:#6b7280;margin-top:0">Dal <strong>1 maggio 2026</strong> al <strong>31 maggio 2026</strong></p>
+          <table style="width:100%;border-collapse:collapse;margin-top:16px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+            <thead>
+              <tr style="background:#f8fafc">
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Giorno</th>
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Orario</th>
+                <th style="padding:8px 12px;text-align:left;font-size:12px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Posto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">lunedì 4 maggio 2026</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">08:00 – 16:00</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#6b7280">Sede principale</td></tr>
+              <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">martedì 5 maggio 2026</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">14:00 – 22:00</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#6b7280">Filiale Nord</td></tr>
+              <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">giovedì 7 maggio 2026</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">08:00 – 16:00</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#6b7280">Sede principale</td></tr>
+              <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151">sabato 9 maggio 2026</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#374151;font-weight:600">Riposo</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#6b7280">—</td></tr>
+              <tr><td style="padding:8px 12px;color:#374151">domenica 10 maggio 2026</td><td style="padding:8px 12px;color:#374151;font-weight:600">22:00 – 06:00</td><td style="padding:8px 12px;color:#6b7280">Filiale Nord</td></tr>
+            </tbody>
+          </table>
+          <p style="color:#6b7280;font-size:14px;margin-top:20px">Accedi all&apos;app per visualizzare tutti i dettagli.</p>
+        </div>' height="380"></iframe>
+    </div>
+  </div>
+
+  <!-- 3. Richiesta approvata -->
+  <div class="email-card">
+    <div class="email-meta">
+      <strong>Da:</strong> Opero Hub &lt;noreply@operohub.com&gt; &nbsp;|&nbsp;
+      <strong>Oggetto:</strong> Richiesta Ferie approvata
+    </div>
+    <div class="email-body">
+      <iframe srcdoc='
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#16a34a">Richiesta approvata ✓</h2>
+          <p>La tua richiesta di <strong>Ferie</strong> dal <strong>12 maggio 2026</strong> al <strong>16 maggio 2026</strong> è stata approvata.</p>
+          <p style="color:#6b7280;font-size:14px">Puoi visualizzarla nella sezione Richieste della tua app.</p>
+        </div>' height="200"></iframe>
+    </div>
+  </div>
+
+  <!-- 4. Richiesta rifiutata -->
+  <div class="email-card">
+    <div class="email-meta">
+      <strong>Da:</strong> Opero Hub &lt;noreply@operohub.com&gt; &nbsp;|&nbsp;
+      <strong>Oggetto:</strong> Richiesta Permesso rifiutata
+    </div>
+    <div class="email-body">
+      <iframe srcdoc='
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#dc2626">Richiesta rifiutata</h2>
+          <p>La tua richiesta di <strong>Permesso</strong> è stata rifiutata.</p>
+          <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:12px;margin-top:12px">
+            <strong>Motivazione:</strong> Copertura insufficiente in quella data, impossibile concedere il permesso.
+          </div>
+        </div>' height="220"></iframe>
+    </div>
+  </div>
+
+  <!-- 5. Sblocco check-in approvato -->
+  <div class="email-card">
+    <div class="email-meta">
+      <strong>Da:</strong> Opero Hub &lt;noreply@operohub.com&gt; &nbsp;|&nbsp;
+      <strong>Oggetto:</strong> Sblocco check-in approvato — hai 30 minuti
+    </div>
+    <div class="email-body">
+      <iframe srcdoc='
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#d97706">Sblocco check-in approvato 🔓</h2>
+          <p>Il tuo sblocco per il turno del <strong>11 maggio 2026</strong> è stato approvato.</p>
+          <p>Hai <strong>30 minuti</strong> per effettuare il check-in dall&apos;app.</p>
+          <p style="color:#6b7280;font-size:14px">Passati i 30 minuti il token scade e dovrai richiedere un nuovo sblocco.</p>
+        </div>' height="220"></iframe>
+    </div>
+  </div>
+
+</body>
+</html>

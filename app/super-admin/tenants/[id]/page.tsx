@@ -38,6 +38,8 @@ export default function TenantDettaglioPage() {
   const [togglingRuoli, setTogglingRuoli] = useState<string | null>(null)
   const [errore, setErrore] = useState<string | null>(null)
   const [modaleUtenti, setModaleUtenti] = useState(false)
+  const [brandingDraft, setBrandingDraft] = useState({ nome_app: '', colore_primario: '#3B5BDB', logo_url: '' })
+  const [savingBranding, setSavingBranding] = useState(false)
 
   async function carica() {
     setLoading(true)
@@ -51,6 +53,11 @@ export default function TenantDettaglioPage() {
       setPianoDraft(data.piano)
       setScadenzaDraft(data.piano_scadenza ? data.piano_scadenza.slice(0, 10) : '')
       setNoteDraft(data.piano_note ?? '')
+      setBrandingDraft({
+        nome_app: data.nome_app ?? '',
+        colore_primario: data.colore_primario ?? '#3B5BDB',
+        logo_url: data.logo_url ?? '',
+      })
     } catch {
       setErrore('Errore di rete.')
     } finally {
@@ -128,6 +135,24 @@ export default function TenantDettaglioPage() {
       } : prev)
     }
     setTogglingRuoli(null)
+  }
+
+  async function salvaBranding() {
+    setSavingBranding(true)
+    try {
+      const res = await fetch(`/api/super-admin/tenants/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome_app: brandingDraft.nome_app || null,
+          colore_primario: brandingDraft.colore_primario || null,
+          logo_url: brandingDraft.logo_url || null,
+        }),
+      })
+      if (!res.ok) { alert('Errore nel salvataggio branding.'); return }
+      await carica()
+    } catch { alert('Errore di rete.') }
+    finally { setSavingBranding(false) }
   }
 
   if (loading) return <p className="text-sm text-gray-500 p-6">Caricamento…</p>
@@ -313,6 +338,66 @@ export default function TenantDettaglioPage() {
               Gestisci utenti
             </button>
           </div>
+
+          {/* Card Branding — visibile solo se white_label_abilitato */}
+          {imp?.white_label_abilitato && (
+            <div className="bg-white rounded-xl border border-slate-900/20 p-5">
+              <h2 className="text-sm font-semibold text-gray-900 mb-4">Branding</h2>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Nome app</label>
+                  <input
+                    type="text"
+                    value={brandingDraft.nome_app}
+                    onChange={e => setBrandingDraft(d => ({ ...d, nome_app: e.target.value }))}
+                    placeholder="es. GestioneTurni Rossi"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
+                  <input
+                    type="url"
+                    value={brandingDraft.logo_url}
+                    onChange={e => setBrandingDraft(d => ({ ...d, logo_url: e.target.value }))}
+                    placeholder="https://..."
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  />
+                  {brandingDraft.logo_url && (
+                    <div className="mt-2 p-2 bg-slate-800 rounded-lg inline-block">
+                      <img src={brandingDraft.logo_url} alt="Anteprima logo" className="h-10 w-auto object-contain" />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Colore primario</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={brandingDraft.colore_primario}
+                      onChange={e => setBrandingDraft(d => ({ ...d, colore_primario: e.target.value }))}
+                      className="w-10 h-9 rounded border border-gray-300 cursor-pointer p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={brandingDraft.colore_primario}
+                      onChange={e => setBrandingDraft(d => ({ ...d, colore_primario: e.target.value }))}
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
+                      maxLength={7}
+                    />
+                    <div className="w-9 h-9 rounded-lg border border-gray-200" style={{ backgroundColor: brandingDraft.colore_primario }} />
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={salvaBranding}
+                disabled={savingBranding}
+                className="mt-4 w-full py-2 bg-slate-900 text-white text-sm rounded-lg hover:bg-slate-700 disabled:opacity-50"
+              >
+                {savingBranding ? 'Salvataggio…' : 'Salva branding'}
+              </button>
+            </div>
+          )}
 
         </div>
       </div>

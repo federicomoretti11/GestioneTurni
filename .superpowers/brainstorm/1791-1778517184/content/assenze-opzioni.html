@@ -1,0 +1,107 @@
+<h2>Come mostrare le assenze nel calendario?</h2>
+<p class="subtitle">Ferie, permessi e malattie approvate devono essere visibili nella griglia admin/manager</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family:sans-serif;font-size:12px;padding:8px">
+        <div style="display:grid;grid-template-columns:80px repeat(3,1fr);gap:2px">
+          <div style="font-size:10px;color:#888;padding:4px"></div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Lun 2</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mar 3</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mer 4</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Rossi Mario</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af;font-weight:600">08:00–16:00</div>
+          <div style="background:#dcfce7;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#166534;font-weight:600">🏖️ Ferie</div>
+          <div style="background:#dcfce7;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#166534;font-weight:600">🏖️ Ferie</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Bianchi Sara</div>
+          <div style="background:#fef9c3;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#854d0e;font-weight:600">🤒 Malattia</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af;font-weight:600">09:00–17:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af;font-weight:600">09:00–17:00</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Verdi Luca</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af;font-weight:600">07:00–15:00</div>
+          <div style="background:#ede9fe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#5b21b6;font-weight:600">⏱️ Permesso</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af;font-weight:600">07:00–15:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Blocco colorato nella cella</h3>
+      <p>L'assenza sostituisce o affianca il turno nella cella. Verde per ferie, giallo per malattia, viola per permesso. Immediato, massima visibilità.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family:sans-serif;font-size:12px;padding:8px">
+        <div style="display:grid;grid-template-columns:80px repeat(3,1fr);gap:2px">
+          <div style="font-size:10px;color:#888;padding:4px"></div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Lun 2</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mar 3</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mer 4</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Rossi Mario</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00 <span style="color:#16a34a">🏖️</span></div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00 <span style="color:#16a34a">🏖️</span></div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Bianchi Sara</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00 <span>🤒</span></div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Verdi Luca</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">07:00–15:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">07:00–15:00 <span style="color:#7c3aed">⏱️</span></div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">07:00–15:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Icona/badge sopra il turno</h3>
+      <p>Il turno rimane visibile, l'assenza appare come icona aggiuntiva nella stessa cella. Meno invasivo ma può sfuggire all'occhio.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-family:sans-serif;font-size:12px;padding:8px">
+        <div style="display:grid;grid-template-columns:80px repeat(3,1fr);gap:2px">
+          <div style="font-size:10px;color:#888;padding:4px"></div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Lun 2</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mar 3</div>
+          <div style="font-size:10px;color:#888;text-align:center;padding:4px">Mer 4</div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Rossi Mario</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">08:00–16:00</div>
+
+          <div style="font-size:11px;padding:4px;color:#166534;font-style:italic;padding-left:8px">↳ ferie</div>
+          <div style="background:#f0fdf4;border-radius:4px;padding:2px 6px;text-align:center;font-size:10px;color:#166534;border:1px dashed #86efac">🏖️ Ferie approvate</div>
+          <div style="background:#f0fdf4;border-radius:4px;padding:2px 6px;text-align:center;font-size:10px;color:#166534;border:1px dashed #86efac">🏖️ Ferie approvate</div>
+          <div style="font-size:10px;color:#888;padding:2px"></div>
+
+          <div style="font-size:11px;padding:4px;color:#374151;font-weight:600">Bianchi Sara</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00</div>
+          <div style="background:#dbeafe;border-radius:6px;padding:4px 6px;text-align:center;font-size:11px;color:#1e40af">09:00–17:00</div>
+
+          <div style="font-size:11px;padding:4px;color:#854d0e;font-style:italic;padding-left:8px">↳ malattia</div>
+          <div style="background:#fefce8;border-radius:4px;padding:2px 6px;text-align:center;font-size:10px;color:#854d0e;border:1px dashed #fde68a">🤒 Malattia</div>
+          <div style="font-size:10px;color:#888;padding:2px"></div>
+          <div style="font-size:10px;color:#888;padding:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Riga separata sotto il dipendente</h3>
+      <p>I turni rimangono intatti. Le assenze appaiono in una riga aggiuntiva sotto il nome. Pulito ma occupa più spazio verticale.</p>
+    </div>
+  </div>
+
+</div>

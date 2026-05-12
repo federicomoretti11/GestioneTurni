@@ -4,14 +4,22 @@ import { usePathname } from 'next/navigation'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number; section?: string; altHrefs?: string[] }
 
-interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string; tenantName?: string }
+interface Branding { logoUrl?: string; nomeApp?: string; colorePrimario?: string }
+interface SidebarProps { items: NavItem[]; title: string; ruolo?: string; logoSrc?: string; tenantName?: string; branding?: Branding }
 
-export function Sidebar({ items }: SidebarProps) {
+export function Sidebar({ items, branding }: SidebarProps) {
   const pathname = usePathname()
+  const colore = branding?.colorePrimario ?? '#2563EB'
   return (
     <aside className="hidden md:flex flex-col w-56 bg-slate-900 text-white flex-shrink-0">
       <div className="px-4 pt-4 pb-3 border-b border-white/5">
-        <img src="/logo-extended-white.svg" alt="Opero Hub" className="h-11 w-auto" />
+        {branding?.logoUrl
+          ? <img src={branding.logoUrl} alt={branding.nomeApp ?? 'Logo'} className="h-11 w-auto object-contain" />
+          : <img src="/logo-extended-white.svg" alt="Opero Hub" className="h-11 w-auto" />
+        }
+        {branding?.nomeApp && (
+          <p className="text-[11px] text-slate-400 mt-1 truncate">{branding.nomeApp}</p>
+        )}
       </div>
       <nav className="flex-1 p-2">
         {items.map((item, i) => {
@@ -27,10 +35,9 @@ export function Sidebar({ items }: SidebarProps) {
               <Link
                 href={item.href}
                 className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-colors mb-0.5 ${
-                  isActive
-                    ? 'bg-blue-600 text-white font-bold'
-                    : 'text-white font-medium hover:bg-white/10'
+                  isActive ? 'text-white font-bold' : 'text-white font-medium hover:bg-white/10'
                 }`}
+                style={isActive ? { backgroundColor: colore } : undefined}
               >
                 <span className="text-[15px] leading-none">{item.icon}</span>
                 <span className="flex-1">{item.label}</span>

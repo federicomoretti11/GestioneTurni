@@ -185,6 +185,9 @@ export interface TenantDettaglio extends TenantConPiano {
   impostazioni: ImpostazioniTenant
   utenti_count: number
   piano_log: TenantPianoLog[]
+  nome_app: string | null
+  colore_primario: string | null
+  logo_url: string | null
 }
 
 export interface TenantPianoLog {
