@@ -8,6 +8,7 @@ import { Notifiche } from '@/components/layout/Notifiche'
 import { Footer } from '@/components/layout/Footer'
 import { isAnalyticsAbilitato } from '@/lib/impostazioni'
 import { ChatPanelSlide } from '@/components/chat/ChatPanelSlide'
+import { SuperAdminChatCount } from '@/components/chat/SuperAdminChatCount'
 
 // ── Icone SVG ────────────────────────────────────────────────
 const ICalendar = (p: React.SVGProps<SVGSVGElement>) => (
@@ -81,10 +82,10 @@ const A = {
 type AccentKey = keyof typeof A
 
 // ── AreaCard ─────────────────────────────────────────────────
-function AreaCard({ titolo, descrizione, href, IconComp, accent, badge }: {
+function AreaCard({ titolo, descrizione, href, IconComp, accent, badge, badgeNode }: {
   titolo: string; descrizione: string; href: string
   IconComp: (p: React.SVGProps<SVGSVGElement>) => React.ReactElement
-  accent: AccentKey; badge?: number
+  accent: AccentKey; badge?: number; badgeNode?: React.ReactNode
 }) {
   const a = A[accent]
   return (
@@ -97,9 +98,9 @@ function AreaCard({ titolo, descrizione, href, IconComp, accent, badge }: {
         <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ backgroundColor: a.tint, color: a.icon }}>
           <IconComp className="w-[18px] h-[18px]" />
         </div>
-        {badge !== undefined && badge > 0 && (
+        {badgeNode ?? (badge !== undefined && badge > 0 && (
           <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">{badge}</span>
-        )}
+        ))}
       </div>
       <div className="text-[15px] font-semibold tracking-tight text-slate-900">
         {titolo}
@@ -170,17 +171,12 @@ export default async function HomePage() {
   const isManager = ruolo === 'manager'
   const isDipendente = ruolo === 'dipendente'
 
-  // Conteggio tenant attivi + messaggi chat non letti (solo super admin)
+  // Conteggio tenant attivi (solo super admin)
   let tenantsAttivi = 0
-  let chatNonLetti = 0
   if (isSuperAdmin) {
     const db = createAdminClient()
-    const [{ count: tCount }, { count: mCount }] = await Promise.all([
-      db.from('tenants').select('*', { count: 'exact', head: true }).eq('attivo', true),
-      db.from('chat_messaggi').select('*', { count: 'exact', head: true }).eq('letto_superadmin', false),
-    ])
-    tenantsAttivi = tCount ?? 0
-    chatNonLetti = mCount ?? 0
+    const { count } = await db.from('tenants').select('*', { count: 'exact', head: true }).eq('attivo', true)
+    tenantsAttivi = count ?? 0
   }
 
   // Analytics flag + turni mese corrente (solo admin)
@@ -271,7 +267,7 @@ export default async function HomePage() {
   type AreaDef = {
     titolo: string; descrizione: string; href: string
     IconComp: (p: React.SVGProps<SVGSVGElement>) => React.ReactElement
-    accent: AccentKey; badge?: number
+    accent: AccentKey; badge?: number; badgeNode?: React.ReactNode
   }
 
   const taskDescAdmin = taskInCorso > 0 || taskDaFare > 0
@@ -288,11 +284,11 @@ export default async function HomePage() {
           accent: 'violet' as AccentKey,
         }, {
           titolo: 'Chat supporto',
-          descrizione: chatNonLetti > 0 ? `${chatNonLetti} messaggi non letti` : 'Nessun messaggio non letto',
+          descrizione: 'Messaggi di assistenza dai tenant',
           href: '/super-admin/chat',
           IconComp: IChat,
           accent: 'blue' as AccentKey,
-          badge: chatNonLetti || undefined,
+          badgeNode: <SuperAdminChatCount />,
         }] : []),
         { titolo: 'Turni',          descrizione: 'Visualizza e gestisci i turni.',       href: '/admin/calendario',                 IconComp: ICalendar, accent: 'blue' },
         { titolo: 'Pianificazione', descrizione: 'Programma i turni settimanali.',      href: '/admin/calendario-programmazione',  IconComp: IDoc,      accent: 'violet' },

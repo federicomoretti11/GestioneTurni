@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export function SuperAdminChatBadge() {
-  const pathname = usePathname()
+export function SuperAdminChatCount() {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
@@ -20,15 +18,13 @@ export function SuperAdminChatBadge() {
 
     const supabase = createClient()
     const channel = supabase
-      .channel('chat-badge-superadmin')
+      .channel('chat-count-home')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'chat_messaggi' },
         payload => {
           const msg = payload.new as { letto_superadmin: boolean }
-          if (!msg.letto_superadmin) {
-            setCount(prev => prev + 1)
-          }
+          if (!msg.letto_superadmin) setCount(prev => prev + 1)
         }
       )
       .on(
@@ -40,16 +36,10 @@ export function SuperAdminChatBadge() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  if (pathname === '/super-admin/chat') return null
-
+  if (count === 0) return null
   return (
-    <a href="/super-admin/chat" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">
-      💬 Chat
-      {count > 0 && (
-        <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
-          {count}
-        </span>
-      )}
-    </a>
+    <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
+      {count}
+    </span>
   )
 }
