@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import type { ImpostazioniTenant } from '@/lib/types'
+import { generaSigla } from '@/lib/utils/matricola'
 
 function Toggle({ label, valore, loading, onChange }: { label: string; valore: boolean; loading: boolean; onChange: () => void }) {
   return (
@@ -102,6 +104,10 @@ export default function ImpostazioniPage() {
   const [loadingRuoli, setLoadingRuoli] = useState(false)
   const [testEmailStato, setTestEmailStato] = useState<'idle' | 'loading' | 'ok' | 'errore'>('idle')
   const [testEmailMsg, setTestEmailMsg] = useState('')
+  const [sigla, setSigla] = useState('')
+  const [siglaSalvata, setSiglaSalvata] = useState('')
+  const [savingSigla, setSavingSigla] = useState(false)
+  const [siglaMsg, setSiglaMsg] = useState<{ tipo: 'ok' | 'errore'; testo: string } | null>(null)
 
   async function scaricaDati(tipo: 'dipendenti' | 'richieste', formato: 'csv' | 'json') {
     const res = await fetch(`/api/admin/export-dati?tipo=${tipo}`)
@@ -146,8 +152,17 @@ export default function ImpostazioniPage() {
   }
 
   async function carica() {
-    const res = await fetch('/api/impostazioni')
-    if (res.ok) setImp(await res.json())
+    const [resImp, resSigla] = await Promise.all([
+      fetch('/api/impostazioni'),
+      fetch('/api/admin/sigla'),
+    ])
+    if (resImp.ok) setImp(await resImp.json())
+    if (resSigla.ok) {
+      const s = await resSigla.json()
+      const val = s.sigla ?? generaSigla(s.nomeTenant ?? '')
+      setSigla(val)
+      setSiglaSalvata(s.sigla ?? '')
+    }
   }
 
   useEffect(() => { carica() }, [])
@@ -194,6 +209,26 @@ export default function ImpostazioniPage() {
     })
     setLoadingRuoli(false)
     router.refresh()
+  }
+
+  async function salvaSigla() {
+    if (!sigla) return
+    setSavingSigla(true)
+    setSiglaMsg(null)
+    const res = await fetch('/api/admin/sigla', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sigla }),
+    })
+    if (res.ok) {
+      setSiglaSalvata(sigla)
+      setSiglaMsg({ tipo: 'ok', testo: 'Sigla salvata. I nuovi utenti riceveranno matricole con questo prefisso.' })
+    } else {
+      const d = await res.json()
+      setSiglaMsg({ tipo: 'errore', testo: d.error ?? 'Errore nel salvataggio' })
+    }
+    setSavingSigla(false)
+    setTimeout(() => setSiglaMsg(null), 5000)
   }
 
   return (
@@ -290,6 +325,37 @@ export default function ImpostazioniPage() {
             loadingRuoli={loadingRuoli}
             onToggleRuolo={r => toggleRuolo('modulo_analytics_ruoli', r)}
           />
+        </div>
+      </section>
+
+      {/* Codice dipendenti */}
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Codice dipendenti</h2>
+        <div className="bg-white rounded-xl border border-slate-900/20 px-5 py-4 space-y-3">
+          <div>
+            <p className="text-sm font-medium text-gray-800">Sigla aziendale</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Prefisso usato per generare la matricola dei dipendenti (es. sigla <strong>RSS</strong> → matricole RSS0001, RSS0002…).
+              {siglaSalvata && <span className="ml-1 text-green-600">Sigla attiva: <strong>{siglaSalvata}</strong></span>}
+            </p>
+          </div>
+          <div className="flex items-end gap-3">
+            <div className="w-36">
+              <Input
+                label=""
+                value={sigla}
+                onChange={e => setSigla(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5))}
+                placeholder="es. RSS"
+                maxLength={5}
+              />
+            </div>
+            <Button onClick={salvaSigla} disabled={savingSigla || !sigla || sigla === siglaSalvata}>
+              {savingSigla ? 'Salvataggio…' : 'Salva sigla'}
+            </Button>
+          </div>
+          {siglaMsg && (
+            <p className={`text-xs ${siglaMsg.tipo === 'ok' ? 'text-green-600' : 'text-red-600'}`}>{siglaMsg.testo}</p>
+          )}
         </div>
       </section>
 

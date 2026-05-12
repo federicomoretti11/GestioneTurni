@@ -20,7 +20,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   const body = await request.json()
   const { data, error } = await supabase
     .from('profiles')
-    .update({ nome: body.nome, cognome: body.cognome, ruolo: body.ruolo, includi_in_turni: body.includi_in_turni })
+    .update({ nome: body.nome, cognome: body.cognome, ruolo: body.ruolo, includi_in_turni: body.includi_in_turni, matricola: body.matricola ?? undefined })
     .eq('id', params.id)
     .eq('tenant_id', tenantId)
     .select()

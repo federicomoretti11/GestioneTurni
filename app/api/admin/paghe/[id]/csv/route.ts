@@ -50,11 +50,11 @@ export async function GET(
       return NextResponse.json({ error: 'Consuntivo non trovato' }, { status: 404 })
     }
 
-    // Fetch righe with profile info
+    // Fetch righe with profile info (inclusa matricola)
     // Sicuro: consuntivo_id già verificato appartenere al tenant tramite consuntivo_paghe
     const { data: righe, error: righeError } = await admin
       .from('consuntivi_righe')
-      .select('*, profile:profiles!consuntivi_righe_dipendente_id_fkey(nome, cognome)')
+      .select('*, profile:profiles!consuntivi_righe_dipendente_id_fkey(nome, cognome, matricola)')
       .eq('consuntivo_id', id)
       .order('profile(cognome)', { ascending: true })
 
@@ -67,18 +67,20 @@ export async function GET(
 
     // Generate CSV
     const csvHeader =
-      'Cognome,Nome,Ore Ordinarie,Ore Notturne,Ore Festive,Ore Straordinarie,Giorni Ferie,Giorni Permesso,Giorni Malattia,Totale Turni'
+      'Matricola,Cognome,Nome,Ore Ordinarie,Ore Notturne,Ore Festive,Ore Straordinarie,Giorni Ferie,Giorni Permesso,Giorni Malattia,Totale Turni'
 
     type RigaConProfile = {
       ore_ordinarie: number; ore_notturne: number; ore_festive: number; ore_straordinarie: number
       giorni_ferie: number; giorni_permesso: number; giorni_malattia: number; turni_count: number
-      profile: { nome: string; cognome: string } | null
+      profile: { nome: string; cognome: string; matricola?: string | null } | null
     }
     const csvRows = (righe || []).map((riga: RigaConProfile) => {
+      const matricola = (riga.profile?.matricola || '').replace(/,/g, ' ')
       const cognome = (riga.profile?.cognome || '').replace(/,/g, ' ')
       const nome = (riga.profile?.nome || '').replace(/,/g, ' ')
 
       return [
+        matricola,
         cognome,
         nome,
         // Ore decimali (con punto)

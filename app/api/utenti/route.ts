@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 import { requireTenantId } from '@/lib/tenant'
 import { sendEmailAttivazioneAccount } from '@/lib/email'
+import { generaSigla, generaMatricola } from '@/lib/utils/matricola'
 
 export async function GET() {
   const supabase = createClient()
@@ -33,7 +34,16 @@ export async function POST(request: Request) {
   const tenantId = requireTenantId()
   const body = await request.json()
 
+  // Genera matricola automatica
   const adminClient = createAdminClient()
+  const { data: tenantData } = await adminClient
+    .from('tenants').select('sigla, nome').eq('id', tenantId).single()
+  const sigla = tenantData?.sigla ?? generaSigla(tenantData?.nome ?? '')
+  const { data: esistenti } = await adminClient
+    .from('profiles').select('matricola').eq('tenant_id', tenantId).not('matricola', 'is', null)
+  const matricolaEsistenti = (esistenti ?? []).map(p => (p as { matricola: string }).matricola).filter(Boolean)
+  const matricola = generaMatricola(sigla, matricolaEsistenti)
+
   const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
     email: body.email,
     password: body.password,
@@ -57,6 +67,8 @@ export async function POST(request: Request) {
       linkAttivazione: linkData.properties.action_link,
     })
   }
+
+  await adminClient.from('profiles').update({ matricola }).eq('id', authData.user.id)
 
   const { data, error } = await supabase.from('profiles').select('*').eq('id', authData.user.id).single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

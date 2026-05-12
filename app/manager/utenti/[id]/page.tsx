@@ -9,12 +9,12 @@ import type { Profile } from '@/lib/types'
 export default function ModificaUtenteManagerPage() {
   const router = useRouter()
   const { id } = useParams<{ id: string }>()
-  const [form, setForm] = useState({ nome: '', cognome: '', ruolo: 'dipendente', attivo: true, includi_in_turni: true })
+  const [form, setForm] = useState({ nome: '', cognome: '', ruolo: 'dipendente', attivo: true, includi_in_turni: true, matricola: '' })
 
   useEffect(() => {
     fetch('/api/utenti').then(r => r.json()).then((utenti: Profile[]) => {
       const u = utenti.find(u => u.id === id)
-      if (u) setForm({ nome: u.nome, cognome: u.cognome, ruolo: u.ruolo, attivo: u.attivo, includi_in_turni: u.includi_in_turni })
+      if (u) setForm({ nome: u.nome, cognome: u.cognome, ruolo: u.ruolo, attivo: u.attivo, includi_in_turni: u.includi_in_turni, matricola: (u as unknown as { matricola?: string }).matricola ?? '' })
     })
   }, [id])
 
@@ -44,6 +44,9 @@ export default function ModificaUtenteManagerPage() {
         <div className="grid grid-cols-2 gap-3">
           <Input label="Nome" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} required />
           <Input label="Cognome" value={form.cognome} onChange={e => setForm(f => ({ ...f, cognome: e.target.value }))} required />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Input label="Matricola" value={form.matricola} onChange={e => setForm(f => ({ ...f, matricola: e.target.value.toUpperCase() }))} placeholder="es. RSS0001" />
         </div>
         <Select label="Ruolo" value={form.ruolo} onChange={e => setForm(f => ({ ...f, ruolo: e.target.value }))}>
           <option value="dipendente">Dipendente</option>
