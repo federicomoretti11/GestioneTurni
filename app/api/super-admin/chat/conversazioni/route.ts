@@ -22,6 +22,7 @@ export async function GET() {
     .from('chat_conversazioni')
     .select(`
       id,
+      titolo,
       stato,
       created_at,
       updated_at,

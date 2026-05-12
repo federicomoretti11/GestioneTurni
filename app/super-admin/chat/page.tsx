@@ -14,6 +14,7 @@ interface Utente {
 
 interface ConvListItem {
   id: string
+  titolo: string | null
   stato: string
   updated_at: string
   messaggi_non_letti: number
@@ -142,8 +143,8 @@ export default function SuperAdminChatPage() {
               className={`w-full text-left px-4 py-3 border-b border-slate-50 transition-colors ${selezionata?.id === conv.id ? 'bg-blue-50 border-l-2 border-l-blue-500' : 'hover:bg-slate-50'}`}
             >
               <div className="flex justify-between items-start">
-                <span className={`text-sm text-slate-800 ${conv.messaggi_non_letti > 0 ? 'font-bold' : 'font-semibold'}`}>
-                  {conv.utente.nome} {conv.utente.cognome}
+                <span className={`text-sm text-slate-800 ${conv.messaggi_non_letti > 0 ? 'font-bold' : 'font-semibold'} truncate`}>
+                  {conv.titolo ?? '—'}
                 </span>
                 {conv.messaggi_non_letti > 0 && (
                   <span className="bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 ml-1 flex-shrink-0">
@@ -151,6 +152,7 @@ export default function SuperAdminChatPage() {
                   </span>
                 )}
               </div>
+              <p className="text-xs text-slate-500">{conv.utente.nome} {conv.utente.cognome}</p>
               <p className="text-xs text-blue-600 font-medium">{conv.utente.tenant?.nome ?? ''} · {conv.utente.ruolo}</p>
             </button>
           ))}
@@ -166,8 +168,8 @@ export default function SuperAdminChatPage() {
                   onClick={() => selezionaConversazione(conv)}
                   className={`w-full text-left px-4 py-3 border-b border-slate-50 opacity-60 hover:opacity-80 transition-opacity ${selezionata?.id === conv.id ? 'bg-blue-50' : ''}`}
                 >
-                  <span className="text-sm text-slate-600">{conv.utente.nome} {conv.utente.cognome}</span>
-                  <p className="text-xs text-slate-400">{conv.utente.tenant?.nome ?? ''}</p>
+                  <p className="text-sm text-slate-600 truncate">{conv.titolo ?? '—'}</p>
+                  <p className="text-xs text-slate-400">{conv.utente.nome} {conv.utente.cognome} · {conv.utente.tenant?.nome ?? ''}</p>
                 </button>
               ))}
             </>
@@ -184,8 +186,8 @@ export default function SuperAdminChatPage() {
         <div className="flex-1 flex flex-col">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">{selezionata.utente.nome} {selezionata.utente.cognome}</h3>
-              <p className="text-xs text-blue-600">{selezionata.utente.tenant?.nome ?? ''} · {selezionata.utente.ruolo}</p>
+              <h3 className="text-sm font-semibold text-slate-900">{selezionata.titolo ?? 'Segnalazione'}</h3>
+              <p className="text-xs text-slate-500">{selezionata.utente.nome} {selezionata.utente.cognome} · <span className="text-blue-600">{selezionata.utente.tenant?.nome ?? ''}</span> · {selezionata.utente.ruolo}</p>
             </div>
             {selezionata.stato === 'aperta' && (
               <button onClick={handleArchivia} className="text-slate-400 hover:text-slate-600 text-sm" title="Archivia">

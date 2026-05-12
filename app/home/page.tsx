@@ -7,6 +7,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Notifiche } from '@/components/layout/Notifiche'
 import { Footer } from '@/components/layout/Footer'
 import { isAnalyticsAbilitato } from '@/lib/impostazioni'
+import { ChatPanelSlide } from '@/components/chat/ChatPanelSlide'
 
 // ── Icone SVG ────────────────────────────────────────────────
 const ICalendar = (p: React.SVGProps<SVGSVGElement>) => (
@@ -60,6 +61,11 @@ const ITask = (p: React.SVGProps<SVGSVGElement>) => (
 const IBuilding = (p: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
     <path d="M3 21h18M3 21V7l9-4 9 4v14M9 21V13h6v8M9 9h.01M15 9h.01M9 13h.01" />
+  </svg>
+)
+const IChat = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...p}>
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
   </svg>
 )
 
@@ -167,15 +173,17 @@ export default async function HomePage() {
   const isManager = ruolo === 'manager'
   const isDipendente = ruolo === 'dipendente'
 
-  // Conteggio tenant attivi (solo super admin)
+  // Conteggio tenant attivi + messaggi chat non letti (solo super admin)
   let tenantsAttivi = 0
+  let chatNonLetti = 0
   if (isSuperAdmin) {
     const db = createAdminClient()
-    const { count } = await db
-      .from('tenants')
-      .select('*', { count: 'exact', head: true })
-      .eq('attivo', true)
-    tenantsAttivi = count ?? 0
+    const [{ count: tCount }, { count: mCount }] = await Promise.all([
+      db.from('tenants').select('*', { count: 'exact', head: true }).eq('attivo', true),
+      db.from('chat_messaggi').select('*', { count: 'exact', head: true }).eq('letto_superadmin', false),
+    ])
+    tenantsAttivi = tCount ?? 0
+    chatNonLetti = mCount ?? 0
   }
 
   // Analytics flag + turni mese corrente (solo admin)
@@ -281,6 +289,13 @@ export default async function HomePage() {
           href: '/super-admin/tenants',
           IconComp: IBuilding,
           accent: 'violet' as AccentKey,
+        }, {
+          titolo: 'Chat supporto',
+          descrizione: chatNonLetti > 0 ? `${chatNonLetti} messaggi non letti` : 'Nessun messaggio non letto',
+          href: '/super-admin/chat',
+          IconComp: IChat,
+          accent: 'blue' as AccentKey,
+          badge: chatNonLetti || undefined,
         }] : []),
         { titolo: 'Turni',          descrizione: 'Visualizza e gestisci i turni.',       href: '/admin/calendario',                 IconComp: ICalendar, accent: 'blue' },
         { titolo: 'Pianificazione', descrizione: 'Programma i turni settimanali.',      href: '/admin/calendario-programmazione',  IconComp: IDoc,      accent: 'violet' },
@@ -507,6 +522,7 @@ export default async function HomePage() {
         </div>
       </div>
       <Footer />
+      {!isSuperAdmin && <ChatPanelSlide userId={user.id} />}
     </div>
   )
 }

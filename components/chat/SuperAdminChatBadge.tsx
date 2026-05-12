@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export function SuperAdminChatBadge() {
+  const pathname = usePathname()
+  if (pathname === '/super-admin/chat') return null
   const [count, setCount] = useState(0)
 
   useEffect(() => {
