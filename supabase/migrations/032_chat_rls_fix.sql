@@ -10,6 +10,8 @@ CREATE POLICY "utente_chat_conv" ON chat_conversazioni
 
 -- Fix chat_messaggi policies: split FOR ALL into SELECT + INSERT with proper checks
 DROP POLICY IF EXISTS "utente_chat_msg" ON chat_messaggi;
+DROP POLICY IF EXISTS "utente_chat_msg_select" ON chat_messaggi;
+DROP POLICY IF EXISTS "utente_chat_msg_insert" ON chat_messaggi;
 
 CREATE POLICY "utente_chat_msg_select" ON chat_messaggi
   FOR SELECT USING (
