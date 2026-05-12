@@ -204,3 +204,17 @@ export interface TenantPianoLog {
   note: string | null
   created_at: string
 }
+
+export type TipoContratto = 'full_time' | 'part_time' | 'turni_fissi' | 'turni_rotanti'
+
+export interface ContrattoDipendente {
+  id: string
+  tenant_id: string
+  dipendente_id: string
+  tipo: TipoContratto
+  ore_settimanali: number
+  ore_giornaliere: number
+  data_inizio: string   // "YYYY-MM-DD"
+  created_at: string
+  updated_at: string
+}
