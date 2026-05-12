@@ -6,15 +6,6 @@ import { useBozzaCount } from './BozzaCounter'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 import { createClient } from '@/lib/supabase/client'
 
-const BASE_ITEMS = [
-  { label: 'Home',             href: '/home',                                    icon: '🏠' },
-  { section: 'Calendario',     label: 'Calendario',     href: '/admin/calendario',               icon: '📅', altHrefs: ['/admin/calendario-posti'] },
-  { section: 'Programmazione', label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝', altHrefs: ['/admin/calendario-programmazione-posti'] },
-  { section: 'Gestione',       label: 'Richieste',      href: '/admin/richieste',                icon: '📋' },
-  {                             label: 'Impostazioni',   href: '/admin/impostazioni',             icon: '⚙️' },
-  { section: 'Account',        label: 'Profilo',        href: '/admin/profilo',                  icon: '👤' },
-]
-
 interface Moduli {
   tasks?: boolean
   documenti?: boolean
@@ -35,6 +26,7 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
   const [branding, setBranding] = useState<Branding | undefined>(undefined)
+
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
@@ -51,39 +43,41 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
         })
     })
   }, [])
+
   const bozza = useBozzaCount()
   const richieste = useRichiesteCount()
   const pathname = usePathname()
 
-  // Voci Gestione condizionali — default true per tasks e documenti
-  const gestioneExtra = [
-    ...(moduli?.tasks      !== false ? [{ label: 'Task',      href: '/admin/task',      icon: '✅' }] : []),
-    ...(moduli?.documenti  !== false ? [{ label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
-    ...(moduli?.cedolini             ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
-    ...(moduli?.analytics            ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
-    ...(moduli?.paghe                ? [{ label: 'Paghe',     href: '/admin/paghe',     icon: '🧾' }] : []),
-  ]
+  const opItems = [
+    ...(moduli?.tasks !== false ? [{ label: 'Task', href: '/admin/task', icon: '✅' }] : []),
+  ].map(item => ({ ...item, section: 'Operatività' }))
 
-  // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
-  const baseWithExtra = BASE_ITEMS.flatMap(item =>
-    item.href === '/admin/impostazioni' && gestioneExtra.length > 0
-      ? [...gestioneExtra, item]
-      : [item]
-  )
+  const contItems = [
+    ...(moduli?.cedolini ? [{ label: 'Cedolini', href: '/admin/cedolini', icon: '💰' }] : []),
+    ...(moduli?.paghe    ? [{ label: 'Paghe',     href: '/admin/paghe',     icon: '🧾' }] : []),
+  ].map(item => ({ ...item, section: 'Contabilità' }))
 
   const items = [
-    ...baseWithExtra,
+    { label: 'Home', href: '/home', icon: '🏠' },
+
+    { section: 'Calendario', label: 'Calendario',     href: '/admin/calendario',               icon: '📅', altHrefs: ['/admin/calendario-posti'] },
+    { section: 'Calendario', label: 'Programmazione', href: '/admin/calendario-programmazione', icon: '📝', altHrefs: ['/admin/calendario-programmazione-posti'],
+      badge: mounted && pathname !== '/admin/calendario-programmazione' && pathname !== '/admin/calendario-programmazione-posti' ? bozza : 0 },
+
+    ...opItems,
+
+    ...contItems,
+
+    { section: 'Gestione', label: 'Richieste',  href: '/admin/richieste',  icon: '📋',
+      badge: mounted && pathname !== '/admin/richieste' ? richieste : 0 },
+    ...(moduli?.analytics           ? [{ section: 'Gestione', label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
+    ...(moduli?.documenti !== false  ? [{ section: 'Gestione', label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
+
+    { section: 'Impostazioni', label: 'Profilo',       href: '/admin/profilo',       icon: '👤' },
+    { section: 'Impostazioni', label: 'Impostazioni',  href: '/admin/impostazioni',  icon: '⚙️' },
+
     ...(isSuperAdmin ? SUPER_ADMIN_ITEMS : []),
-  ].map(it => {
-    if (it.href === '/admin/calendario-programmazione' && mounted) {
-      const badge = (pathname === '/admin/calendario-programmazione' || pathname === '/admin/calendario-programmazione-posti') ? 0 : bozza
-      return { ...it, badge }
-    }
-    if (it.href === '/admin/richieste' && mounted) {
-      const badge = pathname === '/admin/richieste' ? 0 : richieste
-      return { ...it, badge }
-    }
-    return it
-  })
+  ]
+
   return <Sidebar items={items} title="Opero Hub" ruolo="admin" tenantName={tenantName} branding={branding} />
 }

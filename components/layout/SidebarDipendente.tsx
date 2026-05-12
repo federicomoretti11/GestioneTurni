@@ -5,13 +5,6 @@ import { Sidebar } from './Sidebar'
 import { useRichiesteCount } from '@/components/richieste/RichiesteCounter'
 import { createClient } from '@/lib/supabase/client'
 
-const BASE_ITEMS = [
-  { label: 'Home',         href: '/home',                   icon: '🏠' },
-  { label: 'I miei turni', href: '/dipendente/turni',       icon: '📅' },
-  { label: 'Richieste',    href: '/dipendente/richieste',   icon: '📋' },
-  { label: 'Profilo',      href: '/dipendente/profilo',     icon: '👤' },
-]
-
 interface Moduli { tasks?: boolean; cedolini?: boolean; whiteLabelAbilitato?: boolean }
 interface Branding { logoUrl?: string; nomeApp?: string; colorePrimario?: string }
 
@@ -19,6 +12,7 @@ export function SidebarDipendente({ moduli }: { moduli?: Moduli }) {
   const [mounted, setMounted] = useState(false)
   const [tenantName, setTenantName] = useState<string>('')
   const [branding, setBranding] = useState<Branding | undefined>(undefined)
+
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
@@ -34,24 +28,31 @@ export function SidebarDipendente({ moduli }: { moduli?: Moduli }) {
         })
     })
   }, [])
+
   const count = useRichiesteCount()
   const pathname = usePathname()
 
-  const extra = [
-    ...(moduli?.tasks    !== false ? [{ label: 'Task',     href: '/dipendente/task',     icon: '✅' }] : []),
-    ...(moduli?.cedolini           ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
-  ]
-  // Inserisci extra dopo Richieste (prima di Profilo)
-  const allItems = BASE_ITEMS.flatMap(item =>
-    item.href === '/dipendente/profilo' && extra.length > 0 ? [...extra, item] : [item]
-  )
+  const opItems = [
+    ...(moduli?.tasks !== false ? [{ label: 'Task', href: '/dipendente/task', icon: '✅' }] : []),
+    { label: 'Richieste', href: '/dipendente/richieste', icon: '📋',
+      badge: mounted && pathname !== '/dipendente/richieste' ? count : 0 },
+  ].map(item => ({ ...item, section: 'Operatività' }))
 
-  const items = allItems.map(it => {
-    if (it.href === '/dipendente/richieste' && mounted) {
-      const badge = pathname === '/dipendente/richieste' ? 0 : count
-      return { ...it, badge }
-    }
-    return it
-  })
+  const contItems = [
+    ...(moduli?.cedolini ? [{ label: 'Cedolini', href: '/dipendente/cedolini', icon: '💰' }] : []),
+  ].map(item => ({ ...item, section: 'Contabilità' }))
+
+  const items = [
+    { label: 'Home', href: '/home', icon: '🏠' },
+
+    { section: 'Calendario', label: 'I miei turni', href: '/dipendente/turni', icon: '📅' },
+
+    ...opItems,
+
+    ...contItems,
+
+    { section: 'Impostazioni', label: 'Profilo', href: '/dipendente/profilo', icon: '👤' },
+  ]
+
   return <Sidebar items={items} title="I Miei Turni" ruolo="dipendente" tenantName={tenantName} branding={branding} />
 }
