@@ -7,7 +7,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Notifiche } from '@/components/layout/Notifiche'
 import { Footer } from '@/components/layout/Footer'
 import { isAnalyticsAbilitato } from '@/lib/impostazioni'
-import { ChatWidget } from '@/components/chat/ChatWidget'
+import { ChatSupportoLink } from '@/components/chat/ChatSupportoLink'
 import { SuperAdminChatCount } from '@/components/chat/SuperAdminChatCount'
 import { SuperAdminChatTopbarBtn } from '@/components/chat/SuperAdminChatTopbarBtn'
 
@@ -349,7 +349,7 @@ export default async function HomePage() {
 
         {/* Destra: notifiche + avatar + logout */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 w-1/3 justify-end">
-          {isSuperAdmin ? <SuperAdminChatTopbarBtn /> : <ChatWidget userId={user.id} />}
+          {isSuperAdmin ? <SuperAdminChatTopbarBtn /> : <ChatSupportoLink userId={user.id} />}
           <Notifiche userId={user.id} ruolo={ruolo} />
           <Avatar nome={profile.nome} cognome={profile.cognome} size={28} />
           <HomeLogout />
