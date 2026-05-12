@@ -5,16 +5,40 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import type { Profile } from '@/lib/types'
+import type { ContrattoDipendente } from '@/lib/types'
 
 export default function ModificaUtentePage() {
   const router = useRouter()
   const { id } = useParams<{ id: string }>()
   const [form, setForm] = useState({ nome: '', cognome: '', ruolo: 'dipendente', attivo: true, includi_in_turni: true, matricola: '' })
+  const [contrattiAbilitato, setContrattiAbilitato] = useState(false)
+  const [contratto, setContratto] = useState<ContrattoDipendente | null>(null)
+  const [contrattoForm, setContrattoForm] = useState({
+    tipo: 'full_time',
+    ore_settimanali: 40,
+    ore_giornaliere: 8,
+    data_inizio: '',
+  })
+  const [salvandoContratto, setSalvandoContratto] = useState(false)
 
   useEffect(() => {
-    fetch('/api/utenti').then(r => r.json()).then((utenti: Profile[]) => {
+    Promise.all([
+      fetch('/api/utenti').then(r => r.json()),
+      fetch('/api/impostazioni').then(r => r.json()),
+      fetch(`/api/admin/contratti/${id}`).then(r => r.json()),
+    ]).then(([utenti, imp, c]: [Profile[], { modulo_contratti_abilitato?: boolean }, ContrattoDipendente | null]) => {
       const u = utenti.find(u => u.id === id)
       if (u) setForm({ nome: u.nome, cognome: u.cognome, ruolo: u.ruolo, attivo: u.attivo, includi_in_turni: u.includi_in_turni, matricola: (u as unknown as { matricola?: string }).matricola ?? '' })
+      setContrattiAbilitato(imp?.modulo_contratti_abilitato ?? false)
+      if (c) {
+        setContratto(c)
+        setContrattoForm({
+          tipo: c.tipo,
+          ore_settimanali: c.ore_settimanali,
+          ore_giornaliere: c.ore_giornaliere,
+          data_inizio: c.data_inizio,
+        })
+      }
     })
   }, [id])
 
@@ -61,6 +85,21 @@ export default function ModificaUtentePage() {
       return
     }
     router.push('/admin/utenti')
+  }
+
+  async function salvaContratto(e: React.FormEvent) {
+    e.preventDefault()
+    setSalvandoContratto(true)
+    const res = await fetch(`/api/admin/contratti/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contrattoForm),
+    })
+    if (res.ok) {
+      const c = await res.json() as ContrattoDipendente
+      setContratto(c)
+    }
+    setSalvandoContratto(false)
   }
 
   return (
@@ -113,6 +152,64 @@ export default function ModificaUtentePage() {
           </div>
         </div>
       </form>
+      {contrattiAbilitato && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+          <h2 className="text-base font-semibold text-gray-900">Contratto</h2>
+          {!contratto && (
+            <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
+              Nessun contratto impostato per questo dipendente.
+            </p>
+          )}
+          <form onSubmit={salvaContratto} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                label="Tipo contratto"
+                value={contrattoForm.tipo}
+                onChange={e => setContrattoForm(f => ({ ...f, tipo: e.target.value }))}
+              >
+                <option value="full_time">Full time</option>
+                <option value="part_time">Part time</option>
+                <option value="turni_fissi">Turni fissi</option>
+                <option value="turni_rotanti">Turni rotanti</option>
+              </Select>
+              <Input
+                label="Data inizio"
+                type="date"
+                value={contrattoForm.data_inizio}
+                onChange={e => setContrattoForm(f => ({ ...f, data_inizio: e.target.value }))}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Ore settimanali"
+                type="number"
+                min={1}
+                max={60}
+                step={0.5}
+                value={contrattoForm.ore_settimanali}
+                onChange={e => setContrattoForm(f => ({ ...f, ore_settimanali: parseFloat(e.target.value) }))}
+                required
+              />
+              <Input
+                label="Ore giornaliere"
+                type="number"
+                min={0.5}
+                max={24}
+                step={0.5}
+                value={contrattoForm.ore_giornaliere}
+                onChange={e => setContrattoForm(f => ({ ...f, ore_giornaliere: parseFloat(e.target.value) }))}
+                required
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={salvandoContratto}>
+                {salvandoContratto ? 'Salvataggio...' : 'Salva contratto'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
