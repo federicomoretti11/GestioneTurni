@@ -39,7 +39,7 @@ export default function ModificaUtentePage() {
           data_inizio: c.data_inizio,
         })
       }
-    })
+    }).catch(err => console.error('Errore caricamento dati:', err))
   }, [id])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -90,16 +90,22 @@ export default function ModificaUtentePage() {
   async function salvaContratto(e: React.FormEvent) {
     e.preventDefault()
     setSalvandoContratto(true)
-    const res = await fetch(`/api/admin/contratti/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(contrattoForm),
-    })
-    if (res.ok) {
+    try {
+      const res = await fetch(`/api/admin/contratti/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contrattoForm),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({})) as { error?: string }
+        alert(json.error ?? 'Impossibile salvare il contratto.')
+        return
+      }
       const c = await res.json() as ContrattoDipendente
       setContratto(c)
+    } finally {
+      setSalvandoContratto(false)
     }
-    setSalvandoContratto(false)
   }
 
   return (
