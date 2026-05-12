@@ -54,7 +54,7 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
     ...(moduli?.documenti  !== false ? [{ label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
     ...(moduli?.cedolini             ? [{ label: 'Cedolini',  href: '/admin/cedolini',  icon: '💰' }] : []),
     ...(moduli?.analytics            ? [{ label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
-    ...(moduli?.paghe                ? [{ label: 'Paghe',     href: '/admin/paghe',     icon: '📊' }] : []),
+    ...(moduli?.paghe                ? [{ label: 'Paghe',     href: '/admin/paghe',     icon: '🧾' }] : []),
   ]
 
   // Inserisci voci extra nella sezione Gestione (prima di Impostazioni)
