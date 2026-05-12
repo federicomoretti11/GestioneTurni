@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 
 export function SuperAdminChatBadge() {
   const pathname = usePathname()
-  if (pathname === '/super-admin/chat') return null
   const [count, setCount] = useState(0)
 
   useEffect(() => {
@@ -30,6 +29,8 @@ export function SuperAdminChatBadge() {
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
+
+  if (pathname === '/super-admin/chat') return null
 
   return (
     <a href="/super-admin/chat" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">

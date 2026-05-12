@@ -98,14 +98,11 @@ function AreaCard({ titolo, descrizione, href, IconComp, accent, badge }: {
           <IconComp className="w-[18px] h-[18px]" />
         </div>
         {badge !== undefined && badge > 0 && (
-          <span className="text-[11px] font-semibold text-slate-400 tabular-nums">{badge}</span>
+          <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">{badge}</span>
         )}
       </div>
       <div className="text-[15px] font-semibold tracking-tight text-slate-900">
         {titolo}
-        {badge !== undefined && badge > 0 && (
-          <span className="ml-1.5 text-[13px] font-normal text-slate-400">{badge}</span>
-        )}
       </div>
       <div className="text-[12.5px] text-slate-500 mt-0.5">{descrizione}</div>
       <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-1 text-[12px] font-medium text-slate-500 group-hover:text-slate-800 transition-colors">
