@@ -218,3 +218,21 @@ export interface ContrattoDipendente {
   created_at: string
   updated_at: string
 }
+
+export interface ContatoreFerie {
+  id: string
+  tenant_id: string
+  dipendente_id: string
+  anno: number
+  ferie_giorni: number
+  permesso_ore: number
+  rol_ore: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ContatoreFerieSaldo extends ContatoreFerie {
+  ferie_usate: number
+  permesso_usate: number
+  rol_usate: number
+}
