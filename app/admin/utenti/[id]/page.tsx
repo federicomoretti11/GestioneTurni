@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import type { Profile } from '@/lib/types'
 import type { ContrattoDipendente } from '@/lib/types'
+import type { ContatoreFerieSaldo } from '@/lib/types'
 
 export default function ModificaUtentePage() {
   const router = useRouter()
@@ -20,24 +21,30 @@ export default function ModificaUtentePage() {
     data_inizio: '',
   })
   const [salvandoContratto, setSalvandoContratto] = useState(false)
+  const [contatoriAbilitato, setContatoriAbilitato] = useState(false)
+  const [annoContatori, setAnnoContatori] = useState(new Date().getFullYear())
+  const [contatoriSaldo, setContatoriSaldo] = useState<ContatoreFerieSaldo | null>(null)
+  const [contatoriForm, setContatoriForm] = useState({ ferie_giorni: 0, permesso_ore: 0, rol_ore: 0 })
+  const [salvandoContatori, setSalvandoContatori] = useState(false)
 
   useEffect(() => {
     Promise.all([
       fetch('/api/utenti').then(r => r.json()),
       fetch('/api/impostazioni').then(r => r.json()),
       fetch(`/api/admin/contratti/${id}`).then(r => r.json()),
-    ]).then(([utenti, imp, c]: [Profile[], { modulo_contratti_abilitato?: boolean }, ContrattoDipendente | null]) => {
+      fetch(`/api/admin/contatori/${id}?anno=${new Date().getFullYear()}`).then(r => r.json()),
+    ]).then(([utenti, imp, c, cnt]: [Profile[], { modulo_contratti_abilitato?: boolean; modulo_ferie_contatori_abilitato?: boolean }, ContrattoDipendente | null, ContatoreFerieSaldo]) => {
       const u = utenti.find(u => u.id === id)
       if (u) setForm({ nome: u.nome, cognome: u.cognome, ruolo: u.ruolo, attivo: u.attivo, includi_in_turni: u.includi_in_turni, matricola: (u as unknown as { matricola?: string }).matricola ?? '' })
       setContrattiAbilitato(imp?.modulo_contratti_abilitato ?? false)
+      setContatoriAbilitato(imp?.modulo_ferie_contatori_abilitato ?? false)
       if (c) {
         setContratto(c)
-        setContrattoForm({
-          tipo: c.tipo,
-          ore_settimanali: c.ore_settimanali,
-          ore_giornaliere: c.ore_giornaliere,
-          data_inizio: c.data_inizio,
-        })
+        setContrattoForm({ tipo: c.tipo, ore_settimanali: c.ore_settimanali, ore_giornaliere: c.ore_giornaliere, data_inizio: c.data_inizio })
+      }
+      if (cnt) {
+        setContatoriSaldo(cnt)
+        setContatoriForm({ ferie_giorni: cnt.ferie_giorni, permesso_ore: cnt.permesso_ore, rol_ore: cnt.rol_ore })
       }
     }).catch(err => console.error('Errore caricamento dati:', err))
   }, [id])
@@ -85,6 +92,35 @@ export default function ModificaUtentePage() {
       return
     }
     router.push('/admin/utenti')
+  }
+
+  async function cambiaAnnoContatori(nuovoAnno: number) {
+    setAnnoContatori(nuovoAnno)
+    const res = await fetch(`/api/admin/contatori/${id}?anno=${nuovoAnno}`)
+    if (res.ok) {
+      const cnt = await res.json() as ContatoreFerieSaldo
+      setContatoriSaldo(cnt)
+      setContatoriForm({ ferie_giorni: cnt.ferie_giorni, permesso_ore: cnt.permesso_ore, rol_ore: cnt.rol_ore })
+    }
+  }
+
+  async function salvaContatori(e: React.FormEvent) {
+    e.preventDefault()
+    setSalvandoContatori(true)
+    try {
+      const res = await fetch(`/api/admin/contatori/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ anno: annoContatori, ...contatoriForm }),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({})) as { error?: string }
+        alert(json.error ?? 'Impossibile salvare i contatori.')
+        return
+      }
+    } finally {
+      setSalvandoContatori(false)
+    }
   }
 
   async function salvaContratto(e: React.FormEvent) {
@@ -211,6 +247,63 @@ export default function ModificaUtentePage() {
             <div className="flex justify-end">
               <Button type="submit" disabled={salvandoContratto}>
                 {salvandoContratto ? 'Salvataggio...' : 'Salva contratto'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+      {contatoriAbilitato && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900">Ferie e permessi</h2>
+            <select
+              className="text-sm border border-gray-200 rounded-lg px-2 py-1"
+              value={annoContatori}
+              onChange={e => cambiaAnnoContatori(parseInt(e.target.value, 10))}
+            >
+              {[annoContatori - 1, annoContatori, annoContatori + 1].map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <form onSubmit={salvaContatori} className="space-y-3">
+            <div className="grid grid-cols-3 gap-2 text-xs font-medium text-gray-500 pb-1">
+              <span>Tipo</span><span>Budget</span><span>Usato / Residuo</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 items-center">
+              <span className="text-sm text-gray-700">Ferie (giorni)</span>
+              <Input
+                type="number" min={0} max={365} step={0.5}
+                value={contatoriForm.ferie_giorni}
+                onChange={e => setContatoriForm(f => ({ ...f, ferie_giorni: parseFloat(e.target.value) }))}
+              />
+              <span className="text-sm text-gray-600">
+                {contatoriSaldo?.ferie_usate ?? 0} / {Math.max(0, contatoriForm.ferie_giorni - (contatoriSaldo?.ferie_usate ?? 0))}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 items-center">
+              <span className="text-sm text-gray-700">Permesso (ore)</span>
+              <Input
+                type="number" min={0} max={999} step={0.5}
+                value={contatoriForm.permesso_ore}
+                onChange={e => setContatoriForm(f => ({ ...f, permesso_ore: parseFloat(e.target.value) }))}
+              />
+              <span className="text-sm text-gray-600">
+                {contatoriSaldo?.permesso_usate ?? 0} / {Math.max(0, contatoriForm.permesso_ore - (contatoriSaldo?.permesso_usate ?? 0))}
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 items-center">
+              <span className="text-sm text-gray-700">ROL (ore)</span>
+              <Input
+                type="number" min={0} max={999} step={0.5}
+                value={contatoriForm.rol_ore}
+                onChange={e => setContatoriForm(f => ({ ...f, rol_ore: parseFloat(e.target.value) }))}
+              />
+              <span className="text-sm text-gray-400 text-xs">tracking futuro</span>
+            </div>
+            <div className="flex justify-end pt-1">
+              <Button type="submit" disabled={salvandoContatori}>
+                {salvandoContatori ? 'Salvataggio...' : 'Salva budget'}
               </Button>
             </div>
           </form>
