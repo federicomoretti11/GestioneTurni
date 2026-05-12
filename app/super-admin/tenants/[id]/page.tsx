@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { TenantDettaglio, PianoTenant } from '@/lib/types'
@@ -40,6 +40,8 @@ export default function TenantDettaglioPage() {
   const [modaleUtenti, setModaleUtenti] = useState(false)
   const [brandingDraft, setBrandingDraft] = useState({ nome_app: '', colore_primario: '#3B5BDB', logo_url: '' })
   const [savingBranding, setSavingBranding] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function carica() {
     setLoading(true)
@@ -135,6 +137,19 @@ export default function TenantDettaglioPage() {
       } : prev)
     }
     setTogglingRuoli(null)
+  }
+
+  async function uploadLogo(file: File) {
+    setUploadingLogo(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch(`/api/super-admin/tenants/${id}/logo`, { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) { alert(json.error ?? 'Errore upload'); return }
+      setBrandingDraft(d => ({ ...d, logo_url: json.url }))
+    } catch { alert('Errore di rete.') }
+    finally { setUploadingLogo(false) }
   }
 
   async function salvaBranding() {
@@ -355,14 +370,32 @@ export default function TenantDettaglioPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
-                  <input
-                    type="url"
-                    value={brandingDraft.logo_url}
-                    onChange={e => setBrandingDraft(d => ({ ...d, logo_url: e.target.value }))}
-                    placeholder="https://..."
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                  />
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Logo</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={brandingDraft.logo_url}
+                      onChange={e => setBrandingDraft(d => ({ ...d, logo_url: e.target.value }))}
+                      placeholder="https://... oppure carica sotto"
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="shrink-0 px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 disabled:opacity-50"
+                    >
+                      {uploadingLogo ? 'Caricamento…' : 'Carica'}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                      className="hidden"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) uploadLogo(f) }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1">PNG, JPG, SVG, WebP — max 2 MB</p>
                   {brandingDraft.logo_url && (
                     <div className="mt-2 p-2 bg-slate-800 rounded-lg inline-block">
                       <img src={brandingDraft.logo_url} alt="Anteprima logo" className="h-10 w-auto object-contain" />
