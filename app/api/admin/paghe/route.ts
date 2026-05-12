@@ -4,6 +4,7 @@ import { requireTenantId } from '@/lib/tenant'
 import { calcolaOreTurno, calcolaOreDiurneNotturne } from '@/lib/utils/turni'
 import { trovaFestivo } from '@/lib/utils/maggiorazioni'
 import { NextResponse } from 'next/server'
+import { getImpostazioni } from '@/lib/impostazioni'
 
 async function getAuthUser(ruoliConsentiti: string[]) {
   const supabase = createClient()
@@ -37,6 +38,20 @@ export async function GET(request: Request) {
 
   const data_inizio = `${mese}-01`
   const data_fine = ultimoGiornoMese(mese)
+
+  const imp = await getImpostazioni()
+  const straordinariAbilitati = imp.modulo_straordinari_abilitato
+
+  let contrattiMap = new Map<string, number>()
+  if (straordinariAbilitati) {
+    const { data: contratti } = await createAdminClient()
+      .from('contratti_dipendenti')
+      .select('dipendente_id, ore_giornaliere')
+      .eq('tenant_id', tenantId)
+    contrattiMap = new Map(
+      (contratti ?? []).map(c => [c.dipendente_id as string, c.ore_giornaliere as number])
+    )
+  }
 
   const supabase = createClient()
 
@@ -140,8 +155,10 @@ export async function GET(request: Request) {
         (turno.ora_ingresso_effettiva as string).slice(11, 16),
         (turno.ora_uscita_effettiva as string).slice(11, 16)
       )
-      const orePianificate = calcolaOreTurno(oraInizio, oraFine)
-      const diff = oreEffettive - orePianificate
+      const soglia = straordinariAbilitati && contrattiMap.has(turno.dipendente_id)
+        ? contrattiMap.get(turno.dipendente_id)!
+        : calcolaOreTurno(oraInizio, oraFine)
+      const diff = oreEffettive - soglia
       if (diff > 0) riga.ore_straordinarie += diff
     }
   }
