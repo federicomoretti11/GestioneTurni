@@ -3,7 +3,6 @@ import { getImpostazioni, moduliPerRuolo } from '@/lib/impostazioni'
 import { SidebarManager } from '@/components/layout/SidebarManager'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { ChatPanelSlide } from '@/components/chat/ChatPanelSlide'
 
 const BASE_NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
@@ -37,13 +36,12 @@ export default async function ManagerLayout({ children }: { children: React.Reac
     <div className="flex h-screen bg-[#FAFAF8]">
       <SidebarManager moduli={{ tasks: moduli.modulo_tasks_abilitato, documenti: moduli.modulo_documenti_abilitato, cedolini: moduli.modulo_cedolini_abilitato, analytics: moduli.modulo_analytics_abilitato, whiteLabelAbilitato: imp.white_label_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} navItems={navItems} tenantName={tenantName} />
+        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} navItems={navItems} tenantName={tenantName} chatUserId={user!.id} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
           <div className="flex-1 flex flex-col px-4 sm:px-6 pt-6 pb-8">
             <div className="flex-1">{children}</div>
             <Footer />
           </div>
-          <ChatPanelSlide userId={user!.id} />
         </main>
       </div>
     </div>

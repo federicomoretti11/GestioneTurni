@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
 import { Notifiche } from '@/components/layout/Notifiche'
 import { MobileMenu } from '@/components/layout/MobileMenu'
+import { ChatWidget } from '@/components/chat/ChatWidget'
 import { RuoloUtente } from '@/lib/types'
 
 interface NavItem { label: string; href: string; icon: string; badge?: number }
@@ -14,9 +15,10 @@ interface HeaderProps {
   userId: string
   navItems?: NavItem[]
   tenantName?: string
+  chatUserId?: string
 }
 
-export function Header({ nomeUtente, ruolo, userId, navItems, tenantName }: HeaderProps) {
+export function Header({ nomeUtente, ruolo, userId, navItems, tenantName, chatUserId }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -40,6 +42,7 @@ export function Header({ nomeUtente, ruolo, userId, navItems, tenantName }: Head
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {chatUserId && <ChatWidget userId={chatUserId} />}
         <Notifiche userId={userId} ruolo={ruolo} />
         <span className="text-sm font-medium text-gray-700 hidden sm:inline ml-1">{nomeUtente}</span>
         <Avatar nome={nome} cognome={cognome} size={30} />
