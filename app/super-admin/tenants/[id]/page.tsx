@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { TenantDettaglio, PianoTenant } from '@/lib/types'
+import { ModaleUtentiTenant } from '@/components/super-admin/ModaleUtentiTenant'
 
 const PIANO_COLORS: Record<PianoTenant, string> = {
   starter:      'bg-slate-100 text-slate-700',
@@ -36,6 +37,7 @@ export default function TenantDettaglioPage() {
   const [togglingFlag, setTogglingFlag] = useState<string | null>(null)
   const [togglingRuoli, setTogglingRuoli] = useState<string | null>(null)
   const [errore, setErrore] = useState<string | null>(null)
+  const [modaleUtenti, setModaleUtenti] = useState(false)
 
   async function carica() {
     setLoading(true)
@@ -304,11 +306,20 @@ export default function TenantDettaglioPage() {
             <h2 className="text-sm font-semibold text-gray-900 mb-2">Utenti</h2>
             <p className="text-2xl font-bold text-slate-900">{tenant.utenti_count}</p>
             <p className="text-xs text-gray-400 mb-3">utenti attivi</p>
-            <p className="text-xs text-gray-400 italic">Lista utenti — disponibile prossimamente</p>
+            <button
+              onClick={() => setModaleUtenti(true)}
+              className="w-full py-2 text-sm font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors"
+            >
+              Gestisci utenti
+            </button>
           </div>
 
         </div>
       </div>
+
+      {modaleUtenti && (
+        <ModaleUtentiTenant tenantId={id} onClose={() => setModaleUtenti(false)} />
+      )}
     </div>
   )
 }
