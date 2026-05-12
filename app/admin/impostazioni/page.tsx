@@ -102,6 +102,11 @@ export default function ImpostazioniPage() {
   const [loadingTasks, setLoadingTasks] = useState(false)
   const [loadingDocumenti, setLoadingDocumenti] = useState(false)
   const [loadingRuoli, setLoadingRuoli] = useState(false)
+  const [loadingContratti, setLoadingContratti] = useState(false)
+  const [loadingStraordinari, setLoadingStraordinari] = useState(false)
+  const [loadingFerieCont, setLoadingFerieCont] = useState(false)
+  const [loadingStaffing, setLoadingStaffing] = useState(false)
+  const [loadingIndisponibilita, setLoadingIndisponibilita] = useState(false)
   const [testEmailStato, setTestEmailStato] = useState<'idle' | 'loading' | 'ok' | 'errore'>('idle')
   const [testEmailMsg, setTestEmailMsg] = useState('')
   const [sigla, setSigla] = useState('')
@@ -327,6 +332,60 @@ export default function ImpostazioniPage() {
           />
         </div>
       </section>
+
+      {/* Moduli HR avanzati */}
+      {(imp?.modulo_contratti_abilitato || imp?.modulo_straordinari_abilitato || imp?.modulo_ferie_contatori_abilitato || imp?.modulo_staffing_abilitato || imp?.modulo_indisponibilita_abilitato) && (
+        <section>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Moduli HR avanzati</h2>
+          <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
+            {imp?.modulo_contratti_abilitato && (
+              <ToggleRow
+                label="Contratti e orario contrattuale"
+                descrizione="Gestione tipo contratto, ore settimanali previste, full-time/part-time"
+                valore={imp.modulo_contratti_abilitato}
+                loading={loadingContratti}
+                onChange={() => toggle('modulo_contratti_abilitato', setLoadingContratti)}
+              />
+            )}
+            {imp?.modulo_straordinari_abilitato && (
+              <ToggleRow
+                label="Calcolo straordinari automatico"
+                descrizione="Ore effettive vs. pianificate, straordinari ordinari/notturni/festivi, ore mancanti"
+                valore={imp.modulo_straordinari_abilitato}
+                loading={loadingStraordinari}
+                onChange={() => toggle('modulo_straordinari_abilitato', setLoadingStraordinari)}
+              />
+            )}
+            {imp?.modulo_ferie_contatori_abilitato && (
+              <ToggleRow
+                label="Contatori ferie, permessi e ROL"
+                descrizione="Giorni ferie maturati/fruiti/residui, monte ore ROL, contatore malattie per dipendente"
+                valore={imp.modulo_ferie_contatori_abilitato}
+                loading={loadingFerieCont}
+                onChange={() => toggle('modulo_ferie_contatori_abilitato', setLoadingFerieCont)}
+              />
+            )}
+            {imp?.modulo_staffing_abilitato && (
+              <ToggleRow
+                label="Pianificazione fabbisogno (staffing)"
+                descrizione="Definisci quante persone servono per turno/posto, rileva sotto e sovra-organico"
+                valore={imp.modulo_staffing_abilitato}
+                loading={loadingStaffing}
+                onChange={() => toggle('modulo_staffing_abilitato', setLoadingStaffing)}
+              />
+            )}
+            {imp?.modulo_indisponibilita_abilitato && (
+              <ToggleRow
+                label="Indisponibilità e preferenze dipendente"
+                descrizione="Il dipendente dichiara giorni/orari in cui non è disponibile per la pianificazione"
+                valore={imp.modulo_indisponibilita_abilitato}
+                loading={loadingIndisponibilita}
+                onChange={() => toggle('modulo_indisponibilita_abilitato', setLoadingIndisponibilita)}
+              />
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Codice dipendenti */}
       <section>

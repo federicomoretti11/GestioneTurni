@@ -146,6 +146,12 @@ export interface ImpostazioniTenant {
   modulo_paghe_abilitato: boolean
   modulo_ai_copilot_abilitato: boolean
   white_label_abilitato: boolean
+  // Moduli HR avanzati
+  modulo_contratti_abilitato: boolean
+  modulo_straordinari_abilitato: boolean
+  modulo_ferie_contatori_abilitato: boolean
+  modulo_staffing_abilitato: boolean
+  modulo_indisponibilita_abilitato: boolean
   // Ruoli che possono vedere ogni modulo (default: tutti e tre)
   modulo_tasks_ruoli: string[]
   modulo_documenti_ruoli: string[]

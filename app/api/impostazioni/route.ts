@@ -11,6 +11,9 @@ const CAMPI_FLAG = [
   'modulo_cedolini_abilitato', 'modulo_analytics_abilitato',
   'modulo_tasks_abilitato', 'modulo_documenti_abilitato',
   'modulo_paghe_abilitato', 'modulo_ai_copilot_abilitato', 'white_label_abilitato',
+  'modulo_contratti_abilitato', 'modulo_straordinari_abilitato',
+  'modulo_ferie_contatori_abilitato', 'modulo_staffing_abilitato',
+  'modulo_indisponibilita_abilitato',
 ] as const
 
 const CAMPI_RUOLI = [
@@ -25,7 +28,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from('impostazioni')
-    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato, modulo_paghe_abilitato, modulo_ai_copilot_abilitato, white_label_abilitato, modulo_tasks_ruoli, modulo_documenti_ruoli, modulo_cedolini_ruoli, modulo_analytics_ruoli, modulo_paghe_ruoli, modulo_ai_copilot_ruoli')
+    .select('gps_checkin_abilitato, email_notifiche_abilitato, modulo_cedolini_abilitato, modulo_analytics_abilitato, modulo_tasks_abilitato, modulo_documenti_abilitato, modulo_paghe_abilitato, modulo_ai_copilot_abilitato, white_label_abilitato, modulo_tasks_ruoli, modulo_documenti_ruoli, modulo_cedolini_ruoli, modulo_analytics_ruoli, modulo_paghe_ruoli, modulo_ai_copilot_ruoli, modulo_contratti_abilitato, modulo_straordinari_abilitato, modulo_ferie_contatori_abilitato, modulo_staffing_abilitato, modulo_indisponibilita_abilitato')
     .single()
 
   const imp: ImpostazioniTenant = {
@@ -35,9 +38,14 @@ export async function GET() {
     modulo_analytics_abilitato:  data?.modulo_analytics_abilitato ?? false,
     modulo_tasks_abilitato:      data?.modulo_tasks_abilitato ?? true,
     modulo_documenti_abilitato:  data?.modulo_documenti_abilitato ?? true,
-    modulo_paghe_abilitato:      data?.modulo_paghe_abilitato ?? false,
-    modulo_ai_copilot_abilitato: data?.modulo_ai_copilot_abilitato ?? false,
-    white_label_abilitato:       data?.white_label_abilitato ?? false,
+    modulo_paghe_abilitato:           data?.modulo_paghe_abilitato ?? false,
+    modulo_ai_copilot_abilitato:      data?.modulo_ai_copilot_abilitato ?? false,
+    white_label_abilitato:            data?.white_label_abilitato ?? false,
+    modulo_contratti_abilitato:       data?.modulo_contratti_abilitato ?? false,
+    modulo_straordinari_abilitato:    data?.modulo_straordinari_abilitato ?? false,
+    modulo_ferie_contatori_abilitato: data?.modulo_ferie_contatori_abilitato ?? false,
+    modulo_staffing_abilitato:        data?.modulo_staffing_abilitato ?? false,
+    modulo_indisponibilita_abilitato: data?.modulo_indisponibilita_abilitato ?? false,
     modulo_tasks_ruoli:          (data?.modulo_tasks_ruoli      as string[] | null) ?? DEFAULT_RUOLI,
     modulo_documenti_ruoli:      (data?.modulo_documenti_ruoli  as string[] | null) ?? DEFAULT_RUOLI,
     modulo_cedolini_ruoli:       (data?.modulo_cedolini_ruoli   as string[] | null) ?? DEFAULT_RUOLI,

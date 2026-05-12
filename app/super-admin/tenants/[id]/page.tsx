@@ -19,8 +19,13 @@ const FLAG_LABELS: Record<string, { label: string; piano: PianoTenant | null; ru
   modulo_cedolini_abilitato:   { label: 'Modulo Cedolini',   piano: 'professional', ruoliKey: 'modulo_cedolini_ruoli' },
   modulo_analytics_abilitato:  { label: 'Modulo Analytics',  piano: 'professional', ruoliKey: 'modulo_analytics_ruoli' },
   modulo_paghe_abilitato:      { label: 'Modulo Paghe',      piano: 'enterprise',   ruoliKey: 'modulo_paghe_ruoli' },
-  modulo_ai_copilot_abilitato: { label: 'AI Copilot',        piano: 'enterprise',   ruoliKey: 'modulo_ai_copilot_ruoli' },
-  white_label_abilitato:       { label: 'White Label',       piano: 'enterprise' },
+  modulo_ai_copilot_abilitato:        { label: 'AI Copilot',              piano: 'enterprise',   ruoliKey: 'modulo_ai_copilot_ruoli' },
+  white_label_abilitato:              { label: 'White Label',             piano: 'enterprise' },
+  modulo_contratti_abilitato:         { label: 'Contratti e orario',      piano: 'professional' },
+  modulo_straordinari_abilitato:      { label: 'Straordinari automatici', piano: 'professional' },
+  modulo_ferie_contatori_abilitato:   { label: 'Contatori ferie/ROL',     piano: 'professional' },
+  modulo_staffing_abilitato:          { label: 'Staffing / fabbisogno',   piano: 'enterprise' },
+  modulo_indisponibilita_abilitato:   { label: 'Indisponibilità dipendente', piano: 'professional' },
 }
 
 const ROLE_LABELS: Record<string, string> = { admin: 'Admin', manager: 'Manager', dipendente: 'Dipendente' }
