@@ -9,6 +9,7 @@ import { Footer } from '@/components/layout/Footer'
 import { isAnalyticsAbilitato } from '@/lib/impostazioni'
 import { ChatPanelSlide } from '@/components/chat/ChatPanelSlide'
 import { SuperAdminChatCount } from '@/components/chat/SuperAdminChatCount'
+import { SuperAdminChatTopbarBtn } from '@/components/chat/SuperAdminChatTopbarBtn'
 
 // ── Icone SVG ────────────────────────────────────────────────
 const ICalendar = (p: React.SVGProps<SVGSVGElement>) => (
@@ -348,6 +349,7 @@ export default async function HomePage() {
 
         {/* Destra: notifiche + avatar + logout */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 w-1/3 justify-end">
+          {isSuperAdmin && <SuperAdminChatTopbarBtn />}
           <Notifiche userId={user.id} ruolo={ruolo} />
           <Avatar nome={profile.nome} cognome={profile.cognome} size={28} />
           <HomeLogout />
