@@ -44,7 +44,7 @@ export function SuperAdminChatBadge() {
 
   return (
     <a href="/super-admin/chat" className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white transition-colors">
-      💬 Chat
+      💬 Chat di supporto
       {count > 0 && (
         <span className="bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
           {count}

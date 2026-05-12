@@ -19,7 +19,7 @@ const BASE_NAV_ITEMS = [
 export default async function ManagerLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const { data: profile } = await supabase.from('profiles').select('nome, cognome, tenants(nome)').eq('id', user!.id).single()
+  const { data: profile } = await supabase.from('profiles').select('nome, cognome, is_super_admin, tenants(nome)').eq('id', user!.id).single()
   const tenantName = (profile?.tenants as { nome?: string } | null)?.nome ?? ''
 
   const imp = await getImpostazioni()
@@ -36,7 +36,7 @@ export default async function ManagerLayout({ children }: { children: React.Reac
     <div className="flex h-screen bg-[#FAFAF8]">
       <SidebarManager moduli={{ tasks: moduli.modulo_tasks_abilitato, documenti: moduli.modulo_documenti_abilitato, cedolini: moduli.modulo_cedolini_abilitato, analytics: moduli.modulo_analytics_abilitato, whiteLabelAbilitato: imp.white_label_abilitato }} />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} navItems={navItems} tenantName={tenantName} chatUserId={user!.id} />
+        <Header nomeUtente={`${profile?.nome} ${profile?.cognome}`} ruolo="manager" userId={user!.id} navItems={navItems} tenantName={tenantName} chatUserId={user!.id} isSuperAdmin={!!(profile as { is_super_admin?: boolean } | null)?.is_super_admin} />
         <main className="flex-1 overflow-auto flex flex-col" style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
           <div className="flex-1 flex flex-col px-4 sm:px-6 pt-6 pb-8">
             <div className="flex-1">{children}</div>
