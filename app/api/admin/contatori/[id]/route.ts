@@ -46,7 +46,7 @@ export async function GET(
       .single(),
     admin
       .from('richieste')
-      .select('tipo, permesso_tipo, ora_inizio, ora_fine, data_inizio')
+      .select('tipo, permesso_tipo, ora_inizio, ora_fine, data_inizio, data_fine')
       .eq('dipendente_id', params.id)
       .eq('tenant_id', tenantId)
       .eq('stato', 'approvata')
@@ -55,7 +55,13 @@ export async function GET(
       .lte('data_inizio', `${anno}-12-31`),
   ])
 
-  const ferie_usate = (richieste ?? []).filter(r => r.tipo === 'ferie').length
+  const ferie_usate = (richieste ?? [])
+    .filter(r => r.tipo === 'ferie')
+    .reduce((acc, r) => {
+      const inizio = new Date(r.data_inizio as string)
+      const fine = r.data_fine ? new Date(r.data_fine as string) : inizio
+      return acc + Math.round((fine.getTime() - inizio.getTime()) / 86400000) + 1
+    }, 0)
   const permesso_usate = (richieste ?? [])
     .filter(r => r.tipo === 'permesso')
     .reduce((acc, r) => acc + calcolaOrePermesso(r.permesso_tipo, r.ora_inizio, r.ora_fine), 0)
