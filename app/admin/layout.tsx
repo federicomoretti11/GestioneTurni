@@ -3,6 +3,7 @@ import { getImpostazioni, moduliPerRuolo } from '@/lib/impostazioni'
 import { SidebarAdmin } from '@/components/layout/SidebarAdmin'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { ChatPanelSlide } from '@/components/chat/ChatPanelSlide'
 
 const BASE_NAV_ITEMS = [
   { label: 'Home', href: '/home', icon: '🏠' },
@@ -42,6 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="flex-1">{children}</div>
             <Footer />
           </div>
+          <ChatPanelSlide userId={user!.id} />
         </main>
       </div>
     </div>
