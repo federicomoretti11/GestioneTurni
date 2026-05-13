@@ -27,6 +27,7 @@ interface GrigliaProps {
   compact?: boolean
   assenze?: AssenzaCalendario[]
   onAssenzaClick?: (assenza: AssenzaCalendario) => void
+  indisponibilita?: Array<{ dipendente_id: string; data_inizio: string; data_fine: string }>
 }
 
 function oreLabel(ore: number) {
@@ -34,7 +35,7 @@ function oreLabel(ore: number) {
   return `${ore % 1 === 0 ? ore : ore.toFixed(1)}h`
 }
 
-export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick, compact, assenze, onAssenzaClick }: GrigliaProps) {
+export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEditTurno, readonly, onTurnoClick, compact, assenze, onAssenzaClick, indisponibilita }: GrigliaProps) {
   const todayRef = useRef<HTMLTableCellElement>(null)
   useEffect(() => {
     todayRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
@@ -48,6 +49,12 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
     return (assenze ?? []).find(
       a => a.dipendente_id === dipendenteId && a.data_inizio <= data && a.data_fine >= data
     ) ?? null
+  }
+
+  function hasIndisponibilita(dipendenteId: string, data: string): boolean {
+    return (indisponibilita ?? []).some(
+      i => i.dipendente_id === dipendenteId && i.data_inizio <= data && i.data_fine >= data
+    )
   }
 
   function oreCella(dipendenteId: string, data: string) {
@@ -108,17 +115,21 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
                   )
                 }
                 return (
-                  <CellaCalendario
-                    key={data}
-                    turni={getTurniCella(d.id, data)}
-                    onAdd={() => onAddTurno(d.id, data)}
-                    onEdit={onEditTurno}
-                    readonly={readonly}
-                    onReadonlyClick={onTurnoClick}
-                    isOggi={data === oggi}
-                    isPassato={data < oggi}
-                    compact={compact}
-                  />
+                  <td key={data} className="relative border border-slate-200/60">
+                    {hasIndisponibilita(d.id, data) && (
+                      <span className="absolute top-0.5 right-0.5 z-10 w-2 h-2 rounded-full bg-red-500" title="Indisponibile" />
+                    )}
+                    <CellaCalendario
+                      turni={getTurniCella(d.id, data)}
+                      onAdd={() => onAddTurno(d.id, data)}
+                      onEdit={onEditTurno}
+                      readonly={readonly}
+                      onReadonlyClick={onTurnoClick}
+                      isOggi={data === oggi}
+                      isPassato={data < oggi}
+                      compact={compact}
+                    />
+                  </td>
                 )
               })}
               <td className="border border-slate-200/60 bg-blue-50 px-2 py-1.5 text-center font-semibold text-blue-700 whitespace-nowrap text-xs">

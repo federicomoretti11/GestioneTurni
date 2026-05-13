@@ -32,6 +32,8 @@ export default function CalendarioProgrammazionePage() {
   const [loadingAzione, setLoadingAzione] = useState(false)
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
+  const [indisponibilitaAbilitato, setIndisponibilitaAbilitato] = useState(false)
+  const [indisponibilita, setIndisponibilita] = useState<Array<{ dipendente_id: string; data_inizio: string; data_fine: string }>>([])
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
   const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
@@ -44,16 +46,25 @@ export default function CalendarioProgrammazionePage() {
     setErrore('')
     setLoading(true)
     try {
-      const [u, tp, tr, po] = await Promise.all([
+      const [imp, u, tp, tr, po] = await Promise.all([
+        fetch('/api/impostazioni').then(r => r.json()),
         fetch('/api/utenti').then(r => r.json()),
         fetch('/api/template').then(r => r.json()),
         fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
       ])
+      setIndisponibilitaAbilitato(imp?.modulo_indisponibilita_abilitato ?? false)
       setDipendenti(u.filter((x: Profile) => x.includi_in_turni && x.attivo))
       setTemplates(tp)
       setTurni(tr)
       setPosti(po)
+
+      if (imp?.modulo_indisponibilita_abilitato) {
+        const indisp = await fetch(`/api/indisponibilita?from=${periodo.inizio}&to=${periodo.fine}`).then(r => r.json())
+        setIndisponibilita(Array.isArray(indisp) ? indisp : [])
+      } else {
+        setIndisponibilita([])
+      }
     } catch {
       setErrore('Errore nel caricamento dei dati.')
     } finally {
@@ -230,6 +241,7 @@ export default function CalendarioProgrammazionePage() {
               onAddTurno={(dipendenteId, data) => setModale({ open: true, dipendenteId, data })}
               onEditTurno={turno => setModale({ open: true, turno })}
               compact
+              indisponibilita={indisponibilitaAbilitato ? indisponibilita : undefined}
             />
           </div>
           <div className="md:hidden">
