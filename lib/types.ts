@@ -236,3 +236,13 @@ export interface ContatoreFerieSaldo extends ContatoreFerie {
   permesso_usate: number
   rol_usate: number
 }
+
+export interface Indisponibilita {
+  id: string
+  tenant_id: string
+  dipendente_id: string
+  data_inizio: string
+  data_fine: string
+  motivo: string | null
+  created_at: string
+}
