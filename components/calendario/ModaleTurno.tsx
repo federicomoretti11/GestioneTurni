@@ -100,12 +100,20 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     if (!turno) return
     setSalvandoTimbri(true)
     setErroreTimbri('')
+
+    // Converti HH:mm da ora locale browser (italiana) a UTC prima di inviare all'API.
+    // new Date("YYYY-MM-DDTHH:mm:00") senza fuso = ora locale → getUTCHours() dà l'UTC corretto.
+    function toUTC(hhmm: string): string {
+      const d = new Date(`${turno!.data}T${hhmm}:00`)
+      return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+    }
+
     const res = await fetch(`/api/turni/${turno.id}/timbri`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ora_ingresso_effettiva: ingressoCorretto || null,
-        ora_uscita_effettiva: uscitaCorretto || null,
+        ora_ingresso_effettiva: ingressoCorretto ? toUTC(ingressoCorretto) : null,
+        ora_uscita_effettiva: uscitaCorretto ? toUTC(uscitaCorretto) : null,
       }),
     })
     setSalvandoTimbri(false)
