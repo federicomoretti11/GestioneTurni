@@ -1,5 +1,6 @@
 ﻿'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { TurnoTemplate } from '@/lib/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -49,6 +50,7 @@ export default function TemplatePage() {
 
   return (
     <div className="space-y-4">
+      <Link href="/admin/impostazioni" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">← Impostazioni</Link>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-slate-900">Turni</h1>
         <Button onClick={apriNuovo}>+ Nuovo turno</Button>

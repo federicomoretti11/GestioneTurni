@@ -1,5 +1,6 @@
 ﻿'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { exportExcel, exportCsv, exportPdf, calcolaAssenzeDipendenti } from '@/lib/utils/export'
@@ -138,6 +139,7 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-6 max-w-md">
+      <Link href="/admin/impostazioni" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">← Impostazioni</Link>
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Export Turni</h1>
       <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
         <div className="grid grid-cols-2 gap-3">

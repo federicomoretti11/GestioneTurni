@@ -21,6 +21,7 @@ export default async function UtentiPage({ searchParams }: { searchParams: { pag
 
   return (
     <div className="space-y-4">
+      <Link href="/admin/impostazioni" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">← Impostazioni</Link>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight text-slate-900">Utenti</h1>
         <Link href="/admin/utenti/nuovo"><Button>+ Nuovo utente</Button></Link>

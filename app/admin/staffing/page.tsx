@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 
 type GiornoReport = { data: string; giorno: number; confermati: number; minimo: number; ok: boolean }
@@ -71,6 +72,7 @@ export default function StaffingPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
+      <Link href="/admin/impostazioni" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">← Impostazioni</Link>
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">Staffing</h1>
         <div className="flex items-center gap-2">
