@@ -17,6 +17,10 @@ export default function ProfiloPage() {
   const [contatoriAbilitato, setContatoriAbilitato] = useState(false)
   const [contatori, setContatori] = useState<ContatoreFerieSaldo | null>(null)
   const annoCorrente = new Date().getFullYear()
+  const [indisponibilitaAbilitato, setIndisponibilitaAbilitato] = useState(false)
+  const [indisponibilita, setIndisponibilita] = useState<Array<{ id: string; data_inizio: string; data_fine: string; motivo: string | null }>>([])
+  const [formIndisp, setFormIndisp] = useState({ data_inizio: '', data_fine: '', motivo: '' })
+  const [salvandoIndisp, setSalvandoIndisp] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -26,10 +30,13 @@ export default function ProfiloPage() {
         supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => data),
         fetch('/api/impostazioni').then(r => r.json()),
         fetch(`/api/admin/contatori/${user.id}?anno=${new Date().getFullYear()}`).then(r => r.json()),
-      ]).then(([p, imp, cnt]: [Profile | null, { modulo_ferie_contatori_abilitato?: boolean }, ContatoreFerieSaldo]) => {
+        fetch(`/api/indisponibilita?from=${new Date().toISOString().split('T')[0]}`).then(r => r.json()),
+      ]).then(([p, imp, cnt, indisp]: [Profile | null, Record<string, boolean>, ContatoreFerieSaldo, Array<{ id: string; data_inizio: string; data_fine: string; motivo: string | null }>]) => {
         setProfilo(p)
         setContatoriAbilitato(imp?.modulo_ferie_contatori_abilitato ?? false)
+        setIndisponibilitaAbilitato(imp?.modulo_indisponibilita_abilitato ?? false)
         if (cnt) setContatori(cnt)
+        setIndisponibilita(Array.isArray(indisp) ? indisp : [])
       }).catch(err => console.error('Errore caricamento profilo:', err))
     })
   }, [])
@@ -54,6 +61,38 @@ export default function ProfiloPage() {
     if (error) { setErrore('Errore durante il cambio password. Riprova.'); return }
     setSuccesso('Password aggiornata con successo.')
     setForm({ vecchia: '', nuova: '', conferma: '' })
+  }
+
+  async function aggiungiIndisponibilita(e: React.FormEvent) {
+    e.preventDefault()
+    if (!formIndisp.data_inizio || !formIndisp.data_fine) return
+    setSalvandoIndisp(true)
+    try {
+      const res = await fetch('/api/indisponibilita', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data_inizio: formIndisp.data_inizio,
+          data_fine: formIndisp.data_fine,
+          motivo: formIndisp.motivo || null,
+        }),
+      })
+      if (!res.ok) {
+        const j = await res.json()
+        alert(j.error ?? 'Errore durante il salvataggio.')
+        return
+      }
+      const nuova = await res.json()
+      setIndisponibilita(prev => [...prev, nuova].sort((a, b) => a.data_inizio.localeCompare(b.data_inizio)))
+      setFormIndisp({ data_inizio: '', data_fine: '', motivo: '' })
+    } finally {
+      setSalvandoIndisp(false)
+    }
+  }
+
+  async function eliminaIndisponibilita(id: string) {
+    await fetch(`/api/indisponibilita/${id}`, { method: 'DELETE' })
+    setIndisponibilita(prev => prev.filter(i => i.id !== id))
   }
 
   if (!profilo) return null
@@ -112,6 +151,79 @@ export default function ProfiloPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {indisponibilitaAbilitato && (
+        <div className="bg-white rounded-xl border border-slate-900/20 p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+          <h2 className="font-semibold text-slate-800">Le mie indisponibilità</h2>
+
+          {indisponibilita.length === 0 ? (
+            <p className="text-sm text-slate-500">Nessuna indisponibilità futura segnalata.</p>
+          ) : (
+            <ul className="space-y-2">
+              {indisponibilita.map(i => (
+                <li key={i.id} className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  <div>
+                    <span className="text-sm font-medium text-red-900">
+                      {i.data_inizio === i.data_fine
+                        ? new Date(i.data_inizio + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })
+                        : `${new Date(i.data_inizio + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long' })} – ${new Date(i.data_fine + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}`
+                      }
+                    </span>
+                    {i.motivo && <p className="text-xs text-red-700 mt-0.5">{i.motivo}</p>}
+                  </div>
+                  <button
+                    onClick={() => eliminaIndisponibilita(i.id)}
+                    className="text-red-500 hover:text-red-700 text-xs font-medium ml-3"
+                  >
+                    Rimuovi
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form onSubmit={aggiungiIndisponibilita} className="space-y-3 pt-2 border-t border-slate-100">
+            <p className="text-sm font-medium text-slate-700">Aggiungi indisponibilità</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-slate-500 mb-0.5">Dal</label>
+                <input
+                  type="date"
+                  value={formIndisp.data_inizio}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={e => setFormIndisp(f => ({ ...f, data_inizio: e.target.value }))}
+                  required
+                  className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-0.5">Al</label>
+                <input
+                  type="date"
+                  value={formIndisp.data_fine}
+                  min={formIndisp.data_inizio || new Date().toISOString().split('T')[0]}
+                  onChange={e => setFormIndisp(f => ({ ...f, data_fine: e.target.value }))}
+                  required
+                  className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-slate-500 mb-0.5">Motivo (opzionale)</label>
+              <input
+                type="text"
+                value={formIndisp.motivo}
+                onChange={e => setFormIndisp(f => ({ ...f, motivo: e.target.value }))}
+                placeholder="es. visita medica"
+                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <Button type="submit" disabled={salvandoIndisp}>
+              {salvandoIndisp ? 'Salvataggio...' : 'Aggiungi'}
+            </Button>
+          </form>
         </div>
       )}
 
