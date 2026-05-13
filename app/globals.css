@@ -18,3 +18,43 @@ body {
     animation: slide-up 0.22s ease-out;
   }
 }
+
+/* ── Landing page custom classes ── */
+html { scroll-behavior: smooth; }
+
+.serif {
+  font-family: var(--font-serif), 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+.dot-grid {
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.hairline { border-color: #e2e8f0; }
+
+.brand-blue  { color: #045dcc; }
+.bg-brand-blue  { background-color: #045dcc; }
+.bg-brand-dark  { background-color: #010b15; }
+.border-brand-blue { border-color: #045dcc; }
+
+.pricing-featured {
+  background: #010b15;
+  color: white;
+  box-shadow: 0 0 0 2px #045dcc, 0 24px 48px -12px rgba(4,93,204,0.25);
+}
+
+.faq-item summary { list-style: none; cursor: pointer; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item[open] .faq-icon { transform: rotate(45deg); }
+.faq-icon { transition: transform 0.2s ease; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
