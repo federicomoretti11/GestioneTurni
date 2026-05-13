@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
 import type { ImpostazioniTenant } from '@/lib/types'
 
 function Toggle({ label, valore, loading, onChange }: { label: string; valore: boolean; loading: boolean; onChange: () => void }) {
