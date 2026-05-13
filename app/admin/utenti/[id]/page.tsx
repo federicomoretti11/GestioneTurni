@@ -196,7 +196,13 @@ export default function ModificaUtentePage() {
       </form>
       {contrattiAbilitato && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-          <h2 className="text-base font-semibold text-gray-900">Contratto</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900">Contratto</h2>
+            {contratto
+              ? <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full border border-green-200">✓ Registrato</span>
+              : <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full border border-amber-200">Nessun contratto</span>
+            }
+          </div>
           {!contratto && (
             <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
               Nessun contratto impostato per questo dipendente.
