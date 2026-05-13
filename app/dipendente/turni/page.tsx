@@ -77,11 +77,14 @@ export default function MieiTurniPage() {
   const caricaTurnoOggi = useCallback(async () => {
     if (!profilo) return
     const oggi = toDateString(new Date())
+    const ieri = toDateString(new Date(Date.now() - 86400000))
     try {
-      const res = await fetch(`/api/turni?data_inizio=${oggi}&data_fine=${oggi}`)
+      const res = await fetch(`/api/turni?data_inizio=${ieri}&data_fine=${oggi}`)
       const data = await res.json()
-      const mio = Array.isArray(data) ? data.find((t: TurnoConDettagli) => t.dipendente_id === profilo.id) : null
-      setTurnoOggi(mio ?? null)
+      const miei: TurnoConDettagli[] = Array.isArray(data) ? data.filter((t: TurnoConDettagli) => t.dipendente_id === profilo.id) : []
+      const aperto = miei.find(t => t.ora_ingresso_effettiva && !t.ora_uscita_effettiva)
+      const diOggi = miei.find(t => t.data === oggi)
+      setTurnoOggi(aperto ?? diOggi ?? null)
     } catch {
       // silenzioso, il banner si limita a non mostrare
     }
