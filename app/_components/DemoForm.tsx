@@ -103,14 +103,14 @@ export default function DemoForm() {
           className="w-full h-11 px-3.5 rounded-md bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-[#045dcc] focus:ring-2 focus:ring-[rgba(4,93,204,0.3)] transition"
         >
           <option value="">Seleziona...</option>
-          <option>Meno di 10</option>
-          <option>10 – 25</option>
-          <option>26 – 50</option>
-          <option>Oltre 50</option>
+          <option value="meno-di-10">Meno di 10</option>
+          <option value="10-25">10 – 25</option>
+          <option value="26-50">26 – 50</option>
+          <option value="oltre-50">Oltre 50</option>
         </select>
       </div>
       {error && (
-        <p className="text-red-400 text-sm">{error}</p>
+        <p role="alert" className="text-red-400 text-sm">{error}</p>
       )}
       <button
         type="submit"

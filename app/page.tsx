@@ -1,6 +1,10 @@
 // app/page.tsx
-import React from 'react'
 import DemoForm from './_components/DemoForm'
+
+export const metadata = {
+  title: 'Opero Hub — Gestione turni per PMI italiane',
+  description: 'Turni, presenze, ferie e documenti in un solo posto. La piattaforma operativa per piccole e medie imprese italiane.',
+}
 
 export default function LandingPage() {
   return (
@@ -11,7 +15,7 @@ export default function LandingPage() {
         <nav className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2.5 group">
             <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-dark text-white">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h14"/>
               </svg>
             </span>
@@ -61,7 +65,7 @@ export default function LandingPage() {
           <div className="mt-9 flex flex-col sm:flex-row gap-3 sm:items-center">
             <a href="#demo" className="inline-flex items-center justify-center h-11 px-5 rounded-md bg-brand-blue text-white text-sm font-medium hover:opacity-90 transition shadow-sm">
               Richiedi una demo
-              <svg className="ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg aria-hidden="true" className="ml-2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14"/><path d="M13 5l7 7-7 7"/>
               </svg>
             </a>
@@ -205,7 +209,7 @@ export default function LandingPage() {
               <div key={title} className="bg-white p-7 sm:p-9">
                 <div className="flex items-start gap-4">
                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-dark text-white shrink-0">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                       {icon}
                     </svg>
                   </span>
@@ -274,7 +278,7 @@ export default function LandingPage() {
               <div className="mt-6 border-t hairline pt-6 space-y-3 flex-1">
                 {['Turni e calendario','Timbrature GPS','Richieste ferie e permessi','Notifiche in-app ed email','Export CSV'].map(f => (
                   <div key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <svg className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    <svg aria-hidden="true" className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                     {f}
                   </div>
                 ))}
@@ -296,7 +300,7 @@ export default function LandingPage() {
               <div className="mt-6 border-t border-slate-700 pt-6 space-y-3 flex-1">
                 {['Tutto di Starter','Cedolini e documenti','Task management','Analytics & consuntivi paghe','Contatori ferie / ROL','Contratti e straordinari automatici'].map(f => (
                   <div key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
-                    <svg className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    <svg aria-hidden="true" className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                     {f}
                   </div>
                 ))}
@@ -314,7 +318,7 @@ export default function LandingPage() {
               <div className="mt-6 border-t hairline pt-6 space-y-3 flex-1">
                 {['Tutto di Professional','AI Copilot per la pianificazione','White label (dominio personalizzato)','Fabbisogno staffing','Onboarding e supporto dedicato'].map(f => (
                   <div key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <svg className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    <svg aria-hidden="true" className="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                     {f}
                   </div>
                 ))}
@@ -351,7 +355,7 @@ export default function LandingPage() {
               <details key={q} className="faq-item rounded-xl border hairline bg-white overflow-hidden">
                 <summary className="flex items-center justify-between p-6 gap-4">
                   <span className="font-semibold text-slate-900">{q}</span>
-                  <span className="faq-icon shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-lg font-light">+</span>
+                  <span aria-hidden="true" className="faq-icon shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-lg font-light">+</span>
                 </summary>
                 <div className="px-6 pb-6 text-[15px] text-slate-600 leading-relaxed">{a}</div>
               </details>
@@ -375,7 +379,7 @@ export default function LandingPage() {
               <ul className="mt-6 space-y-2">
                 {['Nessuna carta di credito richiesta','Ti ricontattiamo entro 24 ore lavorative','Call su misura per il tuo settore'].map(item => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-slate-300">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                     {item}
                   </li>
                 ))}
@@ -401,7 +405,7 @@ export default function LandingPage() {
             <div className="col-span-2 md:col-span-2">
               <a href="#" className="flex items-center gap-2.5">
                 <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-dark text-white">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                     <path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h14"/>
                   </svg>
                 </span>
