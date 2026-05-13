@@ -47,6 +47,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const [uscitaCorretto, setUscitaCorretto] = useState('')
   const [salvandoTimbri, setSalvandoTimbri] = useState(false)
   const [erroreTimbri, setErroreTimbri] = useState('')
+  const [timbriCorretti, setTimbriCorretti] = useState<{ ingresso: string | null; uscita: string | null } | null>(null)
 
   const mostraSelectDipendente = !turno && !dipendenteNome && !!dipendenti && dipendenti.length > 0
 
@@ -74,6 +75,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     setUscitaCorretto('')
     setSalvandoTimbri(false)
     setErroreTimbri('')
+    setTimbriCorretti(null)
   }, [turno, open])
 
   function handleTemplateChange(id: string) {
@@ -103,17 +105,21 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
 
     // Converti HH:mm da ora locale browser (italiana) a UTC prima di inviare all'API.
     // new Date("YYYY-MM-DDTHH:mm:00") senza fuso = ora locale → getUTCHours() dà l'UTC corretto.
-    function toUTC(hhmm: string): string {
+    function toUTCHhmm(hhmm: string): string {
       const d = new Date(`${turno!.data}T${hhmm}:00`)
       return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+    }
+    function toUTCISO(hhmm: string): string {
+      const utc = toUTCHhmm(hhmm)
+      return `${turno!.data}T${utc}:00+00:00`
     }
 
     const res = await fetch(`/api/turni/${turno.id}/timbri`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ora_ingresso_effettiva: ingressoCorretto ? toUTC(ingressoCorretto) : null,
-        ora_uscita_effettiva: uscitaCorretto ? toUTC(uscitaCorretto) : null,
+        ora_ingresso_effettiva: ingressoCorretto ? toUTCHhmm(ingressoCorretto) : null,
+        ora_uscita_effettiva: uscitaCorretto ? toUTCHhmm(uscitaCorretto) : null,
       }),
     })
     setSalvandoTimbri(false)
@@ -122,6 +128,11 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
       return
     }
     setCorrezioneAperta(false)
+    // Aggiorna il display locale subito, senza aspettare un refetch dal parent
+    setTimbriCorretti({
+      ingresso: ingressoCorretto ? toUTCISO(ingressoCorretto) : null,
+      uscita: uscitaCorretto ? toUTCISO(uscitaCorretto) : null,
+    })
     onTimbriAggiornati?.(ingressoCorretto || null, uscitaCorretto || null)
   }
 
@@ -147,8 +158,8 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     const d = new Date(iso)
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   }
-  const timbroIngresso = turno?.ora_ingresso_effettiva ?? null
-  const timbroUscita = turno?.ora_uscita_effettiva ?? null
+  const timbroIngresso = timbriCorretti !== null ? timbriCorretti.ingresso : (turno?.ora_ingresso_effettiva ?? null)
+  const timbroUscita = timbriCorretti !== null ? timbriCorretti.uscita : (turno?.ora_uscita_effettiva ?? null)
 
   const festivi = useFestivi()
   const dataISO = turno?.data ?? data ?? ''
