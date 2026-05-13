@@ -399,20 +399,20 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-2">
               <a href="#">
-                <img src="/LOGO COMPATTO.svg" alt="Opero Hub" width={120} height={76} />
+                <img src="/LOGO COMPATTO.svg" alt="Opero Hub" width={150} height={95} />
               </a>
-              <p className="mt-4 text-sm text-slate-500 leading-relaxed max-w-xs">
+              <p className="mt-4 text-xs text-slate-500 leading-relaxed max-w-xs">
                 La piattaforma di gestione turni e operazioni per PMI italiane.
               </p>
-              <div className="mt-5 mono text-[11px] uppercase tracking-[0.16em] text-slate-400 leading-relaxed">
+              <div className="mt-5 mono text-[10px] uppercase tracking-[0.16em] text-slate-400 leading-relaxed">
                 S.I.A. S.r.l.s.<br/>
                 P.IVA 14840881008
               </div>
             </div>
 
             <div>
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-slate-400 mb-4">Prodotto</div>
-              <ul className="space-y-2.5 text-sm text-slate-600">
+              <div className="mono text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-4">Prodotto</div>
+              <ul className="space-y-2.5 text-xs text-slate-600">
                 <li><a href="#funzionalita" className="hover:text-slate-900">Funzionalità</a></li>
                 <li><a href="#prezzi" className="hover:text-slate-900">Prezzi</a></li>
                 <li><a href="#faq" className="hover:text-slate-900">FAQ</a></li>
@@ -421,8 +421,8 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <div className="mono text-[11px] uppercase tracking-[0.18em] text-slate-400 mb-4">Legale</div>
-              <ul className="space-y-2.5 text-sm text-slate-600">
+              <div className="mono text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-4">Legale</div>
+              <ul className="space-y-2.5 text-xs text-slate-600">
                 <li><a href="#" className="hover:text-slate-900">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-slate-900">Cookie Policy</a></li>
                 <li><a href="mailto:info@operohub.com" className="hover:text-slate-900">info@operohub.com</a></li>
