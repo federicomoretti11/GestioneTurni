@@ -27,7 +27,7 @@ interface GrigliaProps {
   compact?: boolean
   assenze?: AssenzaCalendario[]
   onAssenzaClick?: (assenza: AssenzaCalendario) => void
-  indisponibilita?: Array<{ dipendente_id: string; data_inizio: string; data_fine: string }>
+  indisponibilita?: Array<{ dipendente_id: string; data_inizio: string; data_fine: string; motivo: string | null }>
 }
 
 function oreLabel(ore: number) {
@@ -51,10 +51,10 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
     ) ?? null
   }
 
-  function hasIndisponibilita(dipendenteId: string, data: string): boolean {
-    return (indisponibilita ?? []).some(
+  function getIndisponibilita(dipendenteId: string, data: string) {
+    return (indisponibilita ?? []).find(
       i => i.dipendente_id === dipendenteId && i.data_inizio <= data && i.data_fine >= data
-    )
+    ) ?? null
   }
 
   function oreCella(dipendenteId: string, data: string) {
@@ -114,20 +114,24 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
                     </td>
                   )
                 }
-                return (
-                  <CellaCalendario
-                    key={data}
-                    turni={getTurniCella(d.id, data)}
-                    onAdd={() => onAddTurno(d.id, data)}
-                    onEdit={onEditTurno}
-                    readonly={readonly}
-                    onReadonlyClick={onTurnoClick}
-                    isOggi={data === oggi}
-                    isPassato={data < oggi}
-                    compact={compact}
-                    indisponibile={hasIndisponibilita(d.id, data)}
-                  />
-                )
+                {
+                  const indisp = getIndisponibilita(d.id, data)
+                  return (
+                    <CellaCalendario
+                      key={data}
+                      turni={getTurniCella(d.id, data)}
+                      onAdd={() => onAddTurno(d.id, data)}
+                      onEdit={onEditTurno}
+                      readonly={readonly}
+                      onReadonlyClick={onTurnoClick}
+                      isOggi={data === oggi}
+                      isPassato={data < oggi}
+                      compact={compact}
+                      indisponibile={!!indisp}
+                      motivoIndisponibilita={indisp?.motivo ?? null}
+                    />
+                  )
+                }
               })}
               <td className="border border-slate-200/60 bg-blue-50 px-2 py-1.5 text-center font-semibold text-blue-700 whitespace-nowrap text-xs">
                 {oreLabel(oreRiga(d.id))}

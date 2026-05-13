@@ -11,12 +11,21 @@ interface CellaProps {
   isPassato?: boolean
   compact?: boolean
   indisponibile?: boolean
+  motivoIndisponibilita?: string | null
 }
 
-export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact, indisponibile }: CellaProps) {
+export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact, indisponibile, motivoIndisponibilita }: CellaProps) {
   const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-slate-50' : '')
   return (
     <td className={`border border-slate-200/60 p-1 align-top min-w-[72px] min-h-[48px] group relative ${sfondo}`}>
+      {indisponibile && (
+        <div className="mb-0.5">
+          <span className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-semibold bg-orange-100 text-orange-700 leading-none">
+            <span>⚠</span>
+            <span>{motivoIndisponibilita ? motivoIndisponibilita : 'Indisponibile'}</span>
+          </span>
+        </div>
+      )}
       <div className="space-y-0.5">
         {turni.map(t => (
           <BadgeTurno
@@ -43,9 +52,6 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onRead
         </button>
       )}
       {turni.length === 0 && <div className="min-h-[36px]" />}
-      {indisponibile && (
-        <span className="absolute top-0.5 right-0.5 z-10 w-2 h-2 rounded-full bg-red-500 pointer-events-none" title="Indisponibile" />
-      )}
     </td>
   )
 }
