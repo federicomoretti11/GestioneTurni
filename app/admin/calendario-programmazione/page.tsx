@@ -33,7 +33,7 @@ export default function CalendarioProgrammazionePage() {
   const [errore, setErrore] = useState('')
   const [loading, setLoading] = useState(true)
   const [indisponibilitaAbilitato, setIndisponibilitaAbilitato] = useState(false)
-  const [indisponibilita, setIndisponibilita] = useState<Array<{ dipendente_id: string; data_inizio: string; data_fine: string }>>([])
+  const [indisponibilita, setIndisponibilita] = useState<Array<{ dipendente_id: string; data_inizio: string; data_fine: string; motivo: string | null }>>([])
 
   const giorni = useMemo(() => getDaysBetween(periodo.inizio, periodo.fine), [periodo])
   const bozzeNelPeriodo = useMemo(() => turni.filter(t => t.stato === 'bozza').length, [turni])
