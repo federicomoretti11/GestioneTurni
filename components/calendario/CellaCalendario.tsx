@@ -10,9 +10,10 @@ interface CellaProps {
   isOggi?: boolean
   isPassato?: boolean
   compact?: boolean
+  indisponibile?: boolean
 }
 
-export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact }: CellaProps) {
+export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onReadonlyClick, isOggi = false, isPassato = false, compact, indisponibile }: CellaProps) {
   const sfondo = isOggi ? 'bg-blue-50/40' : (isPassato && turni.length === 0 ? 'bg-slate-50' : '')
   return (
     <td className={`border border-slate-200/60 p-1 align-top min-w-[72px] min-h-[48px] group relative ${sfondo}`}>
@@ -42,6 +43,9 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onRead
         </button>
       )}
       {turni.length === 0 && <div className="min-h-[36px]" />}
+      {indisponibile && (
+        <span className="absolute top-0.5 right-0.5 z-10 w-2 h-2 rounded-full bg-red-500 pointer-events-none" title="Indisponibile" />
+      )}
     </td>
   )
 }

@@ -115,21 +115,18 @@ export function GrigliaCalendario({ giorni, dipendenti, turni, onAddTurno, onEdi
                   )
                 }
                 return (
-                  <td key={data} className="relative border border-slate-200/60">
-                    {hasIndisponibilita(d.id, data) && (
-                      <span className="absolute top-0.5 right-0.5 z-10 w-2 h-2 rounded-full bg-red-500" title="Indisponibile" />
-                    )}
-                    <CellaCalendario
-                      turni={getTurniCella(d.id, data)}
-                      onAdd={() => onAddTurno(d.id, data)}
-                      onEdit={onEditTurno}
-                      readonly={readonly}
-                      onReadonlyClick={onTurnoClick}
-                      isOggi={data === oggi}
-                      isPassato={data < oggi}
-                      compact={compact}
-                    />
-                  </td>
+                  <CellaCalendario
+                    key={data}
+                    turni={getTurniCella(d.id, data)}
+                    onAdd={() => onAddTurno(d.id, data)}
+                    onEdit={onEditTurno}
+                    readonly={readonly}
+                    onReadonlyClick={onTurnoClick}
+                    isOggi={data === oggi}
+                    isPassato={data < oggi}
+                    compact={compact}
+                    indisponibile={hasIndisponibilita(d.id, data)}
+                  />
                 )
               })}
               <td className="border border-slate-200/60 bg-blue-50 px-2 py-1.5 text-center font-semibold text-blue-700 whitespace-nowrap text-xs">
