@@ -12,6 +12,7 @@ interface Moduli {
   cedolini?: boolean
   analytics?: boolean
   paghe?: boolean
+  staffing?: boolean
   whiteLabelAbilitato?: boolean
 }
 
@@ -71,6 +72,7 @@ export function SidebarAdmin({ moduli }: { moduli?: Moduli }) {
     { section: 'Gestione', label: 'Richieste',  href: '/admin/richieste',  icon: '📋',
       badge: mounted && pathname !== '/admin/richieste' ? richieste : 0 },
     ...(moduli?.analytics           ? [{ section: 'Gestione', label: 'Analytics', href: '/admin/analytics', icon: '📊' }] : []),
+    ...(moduli?.staffing            ? [{ section: 'Gestione', label: 'Staffing',  href: '/admin/staffing',  icon: '👥' }] : []),
     ...(moduli?.documenti !== false  ? [{ section: 'Gestione', label: 'Documenti', href: '/admin/documenti', icon: '🗄️' }] : []),
 
     { section: 'Impostazioni', label: 'Profilo',       href: '/admin/profilo',       icon: '👤' },
