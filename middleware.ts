@@ -29,6 +29,15 @@ async function resolveTenantId(host: string): Promise<string | null> {
   return data?.id ?? process.env.NEXT_PUBLIC_DEV_TENANT_ID ?? null
 }
 
+function isRootDomain(host: string): boolean {
+  return (
+    host.includes('localhost') ||
+    host.includes('127.0.0.1') ||
+    host === 'operohub.com' ||
+    host === 'www.operohub.com'
+  )
+}
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? ''
   const path = request.nextUrl.pathname
@@ -74,8 +83,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const pubbliche = ['/login', '/reset-password', '/auth/callback']
+  const isLandingRoot = path === '/' && isRootDomain(host)
 
-  if (!user && !pubbliche.includes(path)) {
+  if (!user && !pubbliche.includes(path) && !isLandingRoot) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
