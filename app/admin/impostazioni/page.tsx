@@ -240,10 +240,14 @@ export default function ImpostazioniPage() {
     <div className="max-w-2xl space-y-8">
       <h1 className="text-xl font-bold text-gray-900">Impostazioni</h1>
 
-      {/* Impostazioni globali */}
-      <section>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Impostazioni globali</h2>
-        <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
+      {/* Card configurazione unica */}
+      <div className="bg-white rounded-xl border border-slate-900/20 overflow-hidden" style={{ boxShadow: '0 1px 2px rgba(15,23,42,.04)' }}>
+
+        {/* Generali */}
+        <div className="px-5 py-3 bg-slate-50 border-b border-slate-100">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Generali</p>
+        </div>
+        <div className="px-5 divide-y divide-slate-100">
           <ToggleRow
             label="GPS check-in"
             descrizione={
@@ -284,12 +288,12 @@ export default function ImpostazioniPage() {
             </button>
           </div>
         </div>
-      </section>
 
-      {/* Moduli attivi */}
-      <section>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Moduli attivi</h2>
-        <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
+        {/* Moduli */}
+        <div className="px-5 py-3 bg-slate-50 border-y border-slate-100">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Moduli</p>
+        </div>
+        <div className="px-5 divide-y divide-slate-100">
           <ModuloRow
             label="Modulo Task"
             descrizione={imp?.modulo_tasks_abilitato ? 'Attivo — la sezione task è visibile e utilizzabile' : 'Disattivato — la sezione task è nascosta per tutti'}
@@ -331,61 +335,63 @@ export default function ImpostazioniPage() {
             onToggleRuolo={r => toggleRuolo('modulo_analytics_ruoli', r)}
           />
         </div>
-      </section>
 
-      {/* Moduli HR avanzati */}
-      {(imp?.modulo_contratti_abilitato || imp?.modulo_straordinari_abilitato || imp?.modulo_ferie_contatori_abilitato || imp?.modulo_staffing_abilitato || imp?.modulo_indisponibilita_abilitato) && (
-        <section>
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Moduli HR avanzati</h2>
-          <div className="bg-white rounded-xl border border-slate-900/20 px-5 divide-y divide-slate-100">
-            {imp?.modulo_contratti_abilitato && (
-              <ToggleRow
-                label="Contratti e orario contrattuale"
-                descrizione="Gestione tipo contratto, ore settimanali previste, full-time/part-time"
-                valore={imp.modulo_contratti_abilitato}
-                loading={loadingContratti}
-                onChange={() => toggle('modulo_contratti_abilitato', setLoadingContratti)}
-              />
-            )}
-            {imp?.modulo_straordinari_abilitato && (
-              <ToggleRow
-                label="Calcolo straordinari automatico"
-                descrizione="Ore effettive vs. pianificate, straordinari ordinari/notturni/festivi, ore mancanti"
-                valore={imp.modulo_straordinari_abilitato}
-                loading={loadingStraordinari}
-                onChange={() => toggle('modulo_straordinari_abilitato', setLoadingStraordinari)}
-              />
-            )}
-            {imp?.modulo_ferie_contatori_abilitato && (
-              <ToggleRow
-                label="Contatori ferie, permessi e ROL"
-                descrizione="Giorni ferie maturati/fruiti/residui, monte ore ROL, contatore malattie per dipendente"
-                valore={imp.modulo_ferie_contatori_abilitato}
-                loading={loadingFerieCont}
-                onChange={() => toggle('modulo_ferie_contatori_abilitato', setLoadingFerieCont)}
-              />
-            )}
-            {imp?.modulo_staffing_abilitato && (
-              <ToggleRow
-                label="Pianificazione fabbisogno (staffing)"
-                descrizione="Definisci quante persone servono per turno/posto, rileva sotto e sovra-organico"
-                valore={imp.modulo_staffing_abilitato}
-                loading={loadingStaffing}
-                onChange={() => toggle('modulo_staffing_abilitato', setLoadingStaffing)}
-              />
-            )}
-            {imp?.modulo_indisponibilita_abilitato && (
-              <ToggleRow
-                label="Indisponibilità e preferenze dipendente"
-                descrizione="Il dipendente dichiara giorni/orari in cui non è disponibile per la pianificazione"
-                valore={imp.modulo_indisponibilita_abilitato}
-                loading={loadingIndisponibilita}
-                onChange={() => toggle('modulo_indisponibilita_abilitato', setLoadingIndisponibilita)}
-              />
-            )}
-          </div>
-        </section>
-      )}
+        {/* Moduli HR avanzati — visibili solo se almeno uno abilitato */}
+        {(imp?.modulo_contratti_abilitato || imp?.modulo_straordinari_abilitato || imp?.modulo_ferie_contatori_abilitato || imp?.modulo_staffing_abilitato || imp?.modulo_indisponibilita_abilitato) && (
+          <>
+            <div className="px-5 py-3 bg-slate-50 border-y border-slate-100">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Moduli HR avanzati</p>
+            </div>
+            <div className="px-5 divide-y divide-slate-100">
+              {imp?.modulo_contratti_abilitato && (
+                <ToggleRow
+                  label="Contratti e orario contrattuale"
+                  descrizione="Gestione tipo contratto, ore settimanali previste, full-time/part-time"
+                  valore={imp.modulo_contratti_abilitato}
+                  loading={loadingContratti}
+                  onChange={() => toggle('modulo_contratti_abilitato', setLoadingContratti)}
+                />
+              )}
+              {imp?.modulo_straordinari_abilitato && (
+                <ToggleRow
+                  label="Calcolo straordinari automatico"
+                  descrizione="Ore effettive vs. pianificate, straordinari ordinari/notturni/festivi, ore mancanti"
+                  valore={imp.modulo_straordinari_abilitato}
+                  loading={loadingStraordinari}
+                  onChange={() => toggle('modulo_straordinari_abilitato', setLoadingStraordinari)}
+                />
+              )}
+              {imp?.modulo_ferie_contatori_abilitato && (
+                <ToggleRow
+                  label="Contatori ferie, permessi e ROL"
+                  descrizione="Giorni ferie maturati/fruiti/residui, monte ore ROL, contatore malattie per dipendente"
+                  valore={imp.modulo_ferie_contatori_abilitato}
+                  loading={loadingFerieCont}
+                  onChange={() => toggle('modulo_ferie_contatori_abilitato', setLoadingFerieCont)}
+                />
+              )}
+              {imp?.modulo_staffing_abilitato && (
+                <ToggleRow
+                  label="Pianificazione fabbisogno (staffing)"
+                  descrizione="Definisci quante persone servono per turno/posto, rileva sotto e sovra-organico"
+                  valore={imp.modulo_staffing_abilitato}
+                  loading={loadingStaffing}
+                  onChange={() => toggle('modulo_staffing_abilitato', setLoadingStaffing)}
+                />
+              )}
+              {imp?.modulo_indisponibilita_abilitato && (
+                <ToggleRow
+                  label="Indisponibilità e preferenze dipendente"
+                  descrizione="Il dipendente dichiara giorni/orari in cui non è disponibile per la pianificazione"
+                  valore={imp.modulo_indisponibilita_abilitato}
+                  loading={loadingIndisponibilita}
+                  onChange={() => toggle('modulo_indisponibilita_abilitato', setLoadingIndisponibilita)}
+                />
+              )}
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Codice dipendenti */}
       <section>
