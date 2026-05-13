@@ -147,22 +147,6 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { emoji: '📋', title: 'Basta fogli Excel', body: 'Turni copiati, cancellati, smarriti. Un calendario condiviso e sempre aggiornato, accessibile da qualsiasi dispositivo.' },
-              { emoji: '📱', title: 'Timbrature senza carta', body: 'I dipendenti timbrano entrata e uscita dal telefono, con validazione GPS opzionale. Niente fogli firma, niente manomissioni.' },
-              { emoji: '💬', title: 'Ferie e permessi tracciati', body: 'Niente richieste via WhatsApp dimenticate. Ogni richiesta ha un flusso di approvazione chiaro e uno storico consultabile.' },
-            ].map(({ emoji, title, body }) => (
-              <div key={title} className="flex gap-4 items-start p-6 bg-slate-50 rounded-xl border hairline">
-                <span className="mt-0.5 text-2xl">{emoji}</span>
-                <div>
-                  <h3 className="font-semibold text-slate-900">{title}</h3>
-                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-200 border hairline rounded-xl overflow-hidden">
             {[
               {
@@ -207,6 +191,22 @@ export default function LandingPage() {
                     <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
                     <p className="mt-2 text-slate-600 leading-relaxed text-[15px]">{body}</p>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { emoji: '📋', title: 'Basta fogli Excel', body: 'Turni copiati, cancellati, smarriti. Un calendario condiviso e sempre aggiornato, accessibile da qualsiasi dispositivo.' },
+              { emoji: '📱', title: 'Timbrature senza carta', body: 'I dipendenti timbrano entrata e uscita dal telefono, con validazione GPS opzionale. Niente fogli firma, niente manomissioni.' },
+              { emoji: '💬', title: 'Ferie e permessi tracciati', body: 'Niente richieste via WhatsApp dimenticate. Ogni richiesta ha un flusso di approvazione chiaro e uno storico consultabile.' },
+            ].map(({ emoji, title, body }) => (
+              <div key={title} className="flex gap-4 items-start p-6 bg-slate-50 rounded-xl border hairline">
+                <span className="mt-0.5 text-2xl">{emoji}</span>
+                <div>
+                  <h3 className="font-semibold text-slate-900">{title}</h3>
+                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">{body}</p>
                 </div>
               </div>
             ))}
