@@ -14,10 +14,12 @@ CREATE TABLE IF NOT EXISTS contratti_dipendenti (
 
 ALTER TABLE contratti_dipendenti ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "admin_contratti" ON contratti_dipendenti;
 CREATE POLICY "admin_contratti" ON contratti_dipendenti
   FOR ALL USING (tenant_id = get_my_tenant_id() AND EXISTS (
     SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
   ));
 
+DROP POLICY IF EXISTS "manager_contratti_select" ON contratti_dipendenti;
 CREATE POLICY "manager_contratti_select" ON contratti_dipendenti
   FOR SELECT USING (tenant_id = get_my_tenant_id());

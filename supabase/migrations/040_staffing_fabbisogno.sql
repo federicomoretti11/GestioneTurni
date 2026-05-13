@@ -9,11 +9,13 @@ CREATE TABLE IF NOT EXISTS staffing_fabbisogno (
 
 ALTER TABLE staffing_fabbisogno ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "admin_staffing" ON staffing_fabbisogno;
 CREATE POLICY "admin_staffing" ON staffing_fabbisogno
   FOR ALL USING (tenant_id = get_my_tenant_id() AND EXISTS (
     SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
   ));
 
+DROP POLICY IF EXISTS "manager_staffing_select" ON staffing_fabbisogno;
 CREATE POLICY "manager_staffing_select" ON staffing_fabbisogno
   FOR SELECT USING (tenant_id = get_my_tenant_id() AND EXISTS (
     SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo IN ('admin','manager')

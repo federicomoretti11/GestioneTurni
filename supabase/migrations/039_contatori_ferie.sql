@@ -13,15 +13,18 @@ CREATE TABLE IF NOT EXISTS contatori_ferie (
 
 ALTER TABLE contatori_ferie ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "admin_contatori" ON contatori_ferie;
 CREATE POLICY "admin_contatori" ON contatori_ferie
   FOR ALL USING (tenant_id = get_my_tenant_id() AND EXISTS (
     SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo = 'admin'
   ));
 
+DROP POLICY IF EXISTS "manager_contatori_select" ON contatori_ferie;
 CREATE POLICY "manager_contatori_select" ON contatori_ferie
   FOR SELECT USING (tenant_id = get_my_tenant_id() AND EXISTS (
     SELECT 1 FROM profiles WHERE id = auth.uid() AND ruolo IN ('admin','manager')
   ));
 
+DROP POLICY IF EXISTS "dipendente_contatori_select" ON contatori_ferie;
 CREATE POLICY "dipendente_contatori_select" ON contatori_ferie
   FOR SELECT USING (tenant_id = get_my_tenant_id() AND dipendente_id = auth.uid());
