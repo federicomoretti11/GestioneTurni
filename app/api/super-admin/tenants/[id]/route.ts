@@ -17,6 +17,9 @@ const FLAG_KEYS = [
   'modulo_tasks_abilitato', 'modulo_documenti_abilitato',
   'modulo_cedolini_abilitato', 'modulo_analytics_abilitato',
   'modulo_paghe_abilitato', 'modulo_ai_copilot_abilitato', 'white_label_abilitato',
+  'modulo_contratti_abilitato', 'modulo_straordinari_abilitato',
+  'modulo_ferie_contatori_abilitato', 'modulo_staffing_abilitato',
+  'modulo_indisponibilita_abilitato',
 ]
 
 const RUOLI_KEYS = [
