@@ -14,11 +14,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-30 bg-[#FAFAF8]/85 backdrop-blur border-b hairline">
         <nav className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2.5 group">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-dark text-white">
-              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h14"/>
-              </svg>
-            </span>
+            <img src="/logo.svg" alt="Opero Hub" width={28} height={28} className="rounded-md" />
             <span className="font-semibold tracking-tight text-slate-900">Opero Hub</span>
           </a>
 
@@ -404,20 +400,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-2">
               <a href="#" className="flex items-center gap-2.5">
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-brand-dark text-white">
-                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                    <path d="M5 7h14"/><path d="M5 12h9"/><path d="M5 17h14"/>
-                  </svg>
-                </span>
+                <img src="/logo.svg" alt="Opero Hub" width={28} height={28} className="rounded-md" />
                 <span className="font-semibold tracking-tight text-slate-900">Opero Hub</span>
               </a>
               <p className="mt-4 text-sm text-slate-500 leading-relaxed max-w-xs">
                 La piattaforma di gestione turni e operazioni per PMI italiane.
               </p>
               <div className="mt-5 mono text-[11px] uppercase tracking-[0.16em] text-slate-400 leading-relaxed">
-                Opero S.r.l.<br/>
-                Via Roma 12, 20121 Milano<br/>
-                P.IVA · IT 00000000000
+                S.I.A. S.r.l.s.<br/>
+                P.IVA 14840881008
               </div>
             </div>
 
@@ -442,7 +433,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-10 pt-6 border-t hairline flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <span className="mono text-[11px] uppercase tracking-[0.16em] text-slate-400">© 2026 Opero S.r.l. — Tutti i diritti riservati</span>
+            <span className="mono text-[11px] uppercase tracking-[0.16em] text-slate-400">© 2026 Opero Hub — Tutti i diritti riservati</span>
             <span className="mono text-[11px] uppercase tracking-[0.16em] text-slate-400">Made in Italy</span>
           </div>
         </div>
