@@ -14,7 +14,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-30 bg-[#FAFAF8]/85 backdrop-blur border-b hairline">
         <nav className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2.5 group">
-            <img src="/logo.svg" alt="Opero Hub" width={28} height={28} className="rounded-md" />
+            <img src="/logo.svg" alt="Opero Hub" width={40} height={40} className="rounded-md" />
             <span className="font-semibold tracking-tight text-slate-900">Opero Hub</span>
           </a>
 
@@ -399,9 +399,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="col-span-2 md:col-span-2">
-              <a href="#" className="flex items-center gap-2.5">
-                <img src="/logo.svg" alt="Opero Hub" width={28} height={28} className="rounded-md" />
-                <span className="font-semibold tracking-tight text-slate-900">Opero Hub</span>
+              <a href="#">
+                <img src="/logo.svg" alt="Opero Hub" width={96} height={96} className="rounded-xl" />
               </a>
               <p className="mt-4 text-sm text-slate-500 leading-relaxed max-w-xs">
                 La piattaforma di gestione turni e operazioni per PMI italiane.
