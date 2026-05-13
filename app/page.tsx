@@ -397,9 +397,9 @@ export default function LandingPage() {
       <footer id="contatti" className="bg-[#FAFAF8] border-t hairline">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="col-span-2 md:col-span-2">
+            <div className="col-span-2 md:col-span-2 flex flex-col items-center text-center">
               <a href="#">
-                <img src="/LOGO COMPATTO.svg" alt="Opero Hub" width={150} height={95} />
+                <img src="/LOGO COMPATTO.svg" alt="Opero Hub" width={200} height={126} />
               </a>
               <p className="mt-4 text-xs text-slate-500 leading-relaxed max-w-xs">
                 La piattaforma di gestione turni e operazioni per PMI italiane.
