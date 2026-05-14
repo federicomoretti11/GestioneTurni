@@ -39,12 +39,8 @@ export default function ContattiPage() {
             <a href="tel:+393518971492" className="text-slate-800 hover:text-slate-600 transition-colors">+39 351 8971 492</a>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">PEC</p>
-            <p className="text-slate-400 italic">[pec@dominio.it]</p>
-          </div>
 
-        </div>
+</div>
       </div>
       <Footer />
     </div>
