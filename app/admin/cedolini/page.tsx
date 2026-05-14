@@ -89,7 +89,7 @@ function CedoliniPage() {
   const gruppiOrdinati = Object.entries(grouped).sort((a, b) => a[1].nome.localeCompare(b[1].nome))
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">Cedolini digitali</h1>
 
       {/* Form upload */}
