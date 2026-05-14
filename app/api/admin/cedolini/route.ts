@@ -53,6 +53,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Solo file PDF accettati' }, { status: 400 })
   }
 
+  const MAX_SIZE = 50 * 1024 * 1024
+  if (file.size > MAX_SIZE) {
+    return NextResponse.json({ error: 'File troppo grande (max 50MB)' }, { status: 400 })
+  }
+
   const [anno, meseNum] = mese.split('-')
   const nomeMese = MESI_IT[parseInt(meseNum) - 1] ?? meseNum
   const nome = `Cedolino ${nomeMese} ${anno}`

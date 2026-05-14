@@ -17,9 +17,18 @@ export async function GET(request: Request) {
   const ctx = await checkAdmin()
   if (!ctx) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
 
+  const tenantId = requireTenantId()
   const { searchParams } = new URL(request.url)
   const categoriaId = searchParams.get('categoria_id')
   if (!categoriaId) return NextResponse.json({ error: 'categoria_id obbligatorio' }, { status: 400 })
+
+  const { data: categoria } = await ctx.supabase
+    .from('categorie_documenti')
+    .select('id')
+    .eq('id', categoriaId)
+    .eq('tenant_id', tenantId)
+    .single()
+  if (!categoria) return NextResponse.json({ error: 'Categoria non trovata' }, { status: 404 })
 
   const { data, error } = await ctx.supabase
     .from('documenti')
