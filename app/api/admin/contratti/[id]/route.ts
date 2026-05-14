@@ -50,6 +50,12 @@ export async function PUT(
   if (!tipiValidi.includes(body.tipo)) {
     return NextResponse.json({ error: 'Tipo non valido' }, { status: 400 })
   }
+  if (body.ore_giornaliere != null && (body.ore_giornaliere < 0 || body.ore_giornaliere > 24)) {
+    return NextResponse.json({ error: 'ore_giornaliere non valide (0-24)' }, { status: 400 })
+  }
+  if (body.ore_settimanali != null && (body.ore_settimanali < 0 || body.ore_settimanali > 168)) {
+    return NextResponse.json({ error: 'ore_settimanali non valide (0-168)' }, { status: 400 })
+  }
 
   const { data, error } = await createAdminClient()
     .from('contratti_dipendenti')

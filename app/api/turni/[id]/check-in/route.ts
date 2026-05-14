@@ -13,6 +13,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const tenantId = requireTenantId()
   const body = await req.json().catch(() => ({})) as { latitudine?: number; longitudine?: number }
 
+  if (body.latitudine != null && (body.latitudine < -90 || body.latitudine > 90)) {
+    return NextResponse.json({ error: 'Coordinate non valide' }, { status: 400 })
+  }
+  if (body.longitudine != null && (body.longitudine < -180 || body.longitudine > 180)) {
+    return NextResponse.json({ error: 'Coordinate non valide' }, { status: 400 })
+  }
+
   const admin = createAdminClient()
   const { data: turno, error: readErr } = await admin
     .from('turni')

@@ -10,7 +10,7 @@ async function checkSuperAdmin() {
   return data?.is_super_admin ? true : null
 }
 
-const UUID_RE = /^[0-9a-f-]{36}$/i
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export async function POST(req: Request, { params }: { params: { id: string; uid: string } }) {
   const ok = await checkSuperAdmin()

@@ -10,12 +10,16 @@ export async function logAzione(params: {
   tenantId?: string
 }) {
   try {
+    let dettagli = params.dettagli
+    if (dettagli && JSON.stringify(dettagli).length > 10000) {
+      dettagli = { _truncated: true, _reason: 'payload troppo grande' }
+    }
     await createAdminClient().from('audit_log').insert({
       tabella: params.tabella,
       record_id: params.recordId,
       azione: params.azione,
       utente_id: params.utenteId,
-      dettagli: params.dettagli ?? null,
+      dettagli: dettagli ?? null,
       tenant_id: params.tenantId ?? null,
     })
   } catch {
