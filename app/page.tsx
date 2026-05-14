@@ -380,7 +380,7 @@ export default function LandingPage() {
               <DemoForm />
               <p className="mt-3 text-xs text-slate-400 leading-relaxed">
                 Inviando la richiesta accetti la nostra{' '}
-                <a href="#" className="underline decoration-slate-600 hover:text-white">Privacy Policy</a>.
+                <a href="/privacy" className="underline decoration-slate-600 hover:text-white">Privacy Policy</a>.
                 {' '}Niente spam.
               </p>
             </div>
@@ -418,8 +418,8 @@ export default function LandingPage() {
             <div>
               <div className="mono text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-4">Legale</div>
               <ul className="space-y-2.5 text-xs text-slate-600">
-                <li><a href="#" className="hover:text-slate-900">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-slate-900">Cookie Policy</a></li>
+                <li><a href="/privacy" className="hover:text-slate-900">Privacy Policy</a></li>
+                <li><a href="/cookie-policy" className="hover:text-slate-900">Cookie Policy</a></li>
                 <li><a href="mailto:info@operohub.com" className="hover:text-slate-900">info@operohub.com</a></li>
               </ul>
             </div>
