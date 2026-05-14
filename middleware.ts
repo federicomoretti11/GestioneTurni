@@ -34,7 +34,8 @@ function isRootDomain(host: string): boolean {
     host.includes('localhost') ||
     host.includes('127.0.0.1') ||
     host === 'operohub.com' ||
-    host === 'www.operohub.com'
+    host === 'www.operohub.com' ||
+    host.endsWith('.vercel.app')
   )
 }
 
