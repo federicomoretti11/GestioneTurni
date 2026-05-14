@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const pubbliche = ['/login', '/reset-password', '/auth/callback', '/privacy', '/cookie-policy']
+  const pubbliche = ['/login', '/reset-password', '/auth/callback', '/privacy', '/cookie-policy', '/contatti']
   const isLandingRoot = path === '/' && isRootDomain(host)
 
   if (!user && !pubbliche.includes(path) && !isLandingRoot) {
