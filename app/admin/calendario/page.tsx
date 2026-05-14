@@ -41,6 +41,7 @@ export default function CalendarioPage() {
   const [loading, setLoading] = useState(true)
   const [assenze, setAssenze] = useState<AssenzaCalendario[]>([])
   const [assenzaDettaglio, setAssenzaDettaglio] = useState<AssenzaCalendario | null>(null)
+  const [rimuovendo, setRimuovendo] = useState(false)
 
   useEffect(() => {
     const d = parseDataParam(searchParams.get('data'))
@@ -274,12 +275,37 @@ export default function CalendarioPage() {
                 </span>
               </div>
             </div>
-            <button
-              onClick={() => setAssenzaDettaglio(null)}
-              className="mt-5 w-full py-2 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
-            >
-              Chiudi
-            </button>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={async () => {
+                  if (!confirm('Rimuovere questa assenza approvata? I turni associati verranno eliminati.')) return
+                  setRimuovendo(true)
+                  const res = await fetch(`/api/richieste/${assenzaDettaglio.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ azione: 'cancella' }),
+                  })
+                  setRimuovendo(false)
+                  if (res.ok) {
+                    setAssenzaDettaglio(null)
+                    caricaDati()
+                  } else {
+                    const d = await res.json()
+                    mostra(d.error ?? 'Errore nella rimozione', 'errore')
+                  }
+                }}
+                disabled={rimuovendo}
+                className="flex-1 py-2 text-sm font-medium bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {rimuovendo ? 'Rimozione…' : 'Rimuovi'}
+              </button>
+              <button
+                onClick={() => setAssenzaDettaglio(null)}
+                className="flex-1 py-2 text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+              >
+                Chiudi
+              </button>
+            </div>
           </div>
         </div>
       )}

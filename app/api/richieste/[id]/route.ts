@@ -5,7 +5,7 @@ import { sendEmailRichiestaApprovata, sendEmailRichiestaRifiutata, sendEmailSblo
 import { isEmailAbilitata } from '@/lib/impostazioni'
 import { NextResponse } from 'next/server'
 import { validateStatoTransition } from '@/lib/richieste/validations'
-import { checkConflitti, createTurniDaRichiesta } from '@/lib/richieste/turni'
+import { checkConflitti, createTurniDaRichiesta, dateRange } from '@/lib/richieste/turni'
 import {
   notificaRichiestaApprovata,
   notificaRichiestaApprovataManager,
@@ -132,6 +132,20 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (risultato.skipped) {
       avviso = 'Permesso ore approvato. Il calendario non è stato modificato automaticamente — gestisci il turno a mano se necessario.'
     }
+  }
+
+  // Cancella i turni automatici se si annulla una richiesta approvata (ferie/permesso/malattia)
+  if (nuovoStato === 'annullata' && richiesta.stato === 'approvata' &&
+      ['ferie', 'permesso', 'malattia'].includes(richiesta.tipo)) {
+    const dataFine = richiesta.data_fine ?? richiesta.data_inizio
+    const giorni = dateRange(richiesta.data_inizio, dataFine)
+    await createAdminClient()
+      .from('turni')
+      .delete()
+      .eq('dipendente_id', richiesta.dipendente_id)
+      .eq('tenant_id', tenantId)
+      .in('data', giorni)
+      .like('note', `Da richiesta % #${richiesta.id.slice(0, 8)}%`)
   }
 
   // Operazioni background — tutte attese prima di rispondere (Vercel termina la funzione al return)
