@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireTenantId } from '@/lib/tenant'
 import { NextResponse } from 'next/server'
 
 async function checkAdmin() {
@@ -16,10 +17,16 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   const ctx = await checkAdmin()
   if (!ctx) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
 
+  let tenantId: string
+  try { tenantId = requireTenantId() } catch {
+    return NextResponse.json({ error: 'Tenant non risolto' }, { status: 400 })
+  }
+
   const { data: doc } = await ctx.supabase
     .from('documenti')
     .select('storage_path, nome')
     .eq('id', params.id)
+    .eq('tenant_id', tenantId)
     .single()
   if (!doc) return NextResponse.json({ error: 'Documento non trovato' }, { status: 404 })
 
