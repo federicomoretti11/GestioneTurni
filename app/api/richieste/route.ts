@@ -83,6 +83,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'La motivazione è obbligatoria per lo sblocco' }, { status: 422 })
   }
 
+  if (body.turno_id) {
+    const { data: turno } = await supabase
+      .from('turni')
+      .select('id')
+      .eq('id', body.turno_id)
+      .eq('dipendente_id', user.id)
+      .single()
+    if (!turno) return NextResponse.json({ error: 'Turno non trovato' }, { status: 404 })
+  }
+
   // Malattia → stato = 'comunicata' direttamente
   const statoIniziale = tipo === 'malattia' ? 'comunicata' : 'pending'
   const dataInizioEffettiva = data_inizio ?? new Date().toISOString().slice(0, 10)

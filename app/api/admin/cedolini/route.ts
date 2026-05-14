@@ -63,7 +63,8 @@ export async function POST(request: Request) {
   const nome = `Cedolino ${nomeMese} ${anno}`
   const meseDate = `${mese}-01`
 
-  const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
+  let safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
+  if (safeFilename.length > 200) safeFilename = safeFilename.slice(0, 200)
   const cedolinoId = crypto.randomUUID()
   const storagePath = `cedolini/${tenantId}/${cedolinoId}/${safeFilename}`
   const bytes = await file.arrayBuffer()

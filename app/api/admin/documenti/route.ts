@@ -52,7 +52,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'file e categoria_id obbligatori' }, { status: 400 })
   }
 
-  const safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
+  let safeFilename = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.{2,}/g, '_')
+  if (safeFilename.length > 200) safeFilename = safeFilename.slice(0, 200)
   const docId = crypto.randomUUID()
   const storagePath = `${tenantId}/${docId}/${safeFilename}`
   const bytes = await file.arrayBuffer()
