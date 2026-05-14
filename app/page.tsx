@@ -480,7 +480,7 @@ export default function LandingPage() {
                 { icon: <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>, text: 'Risposta entro 24h lavorative' },
                 { icon: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>, text: 'Supporto via chat ed email' },
                 { icon: <><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></>, text: 'Onboarding guidato incluso' },
-              ].map(({ icon, text }, i) => (
+              ].map(({ text }, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm text-slate-300">
                   <svg aria-hidden="true" className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                   {text}
