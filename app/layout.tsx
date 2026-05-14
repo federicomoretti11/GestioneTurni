@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 
@@ -18,6 +18,13 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Opero Hub",
   description: "Opero Hub — gestione turni e operatività aziendale",
@@ -31,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it">
-      <body className={`${inter.variable} ${instrumentSerif.variable} antialiased`}>
+      <body className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} antialiased`}>
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

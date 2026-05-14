@@ -44,7 +44,7 @@ function CedoliniPage() {
   }
 
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-4">
       <h1 className="text-xl font-semibold tracking-tight text-slate-900">I miei cedolini</h1>
 
       {loading ? (

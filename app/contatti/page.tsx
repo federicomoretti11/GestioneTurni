@@ -26,25 +26,21 @@ export default function ContattiPage() {
 
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Sede legale</p>
-            <p className="text-slate-400 italic">[Indirizzo da inserire]</p>
+            <p className="text-slate-800">Via Pindaro 82, 00125 Roma</p>
           </div>
 
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Email</p>
-            <p className="text-slate-400 italic">[email@dominio.it]</p>
+            <a href="mailto:info@operohub.com" className="text-slate-800 hover:text-slate-600 transition-colors">info@operohub.com</a>
           </div>
 
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Telefono</p>
-            <p className="text-slate-400 italic">[+39 000 000 0000]</p>
+            <a href="tel:+393518971492" className="text-slate-800 hover:text-slate-600 transition-colors">+39 351 8971 492</a>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">PEC</p>
-            <p className="text-slate-400 italic">[pec@dominio.it]</p>
-          </div>
 
-        </div>
+</div>
       </div>
       <Footer />
     </div>

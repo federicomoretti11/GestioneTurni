@@ -172,6 +172,34 @@ export async function sendEmailSbloccoApprovato(params: {
   }
 }
 
+export async function sendEmailNuovaRichiestaDemo(params: {
+  nome: string
+  email: string
+  azienda: string
+  dipendenti: string
+}) {
+  const to = process.env.DEMO_NOTIFICATION_EMAIL ?? 'info@operohub.com'
+  try {
+    await getResend().emails.send({
+      from: FROM,
+      to,
+      subject: `Nuova richiesta demo — ${params.azienda}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+          <h2 style="color:#045dcc">Nuova richiesta demo 🎯</h2>
+          <table style="width:100%;border-collapse:collapse;margin-top:16px">
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;width:140px">Nome</td><td style="padding:8px 0;font-weight:600;color:#0f172a">${params.nome}</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px">Email</td><td style="padding:8px 0;font-weight:600;color:#0f172a"><a href="mailto:${params.email}" style="color:#045dcc">${params.email}</a></td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px">Azienda</td><td style="padding:8px 0;font-weight:600;color:#0f172a">${params.azienda}</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280;font-size:14px">Dipendenti</td><td style="padding:8px 0;font-weight:600;color:#0f172a">${params.dipendenti}</td></tr>
+          </table>
+        </div>`,
+    })
+  } catch (e) {
+    console.error('[email] sendEmailNuovaRichiestaDemo fallita', e)
+  }
+}
+
 export async function sendEmailChatMessaggio(params: {
   nomeUtente: string
   nomeAzienda: string

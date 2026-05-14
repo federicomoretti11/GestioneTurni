@@ -69,7 +69,7 @@ export default function LoginPage() {
       <aside className="hidden lg:flex relative bg-slate-900 text-white flex-col p-8 xl:p-10">
         <div className="relative z-10 flex flex-col h-full max-w-sm mx-auto w-full">
           <div className="flex justify-center items-center">
-            <img src="/logo-extended-white.svg" alt="Opero Hub" className="h-28 w-auto mx-auto" />
+            <a href="/"><img src="/logo-extended-white.svg" alt="Opero Hub" className="h-28 w-auto mx-auto" /></a>
           </div>
 
           <div className="flex-1 flex flex-col justify-center py-12">
@@ -112,8 +112,10 @@ export default function LoginPage() {
         style={{ backgroundImage: 'url(/circuit-pattern.svg)', backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>
         {/* Header mobile */}
         <header className="lg:hidden flex items-center gap-2 px-5 py-5 border-b border-slate-200">
-          <Logo size={28} variant="dark" />
-          <span className="text-[15px] font-semibold tracking-tight text-slate-900">Opero Hub</span>
+          <a href="/" className="flex items-center gap-2">
+            <Logo size={28} variant="dark" />
+            <span className="text-[15px] font-semibold tracking-tight text-slate-900">Opero Hub</span>
+          </a>
         </header>
 
         <div className="flex-1 flex items-center justify-center px-5 sm:px-8 py-10 sm:py-16">
