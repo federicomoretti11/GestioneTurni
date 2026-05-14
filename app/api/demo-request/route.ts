@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendEmailNuovaRichiestaDemo } from '@/lib/email'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -37,6 +38,13 @@ export async function POST(req: Request) {
     console.error('demo_requests insert error:', error)
     return NextResponse.json({ error: 'Errore interno' }, { status: 500 })
   }
+
+  await sendEmailNuovaRichiestaDemo({
+    nome: nome.trim(),
+    email: email.trim(),
+    azienda: azienda.trim(),
+    dipendenti: dipendenti.trim(),
+  })
 
   return NextResponse.json({ ok: true })
 }
