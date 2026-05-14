@@ -1,5 +1,6 @@
 // app/page.tsx
 import DemoForm from './_components/DemoForm'
+import { HeroCalendar } from './_components/HeroCalendar'
 
 export const metadata = {
   title: 'Opero Hub — Gestione turni per PMI italiane',
@@ -83,7 +84,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Hero product mockup */}
+        {/* Hero product mockup — calendario animato */}
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-16 sm:pb-24">
           <div className="rounded-xl border hairline bg-white overflow-hidden shadow-[0_1px_0_rgba(15,23,42,0.04),0_24px_48px_-24px_rgba(15,23,42,0.18)]">
             <div className="flex items-center gap-2 px-4 h-9 border-b hairline bg-slate-50/60">
@@ -92,44 +93,7 @@ export default function LandingPage() {
               <span className="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
               <span className="ml-3 mono text-[11px] text-slate-400">operohub.com</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] min-h-[360px]">
-              <div className="hidden md:flex flex-col gap-1.5 p-4 border-r hairline bg-slate-50/40">
-                <div className="h-6 w-24 rounded bg-slate-200/70"></div>
-                <div className="mt-3 space-y-1.5">
-                  <div className="h-7 rounded bg-brand-dark w-full"></div>
-                  <div className="h-7 rounded bg-slate-100 w-full"></div>
-                  <div className="h-7 rounded bg-slate-100 w-full"></div>
-                  <div className="h-7 rounded bg-slate-100 w-full"></div>
-                  <div className="h-7 rounded bg-slate-100 w-3/4"></div>
-                </div>
-              </div>
-              <div className="p-6 sm:p-8">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="mono text-[11px] uppercase tracking-[0.16em] text-slate-400">Settimana 18</div>
-                    <div className="serif text-3xl text-slate-900 mt-1">Pianificazione turni</div>
-                  </div>
-                  <div className="hidden sm:flex gap-2">
-                    <div className="h-8 w-20 rounded border hairline bg-white"></div>
-                    <div className="h-8 w-24 rounded bg-brand-blue"></div>
-                  </div>
-                </div>
-                <div className="mt-6 grid grid-cols-7 gap-2">
-                  {['Lun','Mar','Mer','Gio','Ven','Sab','Dom'].map(g => (
-                    <div key={g} className="mono text-[10px] uppercase text-slate-400 tracking-widest">{g}</div>
-                  ))}
-                </div>
-                <div className="mt-2 grid grid-cols-7 gap-2">
-                  <div className="h-20 rounded-md border hairline bg-white p-2"><div className="h-2 w-8 rounded-full mb-1.5" style={{ background: '#045dcc33' }}></div><div className="h-2 w-12 rounded-full bg-slate-200"></div></div>
-                  <div className="h-20 rounded-md border hairline bg-white p-2"><div className="h-2 w-10 rounded-full mb-1.5" style={{ background: '#045dcc33' }}></div><div className="h-2 w-9 rounded-full bg-slate-200"></div></div>
-                  <div className="h-20 rounded-md border hairline bg-white p-2"><div className="h-2 w-7 rounded-full mb-1.5" style={{ background: '#045dcc33' }}></div><div className="h-2 w-12 rounded-full bg-slate-200"></div><div className="h-2 w-8 rounded-full bg-slate-200 mt-1.5"></div></div>
-                  <div className="h-20 rounded-md border hairline bg-white p-2"><div className="h-2 w-9 rounded-full mb-1.5" style={{ background: '#045dcc33' }}></div><div className="h-2 w-10 rounded-full bg-slate-200"></div></div>
-                  <div className="h-20 rounded-md border hairline bg-white p-2"><div className="h-2 w-12 rounded-full mb-1.5" style={{ background: '#045dcc33' }}></div><div className="h-2 w-8 rounded-full bg-slate-200"></div><div className="h-2 w-10 rounded-full bg-slate-200 mt-1.5"></div></div>
-                  <div className="h-20 rounded-md border hairline bg-slate-50"></div>
-                  <div className="h-20 rounded-md border hairline bg-slate-50"></div>
-                </div>
-              </div>
-            </div>
+            <HeroCalendar />
           </div>
         </div>
       </section>
@@ -196,14 +160,31 @@ export default function LandingPage() {
             ))}
           </div>
 
+          {/* Pain points — icone SVG come le feature card */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { emoji: '📋', title: 'Basta fogli Excel', body: 'Turni copiati, cancellati, smarriti. Un calendario condiviso e sempre aggiornato, accessibile da qualsiasi dispositivo.' },
-              { emoji: '📱', title: 'Timbrature senza carta', body: 'I dipendenti timbrano entrata e uscita dal telefono, con validazione GPS opzionale. Niente fogli firma, niente manomissioni.' },
-              { emoji: '💬', title: 'Ferie e permessi tracciati', body: 'Niente richieste via WhatsApp dimenticate. Ogni richiesta ha un flusso di approvazione chiaro e uno storico consultabile.' },
-            ].map(({ emoji, title, body }) => (
+              {
+                icon: (<><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></>),
+                title: 'Basta fogli Excel',
+                body: 'Turni copiati, cancellati, smarriti. Un calendario condiviso e sempre aggiornato, accessibile da qualsiasi dispositivo.',
+              },
+              {
+                icon: (<><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></>),
+                title: 'Timbrature senza carta',
+                body: 'I dipendenti timbrano entrata e uscita dal telefono, con validazione GPS opzionale. Niente fogli firma, niente manomissioni.',
+              },
+              {
+                icon: (<><rect x="3" y="4" width="18" height="18" rx="2.5"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M8.5 15.5l2.5 2L16 12"/></>),
+                title: 'Ferie e permessi tracciati',
+                body: 'Niente richieste via WhatsApp dimenticate. Ogni richiesta ha un flusso di approvazione chiaro e uno storico consultabile.',
+              },
+            ].map(({ icon, title, body }) => (
               <div key={title} className="flex gap-4 items-start p-6 bg-slate-50 rounded-xl border hairline">
-                <span className="mt-0.5 text-2xl">{emoji}</span>
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-dark text-white shrink-0 mt-0.5">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    {icon}
+                  </svg>
+                </span>
                 <div>
                   <h3 className="font-semibold text-slate-900">{title}</h3>
                   <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">{body}</p>
@@ -214,8 +195,96 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* ── UI PERSONALIZZABILE ── */}
       <section className="border-t hairline">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-20 items-center">
+            <div>
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-4">/ Personalizzazione</div>
+              <h2 className="text-3xl sm:text-4xl tracking-tight text-slate-900">
+                La tua piattaforma,<br/><span className="serif">il tuo brand.</span>
+              </h2>
+              <p className="mt-5 text-slate-600 leading-relaxed">
+                Subdomain dedicato, logo aziendale e palette colori personalizzata. L&apos;esperienza Opero Hub si adatta alla tua identità, non il contrario.
+              </p>
+              <ul className="mt-7 space-y-3">
+                {[
+                  'Logo e nome azienda in ogni pagina',
+                  'Colori primari personalizzati',
+                  'Subdomain dedicato (tuaazienda.operohub.com)',
+                ].map(item => (
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-slate-700">
+                    <svg aria-hidden="true" className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Mockup due skin affiancati */}
+            <div className="flex gap-4">
+              {/* Skin 1 — navy */}
+              <div className="flex-1 rounded-xl border hairline overflow-hidden shadow-[0_4px_24px_-8px_rgba(15,23,42,0.14)]">
+                <div className="flex items-center gap-1.5 px-3 h-7 bg-slate-100 border-b hairline">
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                </div>
+                <div className="flex min-h-[180px]">
+                  <div className="w-[52px] bg-[#0f172a] p-2 flex flex-col gap-1.5">
+                    <div className="w-full h-5 rounded bg-white/10 flex items-center justify-center">
+                      <span className="text-[6px] font-bold text-white/70 tracking-widest">AZ</span>
+                    </div>
+                    <div className="h-0.5 bg-white/10 rounded my-0.5"></div>
+                    {[1,2,3,4].map(i => <div key={i} className="h-4 rounded bg-white/10 w-full" />)}
+                  </div>
+                  <div className="flex-1 bg-white p-3 space-y-2">
+                    <div className="h-3 w-20 rounded bg-slate-200" />
+                    <div className="h-2 w-28 rounded bg-slate-100" />
+                    <div className="mt-3 grid grid-cols-3 gap-1.5">
+                      {[1,2,3,4,5,6].map(i => <div key={i} className="h-8 rounded bg-slate-100" />)}
+                    </div>
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 bg-slate-50 border-t hairline">
+                  <span className="mono text-[9px] uppercase tracking-[0.14em] text-slate-400">Tema scuro</span>
+                </div>
+              </div>
+
+              {/* Skin 2 — indigo/brand */}
+              <div className="flex-1 rounded-xl border hairline overflow-hidden shadow-[0_4px_24px_-8px_rgba(15,23,42,0.14)]">
+                <div className="flex items-center gap-1.5 px-3 h-7 bg-slate-100 border-b hairline">
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                  <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                </div>
+                <div className="flex min-h-[180px]">
+                  <div className="w-[52px] bg-indigo-600 p-2 flex flex-col gap-1.5">
+                    <div className="w-full h-5 rounded bg-white/20 flex items-center justify-center">
+                      <span className="text-[6px] font-bold text-white/90 tracking-widest">MN</span>
+                    </div>
+                    <div className="h-0.5 bg-white/20 rounded my-0.5"></div>
+                    {[1,2,3,4].map(i => <div key={i} className={`h-4 rounded w-full ${i===1?'bg-white/30':'bg-white/15'}`} />)}
+                  </div>
+                  <div className="flex-1 bg-white p-3 space-y-2">
+                    <div className="h-3 w-20 rounded bg-slate-200" />
+                    <div className="h-2 w-28 rounded bg-slate-100" />
+                    <div className="mt-3 grid grid-cols-3 gap-1.5">
+                      {[1,2,3,4,5,6].map(i => <div key={i} className={`h-8 rounded ${i===1?'bg-indigo-100':'bg-slate-100'}`} />)}
+                    </div>
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 bg-slate-50 border-t hairline">
+                  <span className="mono text-[9px] uppercase tracking-[0.14em] text-slate-400">Tema brand</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="border-t hairline bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
           <div className="max-w-2xl">
             <div className="mono text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-4">/ Come funziona</div>
@@ -228,9 +297,9 @@ export default function LandingPage() {
             {[
               { n: '01', tag: 'Configura', title: 'Imposta sedi e team', body: 'Aggiungi le sedi, definisci ruoli e orari standard. Invita i collaboratori via email in pochi minuti.' },
               { n: '02', tag: 'Assegna', title: 'Pianifica i turni', body: 'Crea il calendario settimanale, assegna i turni e pubblica. Ogni dipendente riceve notifica della propria pianificazione.' },
-              { n: '03', tag: 'Monitora', title: 'Controlla e approva', body: 'Approva richieste, verifica presenze in tempo reale ed esporta i report. Tutto in un’unica dashboard.' },
+              { n: '03', tag: 'Monitora', title: 'Controlla e approva', body: "Approva richieste, verifica presenze in tempo reale ed esporta i report. Tutto in un’unica dashboard." },
             ].map(({ n, tag, title, body }) => (
-              <li key={n} className="relative rounded-xl border hairline bg-white p-7">
+              <li key={n} className="relative rounded-xl border hairline bg-slate-50/60 p-7">
                 <div className="flex items-baseline justify-between">
                   <span className="serif text-5xl text-slate-900 leading-none">{n}</span>
                   <span className="mono text-[10px] uppercase tracking-[0.18em] text-slate-400">{tag}</span>
@@ -240,6 +309,69 @@ export default function LandingPage() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      {/* ── TRE INTERFACCE ── */}
+      <section className="border-t hairline">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
+          <div className="max-w-2xl">
+            <div className="mono text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-4">/ Ruoli</div>
+            <h2 className="text-3xl sm:text-4xl tracking-tight text-slate-900">
+              Tre interfacce, <span className="serif">un&apos;unica piattaforma.</span>
+            </h2>
+            <p className="mt-4 text-slate-600 leading-relaxed">
+              Ogni ruolo vede solo ciò che gli serve. Nessuna complessità inutile, nessuna funzione nascosta.
+            </p>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                role: 'Admin',
+                color: 'bg-brand-dark',
+                icon: (<><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 8l2 2-2 2M21 10h-4"/></>),
+                desc: 'Controllo totale sull\'azienda',
+                items: ['Gestione dipendenti e ruoli', 'Impostazioni piattaforma e branding', 'Analytics e report completi', 'Configurazione turni e sedi', 'Export paghe e presenze'],
+              },
+              {
+                role: 'Manager',
+                color: 'bg-indigo-600',
+                icon: (<><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>),
+                desc: 'Supervisione del team operativo',
+                items: ['Pianificazione e pubblicazione turni', 'Approvazione richieste ferie e permessi', 'Monitoraggio presenze in tempo reale', 'Verifica timbrature', 'Assegnazione e gestione task'],
+              },
+              {
+                role: 'Dipendente',
+                color: 'bg-emerald-600',
+                icon: (<><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></>),
+                desc: 'La propria area personale',
+                items: ['Visualizzazione turni personali', 'Timbratura entrata/uscita', 'Richieste ferie, permessi e malattia', 'Accesso cedolini e documenti', 'Task e comunicazioni team'],
+              },
+            ].map(({ role, color, icon, desc, items }) => (
+              <div key={role} className="rounded-xl border hairline bg-white p-7 flex flex-col">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg ${color} text-white shrink-0`}>
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      {icon}
+                    </svg>
+                  </span>
+                  <div>
+                    <div className="text-[15px] font-semibold text-slate-900">{role}</div>
+                    <div className="text-[12px] text-slate-500">{desc}</div>
+                  </div>
+                </div>
+                <ul className="space-y-2.5 flex-1">
+                  {items.map(item => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                      <svg aria-hidden="true" className="mt-0.5 shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -323,6 +455,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── SUPPORTO BANNER ── */}
+      <section className="border-t hairline bg-brand-dark text-white">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-14 sm:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 items-center">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 text-white shrink-0">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </span>
+                <span className="mono text-[11px] uppercase tracking-[0.18em] text-slate-400">/ Supporto</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl tracking-tight">
+                Il team Opero Hub <span className="serif text-white/90">è al tuo fianco.</span>
+              </h2>
+              <p className="mt-3 text-slate-300 max-w-xl leading-relaxed">
+                Dalla configurazione iniziale all&apos;uso quotidiano, hai sempre qualcuno con cui parlare. Non un bot, non un ticket da aspettare settimane.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row md:flex-col gap-4 md:gap-3 shrink-0">
+              {[
+                { icon: <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>, text: 'Risposta entro 24h lavorative' },
+                { icon: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>, text: 'Supporto via chat ed email' },
+                { icon: <><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></>, text: 'Onboarding guidato incluso' },
+              ].map(({ icon, text }, i) => (
+                <div key={i} className="flex items-center gap-3 text-sm text-slate-300">
+                  <svg aria-hidden="true" className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#045dcc" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                  {text}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ── */}
       <section id="faq" className="border-t hairline">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
@@ -335,9 +503,9 @@ export default function LandingPage() {
 
           <div className="mt-12 max-w-3xl space-y-3">
             {[
-              { q: "I dipendenti devono installare un’app?", a: "No. Opero Hub è una web app che funziona su qualsiasi browser, da smartphone o PC. I dipendenti ricevono un link via email e accedono senza installare nulla." },
+              { q: "I dipendenti devono installare un'app?", a: "No. Opero Hub è una web app che funziona su qualsiasi browser, da smartphone o PC. I dipendenti ricevono un link via email e accedono senza installare nulla." },
               { q: "Serve un reparto IT per configurarlo?", a: "Assolutamente no. La configurazione iniziale richiede circa 30–60 minuti: aggiungi i dipendenti, definisci i posti di servizio e sei pronto. Durante la demo ti accompagniamo passo per passo." },
-              { q: "Posso importare i dati da Excel?", a: "Sì. Puoi importare l’elenco dei dipendenti tramite CSV. Per i turni storici, durante l’onboarding valutiamo insieme la migrazione più adatta alla tua situazione." },
+              { q: "Posso importare i dati da Excel?", a: "Sì. Puoi importare l'elenco dei dipendenti tramite CSV. Per i turni storici, durante l'onboarding valutiamo insieme la migrazione più adatta alla tua situazione." },
               { q: "I dati della mia azienda sono al sicuro?", a: "Ogni azienda ha un ambiente completamente isolato (multi-tenant con RLS a livello database). I dati sono ospitati su infrastruttura europea, con backup giornalieri e connessioni cifrate." },
               { q: "Posso disdire quando voglio?", a: "Sì, nessun vincolo contrattuale. Puoi disdire in qualsiasi momento dalla dashboard. Prima della disdetta puoi esportare tutti i tuoi dati in formato CSV." },
               { q: "Come funziona la demo?", a: "Compila il modulo con i tuoi dati e una breve descrizione della tua azienda. Ti ricontattiamo noi entro 24 ore lavorative per organizzare una call illustrativa, senza fretta e senza impegno." },

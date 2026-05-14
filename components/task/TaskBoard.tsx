@@ -80,7 +80,7 @@ function TaskCard({ task, draggable, onDragStart, onClick }: {
       draggable={draggable}
       onDragStart={onDragStart}
       onClick={onClick}
-      className="group relative w-full text-left bg-white border border-slate-900/20 rounded-lg p-4 hover:border-slate-300 hover:shadow-[0_1px_0_rgba(15,23,42,.04),0_4px_12px_-6px_rgba(15,23,42,.18)] transition cursor-pointer select-none"
+      className="group relative w-full text-left bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-slate-300 transition cursor-pointer select-none"
     >
       <span className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-l-lg ${P[task.priorita].bar}`} />
       <div className="flex items-center justify-between mb-2 ml-2">
@@ -129,10 +129,10 @@ function KanbanColumn({ col, tasks, canManage, dragOver, onDragOver, onDrop, onC
   const over = col.max && tasks.length > col.max
   return (
     <div className="flex flex-col min-w-[340px] w-[340px] shrink-0">
-      <div className="flex items-center justify-between px-1 mb-2">
+      <div className="flex items-center justify-between px-1 mb-3">
         <div className="flex items-center gap-2">
-          <span className={`w-1.5 h-1.5 rounded-full ${col.dot}`} />
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate-700 font-semibold">{col.label}</span>
+          <span className={`w-2 h-2 rounded-full ${col.dot}`} />
+          <span className="text-[13px] font-semibold text-slate-800 tracking-tight">{col.label}</span>
           <span className={`font-mono text-[11px] tabular-nums ${over ? 'text-rose-600 font-semibold' : 'text-slate-400'}`}>
             {tasks.length}{col.max ? `/${col.max}` : ''}
           </span>
@@ -145,7 +145,7 @@ function KanbanColumn({ col, tasks, canManage, dragOver, onDragOver, onDrop, onC
       </div>
       <div
         onDragOver={onDragOver} onDrop={onDrop}
-        className={`rounded-md border p-2 flex flex-col gap-2 min-h-[120px] transition-colors ${dragOver ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50/70 border-slate-200/70'}`}
+        className={`rounded-xl border p-2 flex flex-col gap-2.5 min-h-[120px] transition-colors ${dragOver ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-100/80 border-slate-200'}`}
       >
         {tasks.length === 0
           ? <div className="py-10 text-center font-mono text-[10px] uppercase tracking-[0.16em] text-slate-300">Nessun task</div>
