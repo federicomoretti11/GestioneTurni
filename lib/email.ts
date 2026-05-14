@@ -200,6 +200,15 @@ export async function sendEmailNuovaRichiestaDemo(params: {
   }
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+}
+
 export async function sendEmailChatMessaggio(params: {
   nomeUtente: string
   nomeAzienda: string
@@ -215,9 +224,9 @@ export async function sendEmailChatMessaggio(params: {
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
           <h2 style="color:#1e40af">Nuovo messaggio chat 💬</h2>
-          <p><strong>${params.nomeUtente}</strong> (${params.nomeAzienda}) ha scritto:</p>
+          <p><strong>${escapeHtml(params.nomeUtente)}</strong> (${escapeHtml(params.nomeAzienda)}) ha scritto:</p>
           <div style="background:#f1f5f9;border-left:4px solid #3b82f6;padding:12px;margin-top:12px;border-radius:4px">
-            ${params.testo.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+            ${escapeHtml(params.testo)}
           </div>
           <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://operohub.com'}/super-admin/chat"
              style="display:inline-block;margin-top:16px;padding:10px 20px;background:#1e40af;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">

@@ -47,7 +47,7 @@ export async function PATCH(
   // Converte HH:mm in timestamp ISO, null se vuoto
   function toISO(data: string, hhmm: string | null): string | null {
     if (!hhmm || !/^\d{2}:\d{2}$/.test(hhmm)) return null
-    return `${data}T${hhmm}:00+00:00`
+    return `${data}T${hhmm}:00+01:00`
   }
 
   const { error: updErr } = await admin

@@ -58,6 +58,11 @@ export async function POST(request: Request) {
 
   if (!tipo) return NextResponse.json({ error: 'tipo obbligatorio' }, { status: 400 })
 
+  const TIPI_PERMESSO_VALIDI = ['ferie', 'permesso', 'malattia', 'cambio_turno', 'sblocco_checkin']
+  if (permesso_tipo && !TIPI_PERMESSO_VALIDI.includes(permesso_tipo)) {
+    return NextResponse.json({ error: 'Tipo permesso non valido' }, { status: 400 })
+  }
+
   // Validazione lead time (non si applica a sblocco_checkin)
   if (tipo !== 'sblocco_checkin') {
     const leadError = validateLeadTime(tipo as import('@/lib/types').TipoRichiesta, data_inizio ?? '')
