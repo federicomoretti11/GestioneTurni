@@ -74,21 +74,24 @@ export async function POST(request: Request) {
     tenantId,
   })
 
-  // Email non-bloccante per ogni dipendente con il riepilogo dei propri turni
   const emailOn = await isEmailAbilitata()
-  for (const dipendenteId of dipendenteIds) {
-    if (!emailOn) break
-    if (dipendenteId === user.id) continue
-    const { data: userData } = await admin.auth.admin.getUserById(dipendenteId)
-    const email = userData?.user?.email
-    if (email) {
-      sendEmailTurniPubblicati({
-        toEmail: email,
-        dataInizio: data_inizio,
-        dataFine: data_fine,
-        turni: turniPerDipendente[dipendenteId],
-      })
-    }
+  if (emailOn) {
+    await Promise.all(
+      dipendenteIds
+        .filter(id => id !== user.id)
+        .map(async dipendenteId => {
+          const { data: userData } = await admin.auth.admin.getUserById(dipendenteId)
+          const email = userData?.user?.email
+          if (email) {
+            await sendEmailTurniPubblicati({
+              toEmail: email,
+              dataInizio: data_inizio,
+              dataFine: data_fine,
+              turni: turniPerDipendente[dipendenteId],
+            })
+          }
+        })
+    )
   }
 
   return NextResponse.json({ confermati: bozze.length, dipendenti: dipendenteIds.length })

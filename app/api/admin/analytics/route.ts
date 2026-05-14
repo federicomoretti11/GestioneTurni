@@ -38,7 +38,11 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url)
-  const { anno, mese, label } = parseMese(url.searchParams.get('mese'))
+  const meseParam = url.searchParams.get('mese')
+  if (meseParam && !/^\d{4}-\d{2}$/.test(meseParam)) {
+    return NextResponse.json({ error: 'Formato mese non valido (YYYY-MM)' }, { status: 400 })
+  }
+  const { anno, mese, label } = parseMese(meseParam)
 
   const db = createAdminClient()
 
