@@ -37,3 +37,9 @@ next-env.d.ts
 
 # git worktrees (isolated workspaces)
 .worktrees/
+
+# superpowers plugin internals
+.superpowers/
+
+# supabase temp
+supabase/.temp/
