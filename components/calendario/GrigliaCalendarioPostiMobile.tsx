@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura, nomeDipendente } from '@/lib/utils/turni'
 import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { Avatar } from '@/components/ui/Avatar'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -154,10 +154,10 @@ export function GrigliaCalendarioPostiMobile({ giorni, turni, onAddTurno, onEdit
                         className="w-1 rounded-full flex-shrink-0 my-0.5"
                         style={{ backgroundColor: isRiposo ? '#cbd5e1' : colore }}
                       />
-                      <Avatar nome={t.profile.nome} cognome={t.profile.cognome} size={34} />
+                      <Avatar nome={t.profile?.nome ?? ''} cognome={t.profile?.cognome ?? ''} size={34} />
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-[13px] text-gray-800 truncate leading-tight">
-                          {t.profile.cognome} {t.profile.nome}
+                          {nomeDipendente(t)}
                         </div>
                         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                           <span

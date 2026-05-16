@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { exportExcel, exportCsv, exportPdf, calcolaAssenzeDipendenti } from '@/lib/utils/export'
-import { calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreTurno, nomeDipendente } from '@/lib/utils/turni'
 import type { Profile, PostoDiServizio, TurnoConDettagli } from '@/lib/types'
 
 interface RigaAssenza { nome: string; ferie: number; permesso: number; malattia: number }
@@ -21,8 +21,8 @@ function calcolaAnteprima(turni: TurnoConDettagli[]): Anteprima {
 
   const map = new Map<string, { nome: string; ore: number; turni: number }>()
   for (const t of turniLavoro) {
-    const key = t.dipendente_id
-    const nome = `${t.profile.cognome} ${t.profile.nome}`
+    const key = t.dipendente_id ?? nomeDipendente(t)
+    const nome = nomeDipendente(t)
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     if (!map.has(key)) map.set(key, { nome, ore: 0, turni: 0 })
     const entry = map.get(key)!

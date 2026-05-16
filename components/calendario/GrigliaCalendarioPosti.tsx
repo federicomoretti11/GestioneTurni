@@ -2,7 +2,7 @@
 import { useRef, useEffect } from 'react'
 import { TurnoConDettagli, PostoDiServizio } from '@/lib/types'
 import { formatDayLabel, toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura, nomeDipendente } from '@/lib/utils/turni'
 import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -104,7 +104,7 @@ export function GrigliaCalendarioPosti({ giorni, turni, posti: postiProp, onAddT
                             style={{ backgroundColor: t.template?.colore ?? '#6b7280' }}
                           >
                             <div className="font-medium truncate">
-                              {t.profile.cognome} {t.profile.nome}
+                              {nomeDipendente(t)}
                             </div>
                             {t.ora_inizio !== t.ora_fine && (
                               <div className="opacity-90">{t.ora_inizio.slice(0,5)}–{t.ora_fine.slice(0,5)}</div>

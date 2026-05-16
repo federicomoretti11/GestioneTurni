@@ -2,7 +2,7 @@ import type { jsPDF } from 'jspdf'
 import type { CellHookData, RowInput, Styles, UserOptions } from 'jspdf-autotable'
 import { Festivo, TurnoConDettagli } from '@/lib/types'
 import { formatDateIT, formatTimeShort } from './date'
-import { calcolaOreDiurneNotturne, calcolaOreTurno } from './turni'
+import { calcolaOreDiurneNotturne, calcolaOreTurno, nomeDipendente } from './turni'
 import { trovaFestivo } from './maggiorazioni'
 
 function isAssenza(t: TurnoConDettagli): boolean {
@@ -94,7 +94,7 @@ export function turniToExcelRows(
 
   const perDipendente = new Map<string, TurnoConDettagli[]>()
   for (const t of turni.filter(t => !isAssenza(t))) {
-    const key = `${t.profile.cognome} ${t.profile.nome}`
+    const key = nomeDipendente(t)
     if (!perDipendente.has(key)) perDipendente.set(key, [])
     perDipendente.get(key)!.push(t)
   }
@@ -190,7 +190,7 @@ function calcolaRiepilogoDipendenti(
 ): { righe: RiepilogoDip[]; totale: Omit<RiepilogoDip, 'nome'> } {
   const map = new Map<string, RiepilogoDip>()
   for (const t of turni.filter(t => !isAssenza(t))) {
-    const key = `${t.profile.cognome} ${t.profile.nome}`
+    const key = nomeDipendente(t)
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     const isFestivo = !!trovaFestivo(t.data, festivi)
     const { diurne, notturne, festive: oreFestive } = calcolaOreFestiveNotturne(t.ora_inizio, t.ora_fine, isFestivo)
@@ -226,7 +226,7 @@ interface RigaAssenzaDip {
 export function calcolaAssenzeDipendenti(turni: TurnoConDettagli[]): RigaAssenzaDip[] {
   const map = new Map<string, RigaAssenzaDip>()
   for (const t of turni.filter(isAssenza)) {
-    const nome = `${t.profile.cognome} ${t.profile.nome}`
+    const nome = nomeDipendente(t)
     if (!map.has(nome)) map.set(nome, { nome, ferie: 0, permesso: 0, malattia: 0 })
     const r = map.get(nome)!
     const cat = t.template?.categoria

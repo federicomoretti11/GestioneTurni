@@ -2,7 +2,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Profile, TurnoConDettagli } from '@/lib/types'
 import { toDateString } from '@/lib/utils/date'
-import { calcolaOreTurno, statoTimbratura } from '@/lib/utils/turni'
+import { calcolaOreTurno, statoTimbratura, nomeDipendente } from '@/lib/utils/turni'
 import { PallinoTimbratura } from '@/components/ui/PallinoTimbratura'
 import { Avatar } from '@/components/ui/Avatar'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -71,8 +71,9 @@ export function GrigliaCalendarioMobile({ giorni, dipendenti, turni, onAddTurno,
   const turniPerDipendente = useMemo(() => {
     const m = new Map<string, TurnoConDettagli[]>()
     for (const t of turniDelGiorno) {
-      if (!m.has(t.dipendente_id)) m.set(t.dipendente_id, [])
-      m.get(t.dipendente_id)!.push(t)
+      const key = t.dipendente_id ?? nomeDipendente(t)
+      if (!m.has(key)) m.set(key, [])
+      m.get(key)!.push(t)
     }
     return m
   }, [turniDelGiorno])

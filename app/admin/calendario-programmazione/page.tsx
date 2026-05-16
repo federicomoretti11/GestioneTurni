@@ -113,7 +113,7 @@ export default function CalendarioProgrammazionePage() {
           conflitti: conflitti.map(t => {
             const d = dipendenti.find(x => x.id === t.dipendente_id)
             return {
-              dipendente: d ? `${d.cognome} ${d.nome}` : t.dipendente_id,
+              dipendente: d ? `${d.cognome} ${d.nome}` : (t.dipendente_id ?? ''),
               orario: t.ora_inizio !== t.ora_fine ? `${t.ora_inizio.slice(0,5)}–${t.ora_fine.slice(0,5)}` : '',
             }
           }),

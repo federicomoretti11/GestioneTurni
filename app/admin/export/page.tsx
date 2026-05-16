@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { exportExcel, exportCsv, exportPdf, calcolaAssenzeDipendenti } from '@/lib/utils/export'
-import { calcolaOreDiurneNotturne, calcolaOreTurno } from '@/lib/utils/turni'
+import { calcolaOreDiurneNotturne, calcolaOreTurno, nomeDipendente } from '@/lib/utils/turni'
 import { trovaFestivo } from '@/lib/utils/maggiorazioni'
 import { useFestivi } from '@/lib/hooks/useFestivi'
 import type { Profile, PostoDiServizio, TurnoConDettagli, Festivo } from '@/lib/types'
@@ -36,8 +36,8 @@ function calcolaAnteprima(turni: TurnoConDettagli[], festivi: Festivo[]): Antepr
 
   const map = new Map<string, RigaDipendente>()
   for (const t of turniLavoro) {
-    const key = t.dipendente_id
-    const nome = `${t.profile.cognome} ${t.profile.nome}`
+    const key = t.dipendente_id ?? nomeDipendente(t)
+    const nome = nomeDipendente(t)
     const ore = calcolaOreTurno(t.ora_inizio, t.ora_fine)
     const { diurne, notturne } = calcolaOreDiurneNotturne(t.ora_inizio, t.ora_fine)
     const oreFestive = trovaFestivo(t.data, festivi) ? ore : 0
