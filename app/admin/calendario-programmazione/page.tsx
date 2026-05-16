@@ -57,9 +57,9 @@ export default function CalendarioProgrammazionePage() {
       ])
       setIndisponibilitaAbilitato(imp?.modulo_indisponibilita_abilitato ?? false)
       setDipendenti(u.filter((x: Profile) => x.includi_in_turni && x.attivo))
-      setTemplates(tp)
-      setTurni(tr)
-      setPosti(po)
+      setTemplates(Array.isArray(tp) ? tp : [])
+      setTurni(Array.isArray(tr) ? tr : [])
+      setPosti(Array.isArray(po) ? po : [])
       setDipendentiCustom(Array.isArray(dipCustom) ? dipCustom : [])
 
       if (imp?.modulo_indisponibilita_abilitato) {
