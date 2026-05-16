@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       stato,
       tenant_id: tenantId,
     })
-    .select(SELECT)
+    .select('id, data, ora_inizio, ora_fine, stato')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
