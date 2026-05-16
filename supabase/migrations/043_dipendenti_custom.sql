@@ -12,6 +12,9 @@ CREATE TABLE dipendenti_custom (
 
 ALTER TABLE dipendenti_custom ENABLE ROW LEVEL SECURITY;
 
+-- Solo SELECT e INSERT: update/delete sono YAGNI in questo MVP.
+-- La gestione avviene solo lato server tramite service_role se necessario.
+
 -- RLS: admin e manager vedono e creano sul proprio tenant
 CREATE POLICY "dipendenti_custom_select" ON dipendenti_custom
   FOR SELECT USING (
@@ -23,7 +26,12 @@ CREATE POLICY "dipendenti_custom_insert" ON dipendenti_custom
     tenant_id = (SELECT tenant_id FROM profiles WHERE id = auth.uid())
   );
 
+-- Nota: i turni con dipendente_custom_id sono visibili/modificabili solo dagli admin.
+-- Manager e dipendenti non hanno accesso tramite RLS (limitazione nota, documentata in spec).
+
 -- 2. Colonna su turni
+-- ON DELETE RESTRICT: impedisce la cancellazione di un dipendente custom che ha turni assegnati.
+-- Preferito a SET NULL per mantenere integrità storica dei turni.
 ALTER TABLE turni ADD COLUMN dipendente_custom_id uuid
   REFERENCES dipendenti_custom(id) ON DELETE RESTRICT;
 
