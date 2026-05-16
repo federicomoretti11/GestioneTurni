@@ -3,28 +3,20 @@ import { NextResponse } from 'next/server'
 import { requireTenantId } from '@/lib/tenant'
 
 export async function GET() {
-  try {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
-    const tenantId = requireTenantId()
-    const { data, error } = await supabase
-      .from('dipendenti_custom')
-      .select('id, nome, cognome')
-      .eq('tenant_id', tenantId)
-      .eq('attivo', true)
-      .order('cognome')
+  const tenantId = requireTenantId()
+  const { data, error } = await supabase
+    .from('dipendenti_custom')
+    .select('id, nome, cognome')
+    .eq('tenant_id', tenantId)
+    .eq('attivo', true)
+    .order('cognome')
 
-    if (error) {
-      console.error('[dipendenti-custom GET] supabase error:', JSON.stringify(error))
-      return NextResponse.json({ error: error.message, code: error.code, details: error.details, hint: error.hint }, { status: 500 })
-    }
-    return NextResponse.json(data)
-  } catch (e) {
-    console.error('[dipendenti-custom GET] uncaught exception:', e)
-    return NextResponse.json({ error: String(e) }, { status: 500 })
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
 }
 
 export async function POST(request: Request) {

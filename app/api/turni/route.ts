@@ -8,39 +8,31 @@ import { requireTenantId } from '@/lib/tenant'
 const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), dipendente_custom:dipendenti_custom!turni_dipendente_custom_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
 
 export async function GET(request: Request) {
-  try {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Non autenticato' }, { status: 401 })
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('ruolo')
-      .eq('id', user.id)
-      .single()
-    const ruolo = (profile as { ruolo?: string } | null)?.ruolo
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('ruolo')
+    .eq('id', user.id)
+    .single()
+  const ruolo = (profile as { ruolo?: string } | null)?.ruolo
 
-    const { searchParams } = new URL(request.url)
-    const dataInizio = searchParams.get('data_inizio')
-    const dataFine = searchParams.get('data_fine')
-    const statoParam = searchParams.get('stato')
-    const filtro: FiltroTurni = statoParam === 'bozza' ? 'bozza' : statoParam === 'tutti' ? 'tutti' : 'confermati'
+  const { searchParams } = new URL(request.url)
+  const dataInizio = searchParams.get('data_inizio')
+  const dataFine = searchParams.get('data_fine')
+  const statoParam = searchParams.get('stato')
+  const filtro: FiltroTurni = statoParam === 'bozza' ? 'bozza' : statoParam === 'tutti' ? 'tutti' : 'confermati'
 
-    let query = queryTurni(supabase, filtro, SELECT).order('data')
-    if (dataInizio) query = query.gte('data', dataInizio)
-    if (dataFine) query = query.lte('data', dataFine)
-    if (ruolo === 'dipendente') query = query.eq('dipendente_id', user.id)
+  let query = queryTurni(supabase, filtro, SELECT).order('data')
+  if (dataInizio) query = query.gte('data', dataInizio)
+  if (dataFine) query = query.lte('data', dataFine)
+  if (ruolo === 'dipendente') query = query.eq('dipendente_id', user.id)
 
-    const { data, error } = await query
-    if (error) {
-      console.error('[turni GET] supabase error:', JSON.stringify(error))
-      return NextResponse.json({ error: error.message, code: error.code, details: error.details, hint: error.hint }, { status: 500 })
-    }
-    return NextResponse.json(data)
-  } catch (e) {
-    console.error('[turni GET] uncaught exception:', e)
-    return NextResponse.json({ error: String(e) }, { status: 500 })
-  }
+  const { data, error } = await query
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
 }
 
 export async function POST(request: Request) {
