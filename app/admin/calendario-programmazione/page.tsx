@@ -8,7 +8,7 @@ import { ModaleConfermaPeriodo } from '@/components/programmazione/ModaleConferm
 import { ModaleCopiaDaPeriodo } from '@/components/programmazione/ModaleCopiaDaPeriodo'
 import { ModaleSvuotaBozza } from '@/components/programmazione/ModaleSvuotaBozza'
 import { ModaleConfermaAggiuntaTurno } from '@/components/programmazione/ModaleConfermaAggiuntaTurno'
-import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio, DipendenteCustom } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { AlertErrore } from '@/components/ui/AlertErrore'
@@ -24,6 +24,7 @@ export default function CalendarioProgrammazionePage() {
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
+  const [dipendentiCustom, setDipendentiCustom] = useState<DipendenteCustom[]>([])
   const [modale, setModale] = useState<{ open: boolean; dipendenteId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [modaleConferma, setModaleConferma] = useState(false)
   const [modaleCopia, setModaleCopia] = useState(false)
@@ -46,18 +47,20 @@ export default function CalendarioProgrammazionePage() {
     setErrore('')
     setLoading(true)
     try {
-      const [imp, u, tp, tr, po] = await Promise.all([
+      const [imp, u, tp, tr, po, dipCustom] = await Promise.all([
         fetch('/api/impostazioni').then(r => r.json()),
         fetch('/api/utenti').then(r => r.json()),
         fetch('/api/template').then(r => r.json()),
         fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
+        fetch('/api/dipendenti-custom').then(r => r.ok ? r.json() : []),
       ])
       setIndisponibilitaAbilitato(imp?.modulo_indisponibilita_abilitato ?? false)
       setDipendenti(u.filter((x: Profile) => x.includi_in_turni && x.attivo))
       setTemplates(tp)
       setTurni(tr)
       setPosti(po)
+      setDipendentiCustom(Array.isArray(dipCustom) ? dipCustom : [])
 
       if (imp?.modulo_indisponibilita_abilitato) {
         const indisp = await fetch(`/api/indisponibilita?from=${periodo.inizio}&to=${periodo.fine}`).then(r => r.json())
@@ -267,6 +270,7 @@ export default function CalendarioProgrammazionePage() {
         posti={posti}
         dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
         dipendenti={dipendenti}
+        dipendentiCustom={dipendentiCustom}
         data={modale.data}
       />
 

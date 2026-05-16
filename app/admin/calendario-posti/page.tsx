@@ -4,7 +4,7 @@ import { GrigliaCalendarioPosti } from '@/components/calendario/GrigliaCalendari
 import { GrigliaCalendarioPostiMobile } from '@/components/calendario/GrigliaCalendarioPostiMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
-import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
+import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile, DipendenteCustom } from '@/lib/types'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { ViewSwitcher } from '@/components/calendario/ViewSwitcher'
 import { SkeletonCalendario } from '@/components/ui/SkeletonCalendario'
@@ -18,6 +18,7 @@ export default function CalendarioPostiPage() {
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
   const [dipendenti, setDipendenti] = useState<Profile[]>([])
+  const [dipendentiCustom, setDipendentiCustom] = useState<DipendenteCustom[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
   const [loading, setLoading] = useState(true)
   const [errore, setErrore] = useState('')
@@ -31,16 +32,18 @@ export default function CalendarioPostiPage() {
     setLoading(true)
     setErrore('')
     try {
-      const [trn, pst, tp, utenti] = await Promise.all([
+      const [trn, pst, tp, utenti, dipCustom] = await Promise.all([
         fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
         fetch('/api/template').then(r => r.json()),
         fetch('/api/utenti').then(r => r.json()),
+        fetch('/api/dipendenti-custom').then(r => r.ok ? r.json() : []),
       ])
       setTurni(Array.isArray(trn) ? trn : [])
       setPosti(Array.isArray(pst) ? pst : [])
       setTemplates(Array.isArray(tp) ? tp : [])
       setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.ruolo === 'dipendente' && u.attivo) : [])
+      setDipendentiCustom(Array.isArray(dipCustom) ? dipCustom : [])
     } catch {
       setErrore('Errore nel caricamento dei dati.')
     } finally {
@@ -70,7 +73,7 @@ export default function CalendarioPostiPage() {
     filtroPosto ? postiDisponibili.filter(p => p.id === filtroPosto) : postiDisponibili
   , [postiDisponibili, filtroPosto])
 
-  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string; dipendente_custom_id?: string }): Promise<string | void> {
     const res = modale.turno
       ? await fetch(`/api/turni/${modale.turno.id}`, {
           method: 'PUT',
@@ -168,6 +171,7 @@ export default function CalendarioPostiPage() {
         templates={templates}
         posti={posti}
         dipendenti={dipendenti}
+        dipendentiCustom={dipendentiCustom}
         data={modale.data ?? modale.turno?.data}
         postoIdDefault={modale.postoId}
       />

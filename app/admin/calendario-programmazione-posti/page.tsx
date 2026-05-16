@@ -9,7 +9,7 @@ import { ModaleCopiaDaPeriodo } from '@/components/programmazione/ModaleCopiaDaP
 import { ModaleSvuotaBozza } from '@/components/programmazione/ModaleSvuotaBozza'
 import { ModaleConfermaAggiuntaTurno } from '@/components/programmazione/ModaleConfermaAggiuntaTurno'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
-import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile } from '@/lib/types'
+import { TurnoConDettagli, TurnoTemplate, PostoDiServizio, Profile, DipendenteCustom } from '@/lib/types'
 import { getDaysBetween } from '@/lib/utils/date'
 import { presetPeriodo, type Periodo } from '@/lib/utils/periodi'
 import { useToast } from '@/components/ui/ToastProvider'
@@ -24,6 +24,7 @@ export default function CalendarioProgrammazionePostiPage() {
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
   const [dipendenti, setDipendenti] = useState<Profile[]>([])
+  const [dipendentiCustom, setDipendentiCustom] = useState<DipendenteCustom[]>([])
   const [filtroPosto, setFiltroPosto] = useState('')
   const [modale, setModale] = useState<{ open: boolean; postoId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [modaleConferma, setModaleConferma] = useState(false)
@@ -41,16 +42,18 @@ export default function CalendarioProgrammazionePostiPage() {
     setLoading(true)
     setErrore('')
     try {
-      const [trn, pst, tp, utenti] = await Promise.all([
+      const [trn, pst, tp, utenti, dipCustom] = await Promise.all([
         fetch(`/api/turni?stato=tutti&data_inizio=${periodo.inizio}&data_fine=${periodo.fine}`).then(r => r.json()),
         fetch('/api/posti').then(r => r.json()),
         fetch('/api/template').then(r => r.json()),
         fetch('/api/utenti').then(r => r.json()),
+        fetch('/api/dipendenti-custom').then(r => r.ok ? r.json() : []),
       ])
       setTurni(Array.isArray(trn) ? trn : [])
       setPosti(Array.isArray(pst) ? pst : [])
       setTemplates(Array.isArray(tp) ? tp : [])
       setDipendenti(Array.isArray(utenti) ? utenti.filter((u: Profile) => u.includi_in_turni && u.attivo) : [])
+      setDipendentiCustom(Array.isArray(dipCustom) ? dipCustom : [])
     } catch {
       setErrore('Errore nel caricamento dei dati.')
     } finally {
@@ -259,6 +262,7 @@ export default function CalendarioProgrammazionePostiPage() {
         templates={templates}
         posti={posti}
         dipendenti={dipendenti}
+        dipendentiCustom={dipendentiCustom}
         data={modale.data ?? modale.turno?.data}
         postoIdDefault={modale.postoId}
       />
