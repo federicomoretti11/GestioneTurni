@@ -17,8 +17,8 @@ export async function GET() {
       .order('cognome')
 
     if (error) {
-      console.error('[dipendenti-custom GET] supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('[dipendenti-custom GET] supabase error:', JSON.stringify(error))
+      return NextResponse.json({ error: error.message, code: error.code, details: error.details, hint: error.hint }, { status: 500 })
     }
     return NextResponse.json(data)
   } catch (e) {

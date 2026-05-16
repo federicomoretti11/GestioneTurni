@@ -33,8 +33,8 @@ export async function GET(request: Request) {
 
     const { data, error } = await query
     if (error) {
-      console.error('[turni GET] supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('[turni GET] supabase error:', JSON.stringify(error))
+      return NextResponse.json({ error: error.message, code: error.code, details: error.details, hint: error.hint }, { status: 500 })
     }
     return NextResponse.json(data)
   } catch (e) {
