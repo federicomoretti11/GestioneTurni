@@ -3,22 +3,31 @@ import { useState, useEffect } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio, DipendenteCustom } from '@/lib/types'
 import { useFestivi } from '@/lib/hooks/useFestivi'
 import { classificaOre, formatOre } from '@/lib/utils/maggiorazioni'
-import { statoTimbratura } from '@/lib/utils/turni'
+import { statoTimbratura, nomeDipendente } from '@/lib/utils/turni'
 
 interface ModaleTurnoProps {
   open: boolean
   onClose: () => void
-  onSave: (data: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }) => Promise<string | void>
+  onSave: (data: {
+    template_id: string | null
+    ora_inizio: string
+    ora_fine: string
+    posto_id: string | null
+    note: string
+    dipendente_id?: string
+    dipendente_custom_id?: string
+  }) => Promise<string | void>
   onDelete?: () => void
   turno?: TurnoConDettagli | null
   templates: TurnoTemplate[]
   posti: PostoDiServizio[]
   dipendenteNome?: string
   dipendenti?: Profile[]
-  data?: string   // YYYY-MM-DD (formattata internamente per display)
+  dipendentiCustom?: DipendenteCustom[]
+  data?: string   // YYYY-MM-DD
   postoIdDefault?: string
   readOnly?: boolean
   onTimbriAggiornati?: (ingresso: string | null, uscita: string | null) => void
@@ -31,7 +40,7 @@ function formatDataIT(iso: string): string {
   return giorno.charAt(0).toUpperCase() + giorno.slice(1)
 }
 
-export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, data, postoIdDefault, readOnly, onTimbriAggiornati }: ModaleTurnoProps) {
+export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates, posti, dipendenteNome, dipendenti, dipendentiCustom, data, postoIdDefault, readOnly, onTimbriAggiornati }: ModaleTurnoProps) {
   const [templateId, setTemplateId] = useState<string>('')
   const [oraInizio, setOraInizio] = useState('08:00')
   const [oraFine, setOraFine] = useState('16:00')
@@ -48,8 +57,13 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   const [salvandoTimbri, setSalvandoTimbri] = useState(false)
   const [erroreTimbri, setErroreTimbri] = useState('')
   const [timbriCorretti, setTimbriCorretti] = useState<{ ingresso: string | null; uscita: string | null } | null>(null)
+  const [modoDipendente, setModoDipendente] = useState<'reale' | 'custom'>('reale')
+  const [dipendenteCustomId, setDipendenteCustomId] = useState('')
+  const [aggiungendoNuovoCustom, setAggiungendoNuovoCustom] = useState(false)
+  const [nuovoCustomNome, setNuovoCustomNome] = useState('')
+  const [nuovoCustomCognome, setNuovoCustomCognome] = useState('')
 
-  const mostraSelectDipendente = !turno && !dipendenteNome && !!dipendenti && dipendenti.length > 0
+  const mostraSezioneDipendente = !turno && !dipendenteNome && !!dipendenti && dipendenti.length > 0
 
   useEffect(() => {
     if (turno) {
@@ -76,6 +90,11 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
     setSalvandoTimbri(false)
     setErroreTimbri('')
     setTimbriCorretti(null)
+    setModoDipendente('reale')
+    setDipendenteCustomId('')
+    setAggiungendoNuovoCustom(false)
+    setNuovoCustomNome('')
+    setNuovoCustomCognome('')
   }, [turno, open])
 
   function handleTemplateChange(id: string) {
@@ -137,16 +156,46 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
   }
 
   async function handleSave() {
-    if (mostraSelectDipendente && !dipendenteId) { setErrore('Seleziona un dipendente'); return }
+    if (mostraSezioneDipendente) {
+      if (modoDipendente === 'reale' && !dipendenteId) {
+        setErrore('Seleziona un dipendente'); return
+      }
+      if (modoDipendente === 'custom' && !aggiungendoNuovoCustom && !dipendenteCustomId) {
+        setErrore('Seleziona un dipendente esterno'); return
+      }
+      if (modoDipendente === 'custom' && aggiungendoNuovoCustom && (!nuovoCustomNome.trim() || !nuovoCustomCognome.trim())) {
+        setErrore('Inserisci nome e cognome del dipendente esterno'); return
+      }
+    }
     if (!isRiposo && !postoId) { setErrore('Il posto di servizio è obbligatorio'); return }
     setSalvando(true)
+    setErrore('')
+
+    let customIdDaUsare = dipendenteCustomId
+    if (mostraSezioneDipendente && modoDipendente === 'custom' && aggiungendoNuovoCustom) {
+      const res = await fetch('/api/dipendenti-custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nuovoCustomNome.trim(), cognome: nuovoCustomCognome.trim() }),
+      })
+      if (!res.ok) {
+        const d = await res.json()
+        setErrore(d.error ?? 'Errore nella creazione del dipendente esterno')
+        setSalvando(false)
+        return
+      }
+      const created = await res.json()
+      customIdDaUsare = created.id
+    }
+
     const erroreApi = await onSave({
       template_id: templateId || null,
       ora_inizio: oraInizio + ':00',
       ora_fine: oraFine + ':00',
       posto_id: postoId || null,
       note,
-      ...(mostraSelectDipendente ? { dipendente_id: dipendenteId } : {}),
+      ...(mostraSezioneDipendente && modoDipendente === 'reale' ? { dipendente_id: dipendenteId } : {}),
+      ...(mostraSezioneDipendente && modoDipendente === 'custom' ? { dipendente_custom_id: customIdDaUsare } : {}),
     })
     if (erroreApi) { setErrore(erroreApi); setSalvando(false) }
   }
@@ -197,7 +246,7 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         <div className="space-y-3 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Dipendente</span>
-            <span className="font-medium text-gray-900">{turno.profile.cognome} {turno.profile.nome}</span>
+            <span className="font-medium text-gray-900">{nomeDipendente(turno)}</span>
           </div>
           {turno.posto && (
             <div className="flex items-center justify-between">
@@ -411,19 +460,86 @@ export function ModaleTurno({ open, onClose, onSave, onDelete, turno, templates,
         </div>
       )}
       <div className="space-y-4">
-        {mostraSelectDipendente && (
-          <div className="space-y-1.5">
+        {mostraSezioneDipendente && (
+          <div className="space-y-2">
             <label className="block text-[10px] font-semibold tracking-wider uppercase text-gray-500">Dipendente *</label>
-            <select
-              value={dipendenteId}
-              onChange={e => { setDipendenteId(e.target.value); setErrore(''); setModificato(true) }}
-              className={`w-full h-10 border rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors ${errore && !dipendenteId ? 'border-red-500' : 'border-gray-200'}`}
-            >
-              <option value="">— Seleziona —</option>
-              {dipendenti!.map(d => (
-                <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>
-              ))}
-            </select>
+            <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
+              <button
+                type="button"
+                onClick={() => { setModoDipendente('reale'); setDipendenteCustomId(''); setAggiungendoNuovoCustom(false); setErrore('') }}
+                className={`flex-1 py-2 font-medium transition-colors ${modoDipendente === 'reale' ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >
+                Dipendente
+              </button>
+              <button
+                type="button"
+                onClick={() => { setModoDipendente('custom'); setDipendenteId(''); setErrore('') }}
+                className={`flex-1 py-2 font-medium transition-colors ${modoDipendente === 'custom' ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >
+                Esterno / Emergenza
+              </button>
+            </div>
+
+            {modoDipendente === 'reale' && (
+              <select
+                value={dipendenteId}
+                onChange={e => { setDipendenteId(e.target.value); setErrore(''); setModificato(true) }}
+                className={`w-full h-10 border rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors ${errore && !dipendenteId ? 'border-red-500' : 'border-gray-200'}`}
+              >
+                <option value="">— Seleziona —</option>
+                {dipendenti!.map(d => (
+                  <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>
+                ))}
+              </select>
+            )}
+
+            {modoDipendente === 'custom' && !aggiungendoNuovoCustom && (
+              <select
+                value={dipendenteCustomId}
+                onChange={e => {
+                  if (e.target.value === '__nuovo__') {
+                    setAggiungendoNuovoCustom(true)
+                    setDipendenteCustomId('')
+                  } else {
+                    setDipendenteCustomId(e.target.value)
+                    setErrore('')
+                    setModificato(true)
+                  }
+                }}
+                className={`w-full h-10 border rounded-lg px-3 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors ${errore && !dipendenteCustomId ? 'border-red-500' : 'border-gray-200'}`}
+              >
+                <option value="">— Seleziona esterno —</option>
+                {(dipendentiCustom ?? []).map(d => (
+                  <option key={d.id} value={d.id}>{d.cognome} {d.nome}</option>
+                ))}
+                <option value="__nuovo__">+ Aggiungi nuovo...</option>
+              </select>
+            )}
+
+            {modoDipendente === 'custom' && aggiungendoNuovoCustom && (
+              <div className="space-y-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs font-semibold text-gray-600">Nuovo dipendente esterno</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    label="Nome"
+                    value={nuovoCustomNome}
+                    onChange={e => { setNuovoCustomNome(e.target.value); setModificato(true) }}
+                  />
+                  <Input
+                    label="Cognome"
+                    value={nuovoCustomCognome}
+                    onChange={e => { setNuovoCustomCognome(e.target.value); setModificato(true) }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setAggiungendoNuovoCustom(false); setNuovoCustomNome(''); setNuovoCustomCognome('') }}
+                  className="text-xs text-gray-500 hover:underline"
+                >
+                  Annulla
+                </button>
+              </div>
+            )}
           </div>
         )}
         <div className="space-y-1.5">
