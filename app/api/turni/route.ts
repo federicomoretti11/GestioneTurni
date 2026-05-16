@@ -5,7 +5,7 @@ import { queryTurni, type FiltroTurni } from '@/lib/supabase/turni'
 import { logAzione } from '@/lib/audit'
 import { requireTenantId } from '@/lib/tenant'
 
-const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
+const SELECT = '*, profile:profiles!turni_dipendente_id_fkey(id, nome, cognome), dipendente_custom:dipendenti_custom!turni_dipendente_custom_id_fkey(id, nome, cognome), template:turni_template(*), posto:posti_di_servizio(id, nome, attivo)'
 
 export async function GET(request: Request) {
   const supabase = createClient()
@@ -42,16 +42,23 @@ export async function POST(request: Request) {
   const tenantId = requireTenantId()
   let body: Record<string, unknown>
   try { body = await request.json() } catch { return NextResponse.json({ error: 'JSON non valido' }, { status: 400 }) }
+
+  const dipId = body.dipendente_id as string | null | undefined
+  const dipCustomId = body.dipendente_custom_id as string | null | undefined
   const stato: 'bozza' | 'confermato' = body.stato === 'bozza' ? 'bozza' : 'confermato'
 
-  // Controllo sovrapposizione STESSO STATO — bozza e confermato vivono in namespace distinti
-  const { data: esistente } = await supabase
-    .from('turni')
-    .select('id')
-    .eq('dipendente_id', body.dipendente_id)
-    .eq('data', body.data)
-    .eq('stato', stato)
-    .maybeSingle()
+  if ((!dipId && !dipCustomId) || (dipId && dipCustomId)) {
+    return NextResponse.json(
+      { error: 'Specificare esattamente uno tra dipendente_id e dipendente_custom_id' },
+      { status: 400 }
+    )
+  }
+
+  // Controllo sovrapposizione per lo stesso stato
+  let sovQuery = supabase.from('turni').select('id').eq('data', body.data as string).eq('stato', stato)
+  if (dipId) sovQuery = sovQuery.eq('dipendente_id', dipId)
+  else sovQuery = sovQuery.eq('dipendente_custom_id', dipCustomId!)
+  const { data: esistente } = await sovQuery.maybeSingle()
   if (esistente) {
     return NextResponse.json(
       { error: `Il dipendente ha già un turno ${stato === 'bozza' ? 'in bozza' : 'ufficiale'} in questa data.` },
@@ -62,7 +69,8 @@ export async function POST(request: Request) {
   const { data, error } = await supabase
     .from('turni')
     .insert({
-      dipendente_id: body.dipendente_id,
+      dipendente_id: dipId ?? null,
+      dipendente_custom_id: dipCustomId ?? null,
       template_id: body.template_id ?? null,
       data: body.data,
       ora_inizio: body.ora_inizio,
@@ -78,11 +86,11 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Nessuna notifica sulle bozze: i dipendenti non sanno nulla finché non confermi.
-  if (stato === 'confermato') {
+  // Notifiche solo per dipendenti reali con account
+  if (stato === 'confermato' && dipId) {
     await notificaTurnoAssegnato({
       turnoId: data.id,
-      dipendenteId: data.dipendente_id,
+      dipendenteId: dipId,
       data: data.data,
       oraInizio: data.ora_inizio,
       oraFine: data.ora_fine,
@@ -93,7 +101,7 @@ export async function POST(request: Request) {
 
   logAzione({
     tabella: 'turni', recordId: data.id, azione: 'creato', utenteId: user!.id,
-    dettagli: { dipendente_id: data.dipendente_id, data: data.data, stato },
+    dettagli: { dipendente_id: dipId ?? null, dipendente_custom_id: dipCustomId ?? null, data: data.data, stato },
     tenantId,
   })
 
