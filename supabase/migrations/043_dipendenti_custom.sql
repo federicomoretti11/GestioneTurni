@@ -16,15 +16,12 @@ ALTER TABLE dipendenti_custom ENABLE ROW LEVEL SECURITY;
 -- La gestione avviene solo lato server tramite service_role se necessario.
 
 -- RLS: admin e manager vedono e creano sul proprio tenant
+-- get_my_tenant_id() è SECURITY DEFINER: evita interazioni con RLS di profiles.
 CREATE POLICY "dipendenti_custom_select" ON dipendenti_custom
-  FOR SELECT USING (
-    tenant_id = (SELECT tenant_id FROM profiles WHERE id = auth.uid())
-  );
+  FOR SELECT USING (tenant_id = get_my_tenant_id());
 
 CREATE POLICY "dipendenti_custom_insert" ON dipendenti_custom
-  FOR INSERT WITH CHECK (
-    tenant_id = (SELECT tenant_id FROM profiles WHERE id = auth.uid())
-  );
+  FOR INSERT WITH CHECK (tenant_id = get_my_tenant_id());
 
 -- Nota: i turni con dipendente_custom_id sono visibili/modificabili solo dagli admin.
 -- Manager e dipendenti non hanno accesso tramite RLS (limitazione nota, documentata in spec).
