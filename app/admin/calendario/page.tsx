@@ -5,7 +5,7 @@ import { GrigliaCalendario, AssenzaCalendario } from '@/components/calendario/Gr
 import { GrigliaCalendarioMobile } from '@/components/calendario/GrigliaCalendarioMobile'
 import { SwitcherVista } from '@/components/calendario/SwitcherVista'
 import { ModaleTurno } from '@/components/calendario/ModaleTurno'
-import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio } from '@/lib/types'
+import { Profile, TurnoConDettagli, TurnoTemplate, PostoDiServizio, DipendenteCustom } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
 import { getWeekDays, getMonthDays, toDateString } from '@/lib/utils/date'
 import { AlertErrore } from '@/components/ui/AlertErrore'
@@ -30,6 +30,7 @@ export default function CalendarioPage() {
   const [turni, setTurni] = useState<TurnoConDettagli[]>([])
   const [templates, setTemplates] = useState<TurnoTemplate[]>([])
   const [posti, setPosti] = useState<PostoDiServizio[]>([])
+  const [dipendentiCustom, setDipendentiCustom] = useState<DipendenteCustom[]>([])
   const [modale, setModale] = useState<{ open: boolean; dipendenteId?: string; data?: string; turno?: TurnoConDettagli | null }>({ open: false })
   const [filtroDipendente, setFiltroDipendente] = useState('')
   const [filtroPosto, setFiltroPosto] = useState('')
@@ -59,19 +60,25 @@ export default function CalendarioPage() {
     setErrore('')
     setLoading(true)
     try {
-    const [utentiRes, templateRes, turniRes, postiRes, assenzeRes] = await Promise.all([
+    const [utentiRes, templateRes, turniRes, postiRes, assenzeRes, dipCustomRes] = await Promise.all([
       fetch('/api/utenti'),
       fetch('/api/template'),
       fetch(`/api/turni?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
       fetch('/api/posti'),
       fetch(`/api/richieste/calendario?data_inizio=${toDateString(giorni[0])}&data_fine=${toDateString(giorni[giorni.length - 1])}`),
+      fetch('/api/dipendenti-custom'),
     ])
-    const [utenti, tmpl, trn, pst, asz] = await Promise.all([utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json(), assenzeRes.ok ? assenzeRes.json() : Promise.resolve([])])
+    const [utenti, tmpl, trn, pst, asz, dipCustom] = await Promise.all([
+      utentiRes.json(), templateRes.json(), turniRes.json(), postiRes.json(),
+      assenzeRes.ok ? assenzeRes.json() : Promise.resolve([]),
+      dipCustomRes.ok ? dipCustomRes.json() : Promise.resolve([]),
+    ])
     setDipendenti(utenti.filter((u: Profile) => u.includi_in_turni && u.attivo))
     setTemplates(tmpl)
     setTurni(trn)
     setPosti(pst)
     setAssenze(Array.isArray(asz) ? asz : [])
+    setDipendentiCustom(Array.isArray(dipCustom) ? dipCustom : [])
     } catch {
       setErrore('Errore nel caricamento dei dati. Riprova.')
     } finally {
@@ -112,17 +119,34 @@ export default function CalendarioPage() {
     return lista
   }, [dipendenti, filtroDipendente, filtroPosto, turniFiltrati])
 
-  async function handleSalvaTurno(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+  async function handleSalvaTurno(payload: {
+    template_id: string | null
+    ora_inizio: string
+    ora_fine: string
+    posto_id: string | null
+    note: string
+    dipendente_id?: string
+    dipendente_custom_id?: string
+  }): Promise<string | void> {
     const res = modale.turno
       ? await fetch(`/api/turni/${modale.turno.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...payload, dipendente_id: modale.turno.dipendente_id, data: modale.turno.data }),
+          body: JSON.stringify({
+            ...payload,
+            dipendente_id: modale.turno.dipendente_id,
+            data: modale.turno.data,
+          }),
         })
       : await fetch('/api/turni', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...payload, dipendente_id: payload.dipendente_id ?? modale.dipendenteId, data: modale.data }),
+          body: JSON.stringify({
+            ...payload,
+            dipendente_id: payload.dipendente_id ?? modale.dipendenteId ?? null,
+            dipendente_custom_id: payload.dipendente_custom_id ?? null,
+            data: modale.data,
+          }),
         })
     if (!res.ok) {
       const d = await res.json()
@@ -320,6 +344,7 @@ export default function CalendarioPage() {
         dipendenteNome={dipSelezionato ? `${dipSelezionato.nome} ${dipSelezionato.cognome}` : undefined}
         dipendenti={dipendentiFiltrati}
         data={modale.data}
+        dipendentiCustom={dipendentiCustom}
       />
     </div>
   )
