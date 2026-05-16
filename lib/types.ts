@@ -66,7 +66,7 @@ export interface Turno {
   // join opzionali
   profile?: Profile | null
   dipendente_custom?: DipendenteCustom | null
-  template?: TurnoTemplate | null | undefined
+  template?: TurnoTemplate | null
   posto?: PostoDiServizio | null
 }
 
@@ -143,7 +143,7 @@ export interface Richiesta {
   created_at: string
   updated_at: string
   // join opzionali
-  profile?: Profile
+  profile?: Profile | null
   turno?: Turno | null
 }
 
