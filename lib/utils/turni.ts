@@ -1,3 +1,5 @@
+import type { DipendenteCustom, Profile } from '@/lib/types'
+
 function timeToMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number)
   return h * 60 + m
@@ -66,4 +68,13 @@ export function statoTimbratura(t: {
   if (t.ora_ingresso_effettiva && t.ora_uscita_effettiva) return 'completato'
   if (t.ora_ingresso_effettiva) return 'in_corso'
   return 'non_iniziato'
+}
+
+export function nomeDipendente(turno: {
+  profile?: Profile | null
+  dipendente_custom?: DipendenteCustom | null
+}): string {
+  if (turno.profile) return `${turno.profile.cognome} ${turno.profile.nome}`
+  if (turno.dipendente_custom) return `${turno.dipendente_custom.cognome} ${turno.dipendente_custom.nome}`
+  return '—'
 }
