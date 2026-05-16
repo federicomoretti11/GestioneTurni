@@ -10,6 +10,14 @@ export interface Profile {
   created_at: string
 }
 
+export interface DipendenteCustom {
+  id: string
+  nome: string
+  cognome: string
+  attivo: boolean
+  created_at: string
+}
+
 export interface PostoDiServizio {
   id: string
   nome: string
@@ -36,7 +44,8 @@ export type StatoTurno = 'bozza' | 'confermato'
 
 export interface Turno {
   id: string
-  dipendente_id: string
+  dipendente_id: string | null          // null quando è un dipendente custom
+  dipendente_custom_id: string | null   // null quando è un dipendente reale
   template_id: string | null
   data: string        // "YYYY-MM-DD"
   ora_inizio: string  // "HH:MM:SS"
@@ -46,8 +55,8 @@ export interface Turno {
   creato_da: string
   created_at: string
   updated_at: string
-  ora_ingresso_effettiva: string | null  // ISO timestamptz
-  ora_uscita_effettiva: string | null    // ISO timestamptz
+  ora_ingresso_effettiva: string | null
+  ora_uscita_effettiva: string | null
   stato: StatoTurno
   lat_checkin: number | null
   lng_checkin: number | null
@@ -55,13 +64,15 @@ export interface Turno {
   sblocco_checkin_valido_fino: string | null
   sblocco_usato_at: string | null
   // join opzionali
-  profile?: Profile
+  profile?: Profile | null
+  dipendente_custom?: DipendenteCustom | null
   template?: TurnoTemplate | null | undefined
   posto?: PostoDiServizio | null
 }
 
 export interface TurnoConDettagli extends Turno {
-  profile: Profile
+  profile: Profile | null
+  dipendente_custom: DipendenteCustom | null
   template: TurnoTemplate | null
   posto: PostoDiServizio | null
 }
