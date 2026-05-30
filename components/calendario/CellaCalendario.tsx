@@ -54,9 +54,10 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onRead
       {!readonly && turni.length > 0 && (
         <button
           onClick={onAdd}
-          className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 w-4 h-4 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-blue-100 rounded text-xs font-bold transition-all"
+          className="opacity-0 group-hover:opacity-100 mt-1 w-full flex items-center justify-center gap-0.5 py-0.5 rounded text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all"
         >
-          +
+          <span className="text-sm leading-none">+</span>
+          <span>aggiungi</span>
         </button>
       )}
       {turni.length === 0 && <div className="min-h-[36px]" />}
