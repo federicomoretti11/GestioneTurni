@@ -54,18 +54,6 @@ export async function POST(request: Request) {
     )
   }
 
-  // Controllo sovrapposizione per lo stesso stato
-  let sovQuery = supabase.from('turni').select('id').eq('data', body.data as string).eq('stato', stato)
-  if (dipId) sovQuery = sovQuery.eq('dipendente_id', dipId)
-  else sovQuery = sovQuery.eq('dipendente_custom_id', dipCustomId!)
-  const { data: esistente } = await sovQuery.maybeSingle()
-  if (esistente) {
-    return NextResponse.json(
-      { error: `Il dipendente ha già un turno ${stato === 'bozza' ? 'in bozza' : 'ufficiale'} in questa data.` },
-      { status: 409 }
-    )
-  }
-
   const { data, error } = await supabase
     .from('turni')
     .insert({

@@ -19,24 +19,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     .eq('id', params.id)
     .single()
 
-  // Controllo sovrapposizione nello STESSO stato (escludo il turno corrente)
-  if (body.dipendente_id && body.data && prev) {
-    const { data: esistente } = await supabase
-      .from('turni')
-      .select('id')
-      .eq('dipendente_id', body.dipendente_id)
-      .eq('data', body.data)
-      .eq('stato', prev.stato)
-      .neq('id', params.id)
-      .maybeSingle()
-    if (esistente) {
-      return NextResponse.json(
-        { error: `Il dipendente ha già un turno ${prev.stato === 'bozza' ? 'in bozza' : 'ufficiale'} in questa data.` },
-        { status: 409 }
-      )
-    }
-  }
-
   const { data, error } = await supabase
     .from('turni')
     .update({
