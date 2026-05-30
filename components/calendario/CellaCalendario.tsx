@@ -51,6 +51,14 @@ export function CellaCalendario({ turni, onAdd, onEdit, readonly = false, onRead
           +
         </button>
       )}
+      {!readonly && turni.length > 0 && (
+        <button
+          onClick={onAdd}
+          className="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 w-4 h-4 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-blue-100 rounded text-xs font-bold transition-all"
+        >
+          +
+        </button>
+      )}
       {turni.length === 0 && <div className="min-h-[36px]" />}
     </td>
   )
