@@ -117,6 +117,28 @@ export default function CalendarioProgrammazionePostiPage() {
   }
 
   async function eseguiSalvataggio(payload: { template_id: string | null; ora_inizio: string; ora_fine: string; posto_id: string | null; note: string; dipendente_id?: string }): Promise<string | void> {
+    const crossaMezzanotte = !modale.turno && payload.ora_fine > '00:00' && payload.ora_fine < payload.ora_inizio
+    if (crossaMezzanotte) {
+      const data = modale.data!
+      const nextDay = new Date(data + 'T12:00:00')
+      nextDay.setDate(nextDay.getDate() + 1)
+      const nextDayStr = nextDay.toISOString().split('T')[0]
+      const baseBody = { ...payload, dipendente_id: payload.dipendente_id, stato: 'bozza' }
+      const r1 = await fetch('/api/turni', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...baseBody, data, ora_fine: '00:00' }),
+      })
+      if (!r1.ok) { const d = await r1.json(); return d.error ?? 'Errore prima parte turno.' }
+      const r2 = await fetch('/api/turni', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...baseBody, data: nextDayStr, ora_inizio: '00:00' }),
+      })
+      if (!r2.ok) { const d = await r2.json(); return d.error ?? 'Errore seconda parte turno.' }
+      setModale({ open: false })
+      caricaDati()
+      return
+    }
+
     const res = modale.turno
       ? await fetch(`/api/turni/${modale.turno.id}`, {
           method: 'PUT',
